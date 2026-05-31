@@ -21,3 +21,66 @@
 [2m18:43:18[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/TransactionRow.tsx, /src/styles.css[22m
 [2m18:44:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx[22m
 [2m18:44:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx[22m
+[2m19:01:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/components/BottomNavigation.tsx, /src/components/HeaderNavigation.tsx[22m
+[2m19:01:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/HeaderNavigation.tsx, /src/styles.css[22m
+[2m19:01:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/BottomNavigation.tsx, /src/styles.css[22m
+[2m19:02:08[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/styles.css[22m
+[2m19:02:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/DashboardView.tsx, /src/styles.css[22m
+[2m19:02:44[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/AddTransactionView.tsx, /src/styles.css[22m
+[2m19:02:44[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/HistoryView.tsx, /src/styles.css[22m
+[2m19:03:00[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/TransactionForm.tsx, /src/styles.css[22m
+[2m19:03:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/TransactionRow.tsx, /src/styles.css[22m
+[2m19:03:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/TransactionRow.tsx, /src/styles.css[22m
+[2m19:03:36[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/WalletsView.tsx, /src/styles.css[22m
+[2m19:03:42[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/WalletsView.tsx, /src/styles.css[22m
+[2m19:03:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/WalletForm.tsx, /src/styles.css[22m
+[2m19:04:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/CategoryForm.tsx, /src/styles.css[22m
+[2m19:04:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/SettingsView.tsx, /src/styles.css[22m
+[2m19:04:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/SettingsView.tsx, /src/styles.css[22m
+[2m19:04:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx[22m
+[2m19:05:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/TransactionForm.tsx, /src/styles.css[22m
+[2m19:10:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx, /src/views/SettingsView.tsx[22m
+[2m19:10:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ErrorScreen.tsx, /src/styles.css[22m
+[2m19:10:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [33mhmr invalidate [39m[2m/src/components/ErrorScreen.tsx[22m Could not Fast Refresh ("errorPresets" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+[2m19:10:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/SettingsView.tsx, /src/styles.css, /src/AppRouter.tsx, /src/components/AppErrorBoundary.tsx, /src/App.tsx[22m
+[2m19:11:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ErrorScreen.tsx, /src/styles.css[22m
+[2m19:11:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [33mhmr invalidate [39m[2m/src/components/ErrorScreen.tsx[22m Could not Fast Refresh ("errorPresets" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+[2m19:11:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/SettingsView.tsx, /src/styles.css, /src/AppRouter.tsx, /src/components/AppErrorBoundary.tsx, /src/App.tsx[22m
+[2m19:11:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/AppErrorBoundary.tsx, /src/styles.css[22m
+[2m19:11:29[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/AppRouter.tsx, /src/styles.css[22m
+[2m19:11:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/styles.css[22m
+[2m19:11:49[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/WalletSwitcher.tsx, /src/styles.css[22m
+[2m19:12:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/SettingsView.tsx, /src/styles.css[22m
+[2m19:12:06[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/SettingsView.tsx, /src/styles.css[22m
+[2m19:12:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/TransactionForm.tsx, /src/styles.css[22m
+[2m19:12:15[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/HistoryView.tsx, /src/styles.css[22m
+[2m19:12:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/DashboardView.tsx, /src/styles.css[22m
+[2m19:12:28[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/DashboardView.tsx, /src/styles.css[22m
+[2m19:12:34[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/TransactionRow.tsx, /src/styles.css[22m
+[2m19:12:49[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx[22m
+[2m19:12:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx[22m
+[2m19:13:14[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/repositories/repositories.test.ts[22m
+[2m19:16:34[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx[22m
+[2m19:34:06[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/DashboardView.tsx, /src/styles.css, /src/views/WalletsView.tsx, /src/components/TransactionForm.tsx, /src/components/TransactionRow.tsx, /src/App.tsx[22m
+[2m19:35:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx, /src/views/SettingsView.tsx, /src/components/AppErrorBoundary.tsx, /src/AppRouter.tsx, /src/components/TransactionForm.tsx, /src/views/HistoryView.tsx, /src/views/DashboardView.tsx, /src/components/TransactionRow.tsx[22m
+[2m19:35:17[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx[22m
+[2m19:35:31[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx[22m
+[2m19:35:43[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx[22m
+[2m19:35:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/WalletForm.tsx, /src/styles.css[22m
+[2m19:36:00[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/SettingsView.tsx, /src/styles.css[22m
+[2m19:36:05[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/TransactionForm.tsx, /src/styles.css[22m
+[2m19:36:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/TransactionForm.tsx, /src/styles.css[22m
+[2m19:36:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/TransactionRow.tsx, /src/styles.css[22m
+[2m19:36:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/styles.css[22m
+[2m19:37:17[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/DashboardView.tsx, /src/styles.css[22m
+[2m19:37:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/DashboardView.tsx, /src/styles.css[22m
+[2m19:37:32[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/HistoryView.tsx, /src/styles.css[22m
+[2m19:37:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/WalletsView.tsx, /src/styles.css[22m
+[2m19:38:10[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/repositories/repositories.test.ts[22m
+[2m19:38:36[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx, /src/views/DashboardView.tsx, /src/views/HistoryView.tsx[22m
+[2m19:41:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx[22m
+[2m19:41:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/repositories/repositories.test.ts[22m
+[2m19:43:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/styles.css[22m
+[2m19:45:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx, /src/views/DashboardView.tsx, /src/views/HistoryView.tsx[22m
+[2m19:49:31[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx, /src/views/SettingsView.tsx, /src/components/AppErrorBoundary.tsx, /src/AppRouter.tsx, /src/components/TransactionForm.tsx, /src/views/HistoryView.tsx, /src/views/DashboardView.tsx, /src/components/TransactionRow.tsx[22m
+[2m19:49:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/SettingsView.tsx, /src/styles.css[22m

@@ -15,6 +15,8 @@ import { BottomSheet } from "../components/ui/BottomSheet";
 import { EmptyState } from "../components/ui/EmptyState";
 import { SegmentedControl } from "../components/ui/SegmentedControl";
 import { SelectField } from "../components/ui/SelectField";
+import { getCategoryName, type Dictionary } from "../i18n";
+import { convertMinorToBaseCurrency, type ExchangeRateTable } from "../lib/exchangeRates";
 
 interface HistoryViewProps {
   wallets: Wallet[];
@@ -22,6 +24,9 @@ interface HistoryViewProps {
   transactions: Transaction[];
   settings: Settings;
   activeWalletId: WalletView;
+  displayCurrency: string;
+  exchangeRates?: ExchangeRateTable;
+  t: Dictionary;
   onUpdate: (id: string, input: Partial<TransactionInput>) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 }
@@ -34,6 +39,9 @@ export function HistoryView({
   transactions,
   settings,
   activeWalletId,
+  displayCurrency,
+  exchangeRates,
+  t,
   onUpdate,
   onDelete
 }: HistoryViewProps) {
@@ -60,9 +68,23 @@ export function HistoryView({
       }),
     [activeWalletId, categoryFilter, transactions, typeFilter]
   );
+  const displayTransactions = visibleTransactions.map((transaction) => {
+    const convertedAmountMinor = convertMinorToBaseCurrency(
+      transaction.amountMinor,
+      transaction.currency,
+      displayCurrency,
+      exchangeRates
+    );
+    return {
+      transaction,
+      amountMinor: convertedAmountMinor ?? transaction.amountMinor,
+      currency: convertedAmountMinor === null ? transaction.currency : displayCurrency,
+      conversionMissing: convertedAmountMinor === null && transaction.currency.toUpperCase() !== displayCurrency
+    };
+  });
 
   async function handleDelete(transaction: Transaction) {
-    if (window.confirm("Delete this transaction?")) {
+    if (window.confirm(t.history.confirmDelete)) {
       await onDelete(transaction.id);
     }
   }
@@ -70,54 +92,59 @@ export function HistoryView({
   return (
     <div className="grid gap-5">
       <div>
-        <h2 className="text-xl font-semibold text-foreground">History</h2>
+        <h2 className="text-xl font-semibold text-foreground">{t.history.title}</h2>
       </div>
       <div className="grid gap-3 rounded-app border border-line bg-surface p-3">
         <SegmentedControl
           value={typeFilter}
           onChange={setTypeFilter}
           options={[
-            { value: "all", label: "All" },
-            { value: "expense", label: "Expense" },
-            { value: "income", label: "Income" }
+            { value: "all", label: t.common.all },
+            { value: "expense", label: t.common.expense },
+            { value: "income", label: t.common.income }
           ]}
         />
-        <SelectField label="Category" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
-          <option value="all">All categories</option>
+        <SelectField label={t.common.category} value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
+          <option value="all">{t.history.allCategories}</option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
-              {category.name}
+              {getCategoryName(category.name, t)}
             </option>
           ))}
         </SelectField>
       </div>
-      {visibleTransactions.length ? (
+      {displayTransactions.length ? (
         <div className="grid gap-2">
-          {visibleTransactions.map((transaction) => (
+          {displayTransactions.map((item) => (
             <TransactionRow
-              key={transaction.id}
-              transaction={transaction}
-              category={categories.find((category) => category.id === transaction.categoryId)}
-              wallet={wallets.find((wallet) => wallet.id === transaction.walletId)}
+              key={item.transaction.id}
+              transaction={item.transaction}
+              category={categories.find((category) => category.id === item.transaction.categoryId)}
+              wallet={wallets.find((wallet) => wallet.id === item.transaction.walletId)}
               settings={settings}
+              displayAmountMinor={item.amountMinor}
+              displayCurrency={item.currency}
+              conversionMissing={item.conversionMissing}
+              t={t}
               onEdit={setEditing}
               onDelete={handleDelete}
             />
           ))}
         </div>
       ) : (
-        <EmptyState icon={ReceiptText} title="No transactions match these filters." />
+        <EmptyState icon={ReceiptText} title={t.history.empty} />
       )}
 
-      <BottomSheet open={Boolean(editing)} title="Edit transaction" onClose={() => setEditing(null)}>
+      <BottomSheet open={Boolean(editing)} title={t.transaction.editTitle} onClose={() => setEditing(null)}>
         {editing ? (
           <TransactionForm
             wallets={wallets}
             categories={categories}
             settings={settings}
+            t={t}
             activeWalletId={activeWalletId}
             initial={editing}
-            submitLabel="Update transaction"
+            submitLabel={t.transaction.update}
             onSubmit={async (input) => {
               await onUpdate(editing.id, input);
               setEditing(null);

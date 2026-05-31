@@ -5,16 +5,18 @@ import { Button } from "./ui/Button";
 import { SelectField } from "./ui/SelectField";
 import { SegmentedControl } from "./ui/SegmentedControl";
 import { TextField } from "./ui/TextField";
+import type { Dictionary } from "../i18n";
 
 const swatches = ["#207a6f", "#3f73c9", "#b7791f", "#c44a42", "#7b61ff", "#1f8f66"];
 
 interface CategoryFormProps {
   initial?: Category;
+  t: Dictionary;
   submitLabel: string;
   onSubmit: (input: CategoryInput) => Promise<void>;
 }
 
-export function CategoryForm({ initial, submitLabel, onSubmit }: CategoryFormProps) {
+export function CategoryForm({ initial, t, submitLabel, onSubmit }: CategoryFormProps) {
   const [type, setType] = useState<TransactionType>(initial?.type ?? "expense");
   const [name, setName] = useState(initial?.name ?? "");
   const [color, setColor] = useState(initial?.color ?? swatches[0]);
@@ -30,7 +32,7 @@ export function CategoryForm({ initial, submitLabel, onSubmit }: CategoryFormPro
         setName("");
       }
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Unable to save category.");
+      setError(cause instanceof Error ? cause.message : t.categories.saveError);
     }
   }
 
@@ -40,12 +42,12 @@ export function CategoryForm({ initial, submitLabel, onSubmit }: CategoryFormPro
         value={type}
         onChange={setType}
         options={[
-          { value: "expense", label: "Expense" },
-          { value: "income", label: "Income" }
+          { value: "expense", label: t.common.expense },
+          { value: "income", label: t.common.income }
         ]}
       />
-      <TextField label="Name" value={name} onChange={(event) => setName(event.target.value)} maxLength={48} />
-      <SelectField label="Icon" value={icon} onChange={(event) => setIcon(event.target.value)}>
+      <TextField label={t.common.name} value={name} onChange={(event) => setName(event.target.value)} maxLength={48} />
+      <SelectField label={t.categories.icon} value={icon} onChange={(event) => setIcon(event.target.value)}>
         {categoryIconNames.map((iconName) => (
           <option key={iconName} value={iconName}>
             {iconName}
@@ -53,7 +55,7 @@ export function CategoryForm({ initial, submitLabel, onSubmit }: CategoryFormPro
         ))}
       </SelectField>
       <div className="grid gap-2">
-        <span className="text-sm font-medium text-foreground">Color</span>
+        <span className="text-sm font-medium text-foreground">{t.common.color}</span>
         <div className="grid grid-cols-6 gap-2">
           {swatches.map((swatch) => (
             <button

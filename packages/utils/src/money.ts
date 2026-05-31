@@ -40,6 +40,28 @@ export function minorToDecimal(amountMinor: number, currency: string): number {
   return amountMinor / 10 ** getCurrencyMinorUnits(currency);
 }
 
+export function decimalToMinor(value: number, currency: string): number {
+  if (!Number.isFinite(value)) {
+    throw new Error("Amount must be a finite number.");
+  }
+  return Math.round(value * 10 ** getCurrencyMinorUnits(currency));
+}
+
+export function convertMinorBetweenCurrencies(
+  amountMinor: number,
+  fromCurrency: string,
+  toCurrency: string,
+  targetPerSourceRate: number
+): number {
+  if (fromCurrency.toUpperCase() === toCurrency.toUpperCase()) {
+    return amountMinor;
+  }
+  if (!Number.isFinite(targetPerSourceRate) || targetPerSourceRate <= 0) {
+    throw new Error("Exchange rate must be a positive number.");
+  }
+  return decimalToMinor(minorToDecimal(amountMinor, fromCurrency) * targetPerSourceRate, toCurrency);
+}
+
 export function formatMoney(amountMinor: number, currency: string, locale: string): string {
   return new Intl.NumberFormat(locale, {
     style: "currency",

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "../lib/cn";
+import type { Dictionary } from "../i18n";
 import { Button } from "./ui/Button";
 
 export type ErrorScreenKind =
@@ -132,15 +133,16 @@ interface ErrorScreenProps {
   title?: string;
   description?: string;
   details?: string;
+  copy?: Dictionary["errors"];
   compact?: boolean;
   primaryAction?: ErrorAction;
   secondaryAction?: ErrorAction;
 }
 
-function defaultPrimaryAction(kind: ErrorScreenKind): ErrorAction {
+function defaultPrimaryAction(kind: ErrorScreenKind, copy?: Dictionary["errors"]): ErrorAction {
   if (kind === "not-found" || kind === "forbidden" || kind === "unauthorized") {
     return {
-      label: "Go home",
+      label: copy?.actions.goHome ?? "Go home",
       icon: Home,
       onClick: () => {
         window.location.href = "/";
@@ -149,15 +151,15 @@ function defaultPrimaryAction(kind: ErrorScreenKind): ErrorAction {
   }
 
   return {
-    label: "Reload",
+    label: copy?.actions.reload ?? "Reload",
     icon: RefreshCw,
     onClick: () => window.location.reload()
   };
 }
 
-function defaultSecondaryAction(): ErrorAction {
+function defaultSecondaryAction(copy?: Dictionary["errors"]): ErrorAction {
   return {
-    label: "Back",
+    label: copy?.actions.back ?? "Back",
     icon: ArrowLeft,
     variant: "secondary",
     onClick: () => window.history.back()
@@ -169,15 +171,17 @@ export function ErrorScreen({
   title,
   description,
   details,
+  copy,
   compact = false,
   primaryAction,
   secondaryAction
 }: ErrorScreenProps) {
   const [copied, setCopied] = useState(false);
   const preset = errorPresets[kind];
+  const localized = copy?.presets[kind];
   const Icon = preset.icon;
-  const primary = primaryAction ?? defaultPrimaryAction(kind);
-  const secondary = secondaryAction ?? defaultSecondaryAction();
+  const primary = primaryAction ?? defaultPrimaryAction(kind, copy);
+  const secondary = secondaryAction ?? defaultSecondaryAction(copy);
   const PrimaryIcon = primary.icon;
   const SecondaryIcon = secondary.icon;
 
@@ -215,10 +219,12 @@ export function ErrorScreen({
           </span>
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase text-muted">
-              {preset.status} · {preset.eyebrow}
+              {preset.status} · {localized?.eyebrow ?? preset.eyebrow}
             </p>
-            <h1 className="mt-2 text-2xl font-semibold text-foreground">{title ?? preset.title}</h1>
-            <p className="mt-2 text-sm leading-6 text-muted">{description ?? preset.description}</p>
+            <h1 className="mt-2 text-2xl font-semibold text-foreground">{title ?? localized?.title ?? preset.title}</h1>
+            <p className="mt-2 text-sm leading-6 text-muted">
+              {description ?? localized?.description ?? preset.description}
+            </p>
           </div>
         </div>
 
@@ -235,13 +241,15 @@ export function ErrorScreen({
 
         {details ? (
           <details className="mt-5 rounded-app border border-line bg-elevated p-3">
-            <summary className="cursor-pointer text-sm font-semibold text-foreground">Debug details</summary>
+            <summary className="cursor-pointer text-sm font-semibold text-foreground">
+              {copy?.actions.debugDetails ?? "Debug details"}
+            </summary>
             <pre className="mt-3 max-h-56 overflow-auto whitespace-pre-wrap break-words text-xs leading-5 text-muted">
               {details}
             </pre>
             <Button className="mt-3" variant="secondary" size="small" onClick={() => void copyDetails()}>
               <Copy className="h-4 w-4" />
-              {copied ? "Copied" : "Copy details"}
+              {copied ? copy?.actions.copied ?? "Copied" : copy?.actions.copyDetails ?? "Copy details"}
             </Button>
           </details>
         ) : null}

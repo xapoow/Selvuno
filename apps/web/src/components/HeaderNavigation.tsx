@@ -4,10 +4,11 @@ import { navigationItems } from "./navigationItems";
 
 interface HeaderNavigationProps {
   activeView: AppView;
+  labels: Record<AppView, string>;
   onChange: (view: AppView) => void;
 }
 
-export function HeaderNavigation({ activeView, onChange }: HeaderNavigationProps) {
+export function HeaderNavigation({ activeView, labels, onChange }: HeaderNavigationProps) {
   return (
     <nav className="hidden md:grid md:grid-cols-5 md:gap-1 rounded-app bg-elevated p-1 ring-1 ring-line">
       {navigationItems.map((item) => {
@@ -22,9 +23,9 @@ export function HeaderNavigation({ activeView, onChange }: HeaderNavigationProps
               "inline-flex h-10 items-center justify-center gap-2 rounded-[6px] px-3 text-sm font-medium text-muted transition duration-200 active:scale-[0.98]",
               isActive && "bg-surface text-foreground shadow-sm"
             )}
-          >
+            >
             <Icon className="h-4 w-4" />
-            <span>{item.label}</span>
+            <span>{labels[item.view]}</span>
           </button>
         );
       })}

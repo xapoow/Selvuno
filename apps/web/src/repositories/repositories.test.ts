@@ -47,6 +47,32 @@ describe("finance repositories", () => {
     expect(after.currency).toBe(before.currency);
   });
 
+  it("keeps wallet currency independent from the global settings currency", async () => {
+    await seedLocalData();
+    const wallet = await walletRepository.createWallet({ name: "Euro wallet", currency: "eur" });
+    const [category] = await categoryRepository.listCategories("expense");
+    const transaction = await transactionRepository.addTransaction({
+      walletId: wallet.id,
+      categoryId: category.id,
+      type: "expense",
+      amountMinor: 1200,
+      currency: "usd",
+      transactionDate: new Date("2026-05-31T00:00:00.000Z").toISOString()
+    });
+
+    await settingsRepository.updateSettings({ currency: "gbp" });
+
+    expect(transaction.currency).toBe("EUR");
+    expect((await settingsRepository.getSettings()).currency).toBe("GBP");
+    expect((await walletRepository.listWallets({ includeArchived: true })).find((item) => item.id === wallet.id)?.currency).toBe("EUR");
+    expect((await transactionRepository.listTransactions({ includeDeleted: true })).find((item) => item.id === transaction.id)?.currency).toBe("EUR");
+
+    await walletRepository.updateWallet(wallet.id, { currency: "pln" });
+
+    expect((await walletRepository.listWallets({ includeArchived: true })).find((item) => item.id === wallet.id)?.currency).toBe("PLN");
+    expect((await transactionRepository.listTransactions({ includeDeleted: true })).find((item) => item.id === transaction.id)?.currency).toBe("PLN");
+  });
+
   it("repairs old local rows that are missing currency", async () => {
     await seedLocalData();
     const settings = await settingsRepository.getSettings();

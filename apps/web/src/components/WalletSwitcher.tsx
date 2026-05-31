@@ -4,10 +4,11 @@ import { cn } from "../lib/cn";
 interface WalletSwitcherProps {
   wallets: Wallet[];
   value: WalletView;
+  allLabel: string;
   onChange: (value: WalletView) => void;
 }
 
-export function WalletSwitcher({ wallets, value, onChange }: WalletSwitcherProps) {
+export function WalletSwitcher({ wallets, value, allLabel, onChange }: WalletSwitcherProps) {
   return (
     <div className="-mx-4 overflow-x-auto px-4 pb-1">
       <div className="flex min-w-max gap-2">
@@ -19,7 +20,7 @@ export function WalletSwitcher({ wallets, value, onChange }: WalletSwitcherProps
             value === "all" && "border-foreground bg-foreground text-background"
           )}
         >
-          All wallets
+          {allLabel}
         </button>
         {wallets.map((wallet) => (
           <button

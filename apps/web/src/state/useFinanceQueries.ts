@@ -58,7 +58,9 @@ function invalidateFinance(queryClient: ReturnType<typeof useQueryClient>) {
 
 export function useFinanceMutations() {
   const queryClient = useQueryClient();
-  const invalidate = () => invalidateFinance(queryClient);
+  const invalidate = () => {
+    void invalidateFinance(queryClient);
+  };
 
   return {
     addTransaction: useMutation({

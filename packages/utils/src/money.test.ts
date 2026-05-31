@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatMoney, parseAmountToMinor } from "./money";
+import { convertMinorBetweenCurrencies, formatMoney, parseAmountToMinor } from "./money";
 
 describe("money helpers", () => {
   it("parses decimal amounts into minor units", () => {
@@ -14,5 +14,10 @@ describe("money helpers", () => {
 
   it("formats money using locale and currency", () => {
     expect(formatMoney(1234, "USD", "en-US")).toContain("12.34");
+  });
+
+  it("converts minor amounts between currencies", () => {
+    expect(convertMinorBetweenCurrencies(1000, "USD", "EUR", 0.9)).toBe(900);
+    expect(convertMinorBetweenCurrencies(1000, "USD", "USD", 0.9)).toBe(1000);
   });
 });

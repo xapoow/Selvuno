@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { ErrorScreen } from "./ErrorScreen";
+import { getDictionary } from "../i18n";
 
 interface AppErrorBoundaryProps {
   children: ReactNode;
@@ -37,17 +38,19 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
     ]
       .filter(Boolean)
       .join("\n\n");
+    const t = getDictionary(typeof navigator === "undefined" ? "en-US" : navigator.language);
 
     return (
       <ErrorScreen
         kind="runtime"
+        copy={t.errors}
         details={details}
         primaryAction={{
-          label: "Reload app",
+          label: t.errors.actions.reloadApp,
           onClick: () => window.location.reload()
         }}
         secondaryAction={{
-          label: "Go home",
+          label: t.errors.actions.goHome,
           variant: "secondary",
           onClick: () => {
             window.location.href = "/";

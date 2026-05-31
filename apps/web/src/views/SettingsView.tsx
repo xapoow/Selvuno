@@ -9,6 +9,7 @@ import type {
 } from "@myfinances/types";
 import { Edit3, FileDown, FileUp, Tags, Trash2 } from "lucide-react";
 import { CategoryIcon } from "../lib/icons";
+import { currencyOptions } from "../lib/currencies";
 import { CategoryForm } from "../components/CategoryForm";
 import { BottomSheet } from "../components/ui/BottomSheet";
 import { Button } from "../components/ui/Button";
@@ -17,10 +18,12 @@ import { EmptyState } from "../components/ui/EmptyState";
 import { Section } from "../components/ui/Section";
 import { SegmentedControl } from "../components/ui/SegmentedControl";
 import { SelectField } from "../components/ui/SelectField";
+import { appVersion, getCategoryName, languageOptions, type Dictionary, type SettingsTab } from "../i18n";
 
 interface SettingsViewProps {
   settings: Settings;
   categories: Category[];
+  t: Dictionary;
   onUpdateSettings: (update: SettingsUpdate) => Promise<void>;
   onCreateCategory: (input: CategoryInput) => Promise<void>;
   onUpdateCategory: (id: string, input: Partial<CategoryInput>) => Promise<void>;
@@ -29,8 +32,6 @@ interface SettingsViewProps {
   onImportBackup: (backup: unknown) => Promise<void>;
 }
 
-const localeOptions = ["en-US", "pl-PL", "ru-RU", "de-DE"];
-const currencyOptions = ["USD", "PLN", "EUR", "GBP", "UAH", "RUB"];
 const timeZoneOptions = ["UTC", "Europe/Warsaw", "Europe/Berlin", "America/New_York", "Asia/Tokyo"];
 const debugErrorKinds: ErrorScreenKind[] = [
   "bad-request",
@@ -42,20 +43,19 @@ const debugErrorKinds: ErrorScreenKind[] = [
   "offline",
   "storage"
 ];
-type SettingsTab = "general" | "appearance" | "categories" | "backup" | "sync" | "debug";
-
-const settingsTabs: Array<{ value: SettingsTab; label: string }> = [
-  { value: "general", label: "General" },
-  { value: "appearance", label: "Appearance" },
-  { value: "categories", label: "Categories" },
-  { value: "backup", label: "Backup" },
-  { value: "sync", label: "Sync" },
-  { value: "debug", label: "Debug" }
+const settingsTabs: Array<{ value: SettingsTab }> = [
+  { value: "general" },
+  { value: "appearance" },
+  { value: "categories" },
+  { value: "backup" },
+  { value: "sync" },
+  { value: "debug" }
 ];
 
 export function SettingsView({
   settings,
   categories,
+  t,
   onUpdateSettings,
   onCreateCategory,
   onUpdateCategory,
@@ -101,11 +101,11 @@ export function SettingsView({
     try {
       const text = await file.text();
       const parsed = JSON.parse(text) as unknown;
-      if (window.confirm("Replace local data with this backup?")) {
+      if (window.confirm(t.settings.replaceBackup)) {
         await onImportBackup(parsed);
       }
     } catch (cause) {
-      setImportError(cause instanceof Error ? cause.message : "Unable to import backup.");
+      setImportError(cause instanceof Error ? cause.message : t.settings.importError);
     } finally {
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -120,7 +120,7 @@ export function SettingsView({
   return (
     <div className="grid gap-6">
       <div>
-        <h2 className="text-xl font-semibold text-foreground">Settings</h2>
+        <h2 className="text-xl font-semibold text-foreground">{t.settings.title}</h2>
       </div>
 
       <div className="-mx-4 overflow-x-auto px-4 pb-1">
@@ -134,28 +134,28 @@ export function SettingsView({
                 activeTab === tab.value ? "bg-surface text-foreground shadow-sm" : "text-muted"
               }`}
             >
-              {tab.label}
+              {t.settings.tabs[tab.value]}
             </button>
           ))}
         </div>
       </div>
 
       {activeTab === "general" ? (
-        <Section title="General">
+        <Section title={t.settings.general}>
           <div className="grid gap-4 rounded-app border border-line bg-surface p-4 sm:grid-cols-2">
             <SelectField
-              label="Language"
+              label={t.common.language}
               value={settings.locale}
               onChange={(event) => void onUpdateSettings({ locale: event.target.value })}
             >
-              {localeOptions.map((locale) => (
-                <option key={locale} value={locale}>
-                  {locale}
+              {languageOptions.map((language) => (
+                <option key={language.value} value={language.value}>
+                  {language.label}
                 </option>
               ))}
             </SelectField>
             <SelectField
-              label="Currency"
+              label={t.settings.globalCurrency}
               value={settings.currency}
               onChange={(event) => void onUpdateSettings({ currency: event.target.value })}
             >
@@ -166,18 +166,18 @@ export function SettingsView({
               ))}
             </SelectField>
             <SelectField
-              label="Date format"
+              label={t.settings.dateFormat}
               value={settings.dateFormat}
               onChange={(event) =>
                 void onUpdateSettings({ dateFormat: event.target.value as DateFormatPreference })
               }
             >
-              <option value="short">Short</option>
-              <option value="medium">Medium</option>
-              <option value="long">Long</option>
+              <option value="short">{t.settings.dateFormats.short}</option>
+              <option value="medium">{t.settings.dateFormats.medium}</option>
+              <option value="long">{t.settings.dateFormats.long}</option>
             </SelectField>
             <SelectField
-              label="Time zone"
+              label={t.common.timeZone}
               value={settings.timeZone}
               onChange={(event) => void onUpdateSettings({ timeZone: event.target.value })}
             >
@@ -192,15 +192,15 @@ export function SettingsView({
       ) : null}
 
       {activeTab === "appearance" ? (
-        <Section title="Appearance">
+        <Section title={t.settings.appearance}>
           <div className="grid gap-4 rounded-app border border-line bg-surface p-4">
             <SegmentedControl
               value={settings.theme}
               onChange={(theme: ThemePreference) => void onUpdateSettings({ theme })}
               options={[
-                { value: "system", label: "System" },
-                { value: "light", label: "Light" },
-                { value: "dark", label: "Dark" }
+                { value: "system", label: t.settings.system },
+                { value: "light", label: t.settings.light },
+                { value: "dark", label: t.settings.dark }
               ]}
             />
           </div>
@@ -209,10 +209,10 @@ export function SettingsView({
 
       {activeTab === "categories" ? (
         <Section
-          title="Categories"
+          title={t.categories.title}
           action={
             <Button variant="secondary" size="small" onClick={() => setCreatingCategory(true)}>
-              Add
+              {t.common.add}
             </Button>
           }
         >
@@ -220,7 +220,9 @@ export function SettingsView({
             <div className="grid gap-3">
               {(["expense", "income"] as const).map((type) => (
                 <div key={type} className="grid gap-2">
-                  <h3 className="text-sm font-semibold capitalize text-foreground">{type}</h3>
+                  <h3 className="text-sm font-semibold capitalize text-foreground">
+                    {type === "expense" ? t.common.expense : t.common.income}
+                  </h3>
                   <div className="grid gap-2">
                     {groupedCategories[type].map((category) => (
                       <article
@@ -233,14 +235,14 @@ export function SettingsView({
                         >
                           <CategoryIcon name={category.icon} className="h-5 w-5" />
                         </span>
-                        <span className="text-sm font-semibold text-foreground">{category.name}</span>
+                        <span className="text-sm font-semibold text-foreground">{getCategoryName(category.name, t)}</span>
                         <span className="flex gap-1">
                           <Button
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
                             onClick={() => setEditingCategory(category)}
-                            aria-label="Edit category"
+                            aria-label={t.categories.editTitle}
                           >
                             <Edit3 className="h-4 w-4" />
                           </Button>
@@ -249,11 +251,11 @@ export function SettingsView({
                             size="icon"
                             className="h-8 w-8 text-expense"
                             onClick={() => {
-                              if (window.confirm("Delete this category?")) {
+                              if (window.confirm(t.categories.confirmDelete)) {
                                 void onDeleteCategory(category.id);
                               }
                             }}
-                            aria-label="Delete category"
+                            aria-label={t.common.delete}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -265,21 +267,21 @@ export function SettingsView({
               ))}
             </div>
           ) : (
-            <EmptyState icon={Tags} title="Add categories for income and expenses." />
+            <EmptyState icon={Tags} title={t.categories.empty} />
           )}
         </Section>
       ) : null}
 
       {activeTab === "backup" ? (
-        <Section title="Backup">
+        <Section title={t.settings.backup}>
           <div className="grid gap-3 rounded-app border border-line bg-surface p-4 sm:grid-cols-2">
             <Button variant="secondary" onClick={() => void handleExport()}>
               <FileDown className="h-4 w-4" />
-              Export JSON
+              {t.settings.exportJson}
             </Button>
             <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
               <FileUp className="h-4 w-4" />
-              Import JSON
+              {t.settings.importJson}
             </Button>
             <input
               ref={fileInputRef}
@@ -294,20 +296,23 @@ export function SettingsView({
       ) : null}
 
       {activeTab === "sync" ? (
-        <Section title="Sync">
+        <Section title={t.settings.sync}>
           <div className="rounded-app border border-line bg-surface p-5">
-            <p className="text-sm font-semibold uppercase text-muted">Coming soon</p>
-            <h3 className="mt-2 text-xl font-semibold text-foreground">Cloud sync is planned</h3>
+            <p className="text-sm font-semibold uppercase text-muted">{t.settings.comingSoon}</p>
+            <h3 className="mt-2 text-xl font-semibold text-foreground">{t.settings.syncTitle}</h3>
             <p className="mt-2 text-sm leading-6 text-muted">
-              Accounts, cloud backup, restore, and multi-device synchronization will live here.
+              {t.settings.syncBody}
             </p>
           </div>
         </Section>
       ) : null}
 
       {activeTab === "debug" ? (
-        <Section title="Debug">
+        <Section title={t.settings.debug}>
           <div className="grid gap-3 rounded-app border border-line bg-surface p-4">
+            <div className="rounded-app bg-elevated px-3 py-2 text-sm text-muted">
+              {t.settings.version}: <span className="font-semibold text-foreground">{appVersion}</span>
+            </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {debugErrorKinds.map((kind) => (
                 <Button key={kind} variant="secondary" size="small" onClick={() => setDebugError(kind)}>
@@ -316,15 +321,16 @@ export function SettingsView({
               ))}
             </div>
             <Button variant="danger" size="small" onClick={() => setShouldCrash(true)}>
-              Trigger runtime error
+              {t.settings.triggerRuntimeError}
             </Button>
           </div>
         </Section>
       ) : null}
 
-      <BottomSheet open={creatingCategory} title="New category" onClose={() => setCreatingCategory(false)}>
+      <BottomSheet open={creatingCategory} title={t.categories.newTitle} onClose={() => setCreatingCategory(false)}>
         <CategoryForm
-          submitLabel="Create category"
+          t={t}
+          submitLabel={t.categories.create}
           onSubmit={async (input) => {
             await onCreateCategory(input);
             setCreatingCategory(false);
@@ -332,11 +338,12 @@ export function SettingsView({
         />
       </BottomSheet>
 
-      <BottomSheet open={Boolean(editingCategory)} title="Edit category" onClose={() => setEditingCategory(null)}>
+      <BottomSheet open={Boolean(editingCategory)} title={t.categories.editTitle} onClose={() => setEditingCategory(null)}>
         {editingCategory ? (
           <CategoryForm
             initial={editingCategory}
-            submitLabel="Update category"
+            t={t}
+            submitLabel={t.categories.update}
             onSubmit={async (input) => {
               await onUpdateCategory(editingCategory.id, input);
               setEditingCategory(null);
@@ -345,10 +352,11 @@ export function SettingsView({
         ) : null}
       </BottomSheet>
 
-      <BottomSheet open={Boolean(debugError)} title="Error preview" onClose={() => setDebugError(null)}>
+      <BottomSheet open={Boolean(debugError)} title={t.settings.errorPreview} onClose={() => setDebugError(null)}>
         {debugError ? (
           <ErrorScreen
             kind={debugError}
+            copy={t.errors}
             compact
             details={[
               `Preview: ${debugError}`,
@@ -356,11 +364,11 @@ export function SettingsView({
               `Time: ${new Date().toISOString()}`
             ].join("\n")}
             primaryAction={{
-              label: "Close preview",
+              label: t.settings.closePreview,
               onClick: () => setDebugError(null)
             }}
             secondaryAction={{
-              label: "Reload",
+              label: t.common.reload,
               variant: "secondary",
               onClick: () => window.location.reload()
             }}

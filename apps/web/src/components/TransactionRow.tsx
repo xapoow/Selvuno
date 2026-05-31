@@ -3,12 +3,17 @@ import { Edit3, Trash2 } from "lucide-react";
 import { formatDate, formatSignedMoney } from "@myfinances/utils";
 import { CategoryIcon } from "../lib/icons";
 import { Button } from "./ui/Button";
+import { getCategoryName, type Dictionary } from "../i18n";
 
 interface TransactionRowProps {
   transaction: Transaction;
   category?: Category;
   wallet?: Wallet;
   settings: Settings;
+  t?: Dictionary;
+  displayAmountMinor?: number;
+  displayCurrency?: string;
+  conversionMissing?: boolean;
   onEdit?: (transaction: Transaction) => void;
   onDelete?: (transaction: Transaction) => void;
 }
@@ -18,10 +23,17 @@ export function TransactionRow({
   category,
   wallet,
   settings,
+  t,
+  displayAmountMinor,
+  displayCurrency,
+  conversionMissing,
   onEdit,
   onDelete
 }: TransactionRowProps) {
   const amountClass = transaction.type === "income" ? "text-income" : "text-expense";
+  const categoryName = t ? getCategoryName(category?.name, t) : category?.name ?? "Uncategorized";
+  const amountMinor = displayAmountMinor ?? transaction.amountMinor;
+  const currency = displayCurrency ?? transaction.currency;
 
   return (
     <article className="grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-app border border-line bg-surface p-3">
@@ -34,7 +46,7 @@ export function TransactionRow({
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <h3 className="truncate text-sm font-semibold text-foreground">
-            {category?.name ?? "Uncategorized"}
+            {categoryName}
           </h3>
           {wallet ? <span className="truncate text-xs text-muted">{wallet.name}</span> : null}
         </div>
@@ -46,16 +58,17 @@ export function TransactionRow({
       <div className="grid justify-items-end gap-2">
         <p className={`text-sm font-semibold ${amountClass}`}>
           {formatSignedMoney(
-            transaction.amountMinor,
-            transaction.currency,
+            amountMinor,
+            currency,
             settings.locale,
             transaction.type
           )}
+          {conversionMissing ? " *" : ""}
         </p>
         {(onEdit || onDelete) && (
           <div className="flex gap-1">
             {onEdit ? (
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(transaction)} aria-label="Edit">
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(transaction)} aria-label={t?.common.edit ?? "Edit"}>
                 <Edit3 className="h-4 w-4" />
               </Button>
             ) : null}
@@ -65,7 +78,7 @@ export function TransactionRow({
                 size="icon"
                 className="h-8 w-8 text-expense"
                 onClick={() => onDelete(transaction)}
-                aria-label="Delete"
+                aria-label={t?.common.delete ?? "Delete"}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>

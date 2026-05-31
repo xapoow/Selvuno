@@ -4,10 +4,11 @@ import { navigationItems } from "./navigationItems";
 
 interface BottomNavigationProps {
   activeView: AppView;
+  labels: Record<AppView, string>;
   onChange: (view: AppView) => void;
 }
 
-export function BottomNavigation({ activeView, onChange }: BottomNavigationProps) {
+export function BottomNavigation({ activeView, labels, onChange }: BottomNavigationProps) {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/88 px-3 pb-[calc(env(safe-area-inset-bottom)+10px)] pt-2 backdrop-blur-xl md:hidden">
       <div className="mx-auto grid max-w-xl grid-cols-5 gap-1">
@@ -25,7 +26,7 @@ export function BottomNavigation({ activeView, onChange }: BottomNavigationProps
               )}
             >
               <Icon className="h-5 w-5" />
-              <span>{item.label}</span>
+              <span>{labels[item.view]}</span>
             </button>
           );
         })}

@@ -40,7 +40,22 @@ export const walletRepository: WalletRepository = {
       name: next.name,
       currency: next.currency
     });
-    await financeDb.wallets.put(next);
+    await financeDb.transaction("rw", financeDb.wallets, financeDb.transactions, async () => {
+      await financeDb.wallets.put(next);
+      if (next.currency !== current.currency) {
+        const transactions = await financeDb.transactions.where("walletId").equals(id).toArray();
+        await Promise.all(
+          transactions.map((transaction) =>
+            financeDb.transactions.put({
+              ...transaction,
+              currency: next.currency,
+              updatedAt: next.updatedAt,
+              syncStatus: "pending"
+            })
+          )
+        );
+      }
+    });
     return next;
   },
 

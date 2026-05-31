@@ -1,0 +1,588 @@
+import type { AppView } from "./state/appStore";
+
+export type Language = "en" | "ru";
+export type SettingsTab = "general" | "appearance" | "categories" | "backup" | "sync" | "debug";
+export type DateFormatLabel = "short" | "medium" | "long";
+
+export const appVersion = "0.1.0";
+
+export const languageOptions = [
+  { value: "en-US", label: "🇺🇸 English", language: "en" },
+  { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" }
+] as const;
+
+interface ErrorCopy {
+  actions: {
+    back: string;
+    copied: string;
+    copyDetails: string;
+    debugDetails: string;
+    goHome: string;
+    reload: string;
+    reloadApp: string;
+  };
+  bootTitle: string;
+  presets: Record<
+    | "bad-request"
+    | "unauthorized"
+    | "forbidden"
+    | "not-found"
+    | "server"
+    | "unavailable"
+    | "offline"
+    | "maintenance"
+    | "storage"
+    | "runtime",
+    {
+      eyebrow: string;
+      title: string;
+      description: string;
+    }
+  >;
+}
+
+export interface Dictionary {
+  appName: string;
+  brand: string;
+  nav: Record<AppView, string>;
+  common: {
+    add: string;
+    all: string;
+    back: string;
+    balance: string;
+    cancel: string;
+    category: string;
+    close: string;
+    color: string;
+    copied: string;
+    copyDetails: string;
+    currency: string;
+    date: string;
+    delete: string;
+    edit: string;
+    expense: string;
+    expenses: string;
+    income: string;
+    language: string;
+    name: string;
+    note: string;
+    reload: string;
+    saved: string;
+    timeZone: string;
+    uncategorized: string;
+    wallet: string;
+  };
+  greetings: {
+    morning: string[];
+    day: string[];
+    evening: string[];
+    night: string[];
+  };
+  categoryNames: Record<string, string>;
+  dashboard: {
+    spending: string;
+    recent: string;
+    emptyChart: string;
+    emptyTransactions: string;
+    addTransaction: string;
+    convertedTo: string;
+    exchangeRatesLoading: string;
+    exchangeRatesUnavailable: string;
+  };
+  transaction: {
+    addTitle: string;
+    editTitle: string;
+    amount: string;
+    chooseWalletAndCategory: string;
+    save: string;
+    update: string;
+    saveError: string;
+  };
+  history: {
+    title: string;
+    allCategories: string;
+    empty: string;
+    confirmDelete: string;
+  };
+  wallets: {
+    title: string;
+    allWallets: string;
+    add: string;
+    archive: string;
+    confirmArchive: string;
+    createEmpty: string;
+    newTitle: string;
+    editTitle: string;
+    create: string;
+    update: string;
+    saveError: string;
+  };
+  categories: {
+    title: string;
+    icon: string;
+    newTitle: string;
+    editTitle: string;
+    create: string;
+    update: string;
+    empty: string;
+    confirmDelete: string;
+    saveError: string;
+  };
+  settings: {
+    title: string;
+    tabs: Record<SettingsTab, string>;
+    general: string;
+    appearance: string;
+    globalCurrency: string;
+    dateFormat: string;
+    dateFormats: Record<DateFormatLabel, string>;
+    system: string;
+    light: string;
+    dark: string;
+    backup: string;
+    exportJson: string;
+    importJson: string;
+    importError: string;
+    replaceBackup: string;
+    sync: string;
+    comingSoon: string;
+    syncTitle: string;
+    syncBody: string;
+    debug: string;
+    version: string;
+    triggerRuntimeError: string;
+    errorPreview: string;
+    closePreview: string;
+  };
+  errors: ErrorCopy;
+}
+
+export function getLanguage(locale: string): Language {
+  return locale.toLowerCase().startsWith("ru") ? "ru" : "en";
+}
+
+export function getLanguageLabel(locale: string): string {
+  return languageOptions.find((option) => option.value === locale)?.label ?? "🇺🇸 English";
+}
+
+export function getCategoryName(name: string | undefined, t: Dictionary): string {
+  if (!name) {
+    return t.common.uncategorized;
+  }
+  return t.categoryNames[name] ?? name;
+}
+
+export const dictionaries: Record<Language, Dictionary> = {
+  en: {
+    appName: "Budget Tracker",
+    brand: "MyFinances",
+    nav: {
+      dashboard: "Home",
+      history: "History",
+      add: "Add",
+      wallets: "Wallets",
+      settings: "Settings"
+    },
+    common: {
+      add: "Add",
+      all: "All",
+      back: "Back",
+      balance: "Balance",
+      cancel: "Cancel",
+      category: "Category",
+      close: "Close",
+      color: "Color",
+      copied: "Copied",
+      copyDetails: "Copy details",
+      currency: "Currency",
+      date: "Date",
+      delete: "Delete",
+      edit: "Edit",
+      expense: "Expense",
+      expenses: "Expenses",
+      income: "Income",
+      language: "Language",
+      name: "Name",
+      note: "Note",
+      reload: "Reload",
+      saved: "Saved",
+      timeZone: "Time zone",
+      uncategorized: "Uncategorized",
+      wallet: "Wallet"
+    },
+    greetings: {
+      morning: ["Good morning", "Morning check-in", "Fresh start", "Ready for today"],
+      day: ["Good afternoon", "Midday money pulse", "Today in focus"],
+      evening: ["Good evening", "Evening balance check"],
+      night: ["Late-night overview"]
+    },
+    categoryNames: {
+      Groceries: "Groceries",
+      Transport: "Transport",
+      Home: "Home",
+      Dining: "Dining",
+      Health: "Health",
+      Salary: "Salary",
+      Freelance: "Freelance",
+      Gifts: "Gifts"
+    },
+    dashboard: {
+      spending: "Spending",
+      recent: "Recent",
+      emptyChart: "Charts appear after the first expenses.",
+      emptyTransactions: "No transactions yet.",
+      addTransaction: "Add transaction",
+      convertedTo: "Converted to",
+      exchangeRatesLoading: "Updating exchange rates",
+      exchangeRatesUnavailable: "Some exchange rates are unavailable"
+    },
+    transaction: {
+      addTitle: "Add transaction",
+      editTitle: "Edit transaction",
+      amount: "Amount",
+      chooseWalletAndCategory: "Choose a wallet and category.",
+      save: "Save transaction",
+      update: "Update transaction",
+      saveError: "Unable to save transaction."
+    },
+    history: {
+      title: "History",
+      allCategories: "All categories",
+      empty: "No transactions match these filters.",
+      confirmDelete: "Delete this transaction?"
+    },
+    wallets: {
+      title: "Wallets",
+      allWallets: "All wallets",
+      add: "Add wallet",
+      archive: "Archive",
+      confirmArchive: "Archive this wallet?",
+      createEmpty: "Create a wallet to start tracking.",
+      newTitle: "New wallet",
+      editTitle: "Edit wallet",
+      create: "Create wallet",
+      update: "Update wallet",
+      saveError: "Unable to save wallet."
+    },
+    categories: {
+      title: "Categories",
+      icon: "Icon",
+      newTitle: "New category",
+      editTitle: "Edit category",
+      create: "Create category",
+      update: "Update category",
+      empty: "Add categories for income and expenses.",
+      confirmDelete: "Delete this category?",
+      saveError: "Unable to save category."
+    },
+    settings: {
+      title: "Settings",
+      tabs: {
+        general: "General",
+        appearance: "Appearance",
+        categories: "Categories",
+        backup: "Backup",
+        sync: "Sync",
+        debug: "Debug"
+      },
+      general: "General",
+      appearance: "Appearance",
+      globalCurrency: "Global currency",
+      dateFormat: "Date format",
+      dateFormats: {
+        short: "Short",
+        medium: "Medium",
+        long: "Long"
+      },
+      system: "System",
+      light: "Light",
+      dark: "Dark",
+      backup: "Backup",
+      exportJson: "Export JSON",
+      importJson: "Import JSON",
+      importError: "Unable to import backup.",
+      replaceBackup: "Replace local data with this backup?",
+      sync: "Sync",
+      comingSoon: "Coming soon",
+      syncTitle: "Cloud sync is planned",
+      syncBody: "Accounts, cloud backup, restore, and multi-device synchronization will live here.",
+      debug: "Debug",
+      version: "Version",
+      triggerRuntimeError: "Trigger runtime error",
+      errorPreview: "Error preview",
+      closePreview: "Close preview"
+    },
+    errors: {
+      actions: {
+        back: "Back",
+        copied: "Copied",
+        copyDetails: "Copy details",
+        debugDetails: "Debug details",
+        goHome: "Go home",
+        reload: "Reload",
+        reloadApp: "Reload app"
+      },
+      bootTitle: "Unable to load MyFinances",
+      presets: {
+        "bad-request": {
+          eyebrow: "Bad request",
+          title: "The request is not valid",
+          description: "Something in the request shape is malformed. Check the input and try again."
+        },
+        unauthorized: {
+          eyebrow: "Unauthorized",
+          title: "Sign in is required",
+          description: "This area needs an account session. Local-only mode still works without cloud access."
+        },
+        forbidden: {
+          eyebrow: "Forbidden",
+          title: "You do not have access",
+          description: "The account does not have permission for this resource."
+        },
+        "not-found": {
+          eyebrow: "Not found",
+          title: "This page does not exist",
+          description: "The link may be stale, mistyped, or not available in the local app."
+        },
+        server: {
+          eyebrow: "Server error",
+          title: "Something broke",
+          description: "The app hit an unexpected failure. Reloading usually clears temporary runtime state."
+        },
+        unavailable: {
+          eyebrow: "Unavailable",
+          title: "Service is temporarily unavailable",
+          description: "Cloud services are not reachable right now. Local data remains available."
+        },
+        offline: {
+          eyebrow: "Offline",
+          title: "You are offline",
+          description: "The app can keep working locally. Sync and cloud backup resume when the network returns."
+        },
+        maintenance: {
+          eyebrow: "Maintenance",
+          title: "Maintenance is in progress",
+          description: "This area is paused while infrastructure work is happening."
+        },
+        storage: {
+          eyebrow: "Local storage",
+          title: "Local data could not be opened",
+          description: "IndexedDB may be blocked, full, or corrupted. Exported backups can restore data later."
+        },
+        runtime: {
+          eyebrow: "Runtime error",
+          title: "The app hit a critical error",
+          description: "A local runtime error stopped this screen. The debug details below can help trace it."
+        }
+      }
+    }
+  },
+  ru: {
+    appName: "Бюджет",
+    brand: "MyFinances",
+    nav: {
+      dashboard: "Главная",
+      history: "История",
+      add: "Добавить",
+      wallets: "Кошельки",
+      settings: "Настройки"
+    },
+    common: {
+      add: "Добавить",
+      all: "Все",
+      back: "Назад",
+      balance: "Баланс",
+      cancel: "Отмена",
+      category: "Категория",
+      close: "Закрыть",
+      color: "Цвет",
+      copied: "Скопировано",
+      copyDetails: "Скопировать детали",
+      currency: "Валюта",
+      date: "Дата",
+      delete: "Удалить",
+      edit: "Редактировать",
+      expense: "Расход",
+      expenses: "Расходы",
+      income: "Доход",
+      language: "Язык",
+      name: "Название",
+      note: "Заметка",
+      reload: "Перезагрузить",
+      saved: "Сохранено",
+      timeZone: "Часовой пояс",
+      uncategorized: "Без категории",
+      wallet: "Кошелек"
+    },
+    greetings: {
+      morning: ["Доброе утро", "Утренний чек-ин", "Свежий старт", "План на день готов"],
+      day: ["Добрый день", "Дневной срез финансов", "Фокус на сегодня"],
+      evening: ["Добрый вечер", "Вечерняя сверка баланса"],
+      night: ["Ночной обзор"]
+    },
+    categoryNames: {
+      Groceries: "Продукты",
+      Transport: "Транспорт",
+      Home: "Дом",
+      Dining: "Кафе",
+      Health: "Здоровье",
+      Salary: "Зарплата",
+      Freelance: "Фриланс",
+      Gifts: "Подарки"
+    },
+    dashboard: {
+      spending: "Траты",
+      recent: "Последние",
+      emptyChart: "График появится после первого расхода.",
+      emptyTransactions: "Операций пока нет.",
+      addTransaction: "Добавить операцию",
+      convertedTo: "Конвертировано в",
+      exchangeRatesLoading: "Обновляем курсы валют",
+      exchangeRatesUnavailable: "Некоторые курсы валют недоступны"
+    },
+    transaction: {
+      addTitle: "Добавить операцию",
+      editTitle: "Редактировать операцию",
+      amount: "Сумма",
+      chooseWalletAndCategory: "Выбери кошелек и категорию.",
+      save: "Сохранить операцию",
+      update: "Обновить операцию",
+      saveError: "Не удалось сохранить операцию."
+    },
+    history: {
+      title: "История",
+      allCategories: "Все категории",
+      empty: "Операций по этим фильтрам нет.",
+      confirmDelete: "Удалить эту операцию?"
+    },
+    wallets: {
+      title: "Кошельки",
+      allWallets: "Все кошельки",
+      add: "Добавить кошелек",
+      archive: "Архивировать",
+      confirmArchive: "Архивировать этот кошелек?",
+      createEmpty: "Создай кошелек, чтобы начать учет.",
+      newTitle: "Новый кошелек",
+      editTitle: "Редактировать кошелек",
+      create: "Создать кошелек",
+      update: "Обновить кошелек",
+      saveError: "Не удалось сохранить кошелек."
+    },
+    categories: {
+      title: "Категории",
+      icon: "Иконка",
+      newTitle: "Новая категория",
+      editTitle: "Редактировать категорию",
+      create: "Создать категорию",
+      update: "Обновить категорию",
+      empty: "Добавь категории для доходов и расходов.",
+      confirmDelete: "Удалить эту категорию?",
+      saveError: "Не удалось сохранить категорию."
+    },
+    settings: {
+      title: "Настройки",
+      tabs: {
+        general: "Общее",
+        appearance: "Вид",
+        categories: "Категории",
+        backup: "Бэкап",
+        sync: "Синхронизация",
+        debug: "Дебаг"
+      },
+      general: "Общее",
+      appearance: "Внешний вид",
+      globalCurrency: "Общая валюта",
+      dateFormat: "Формат даты",
+      dateFormats: {
+        short: "Короткий",
+        medium: "Средний",
+        long: "Длинный"
+      },
+      system: "Система",
+      light: "Светлая",
+      dark: "Темная",
+      backup: "Бэкап",
+      exportJson: "Экспорт JSON",
+      importJson: "Импорт JSON",
+      importError: "Не удалось импортировать бэкап.",
+      replaceBackup: "Заменить локальные данные этим бэкапом?",
+      sync: "Синхронизация",
+      comingSoon: "Скоро",
+      syncTitle: "Облачная синхронизация запланирована",
+      syncBody: "Аккаунты, облачный бэкап, восстановление и синхронизация между устройствами будут здесь.",
+      debug: "Дебаг",
+      version: "Версия",
+      triggerRuntimeError: "Вызвать runtime ошибку",
+      errorPreview: "Превью ошибки",
+      closePreview: "Закрыть превью"
+    },
+    errors: {
+      actions: {
+        back: "Назад",
+        copied: "Скопировано",
+        copyDetails: "Скопировать детали",
+        debugDetails: "Детали для дебага",
+        goHome: "На главную",
+        reload: "Перезагрузить",
+        reloadApp: "Перезагрузить приложение"
+      },
+      bootTitle: "Не удалось загрузить MyFinances",
+      presets: {
+        "bad-request": {
+          eyebrow: "Некорректный запрос",
+          title: "Запрос невалиден",
+          description: "В данных запроса есть ошибка. Проверь ввод и попробуй снова."
+        },
+        unauthorized: {
+          eyebrow: "Нет авторизации",
+          title: "Нужно войти",
+          description: "Этому разделу нужна сессия аккаунта. Локальный режим продолжит работать без облака."
+        },
+        forbidden: {
+          eyebrow: "Нет доступа",
+          title: "Доступ закрыт",
+          description: "У аккаунта нет прав на этот ресурс."
+        },
+        "not-found": {
+          eyebrow: "Не найдено",
+          title: "Такой страницы нет",
+          description: "Ссылка могла устареть, быть введена с ошибкой или отсутствовать в локальном приложении."
+        },
+        server: {
+          eyebrow: "Ошибка сервера",
+          title: "Что-то сломалось",
+          description: "Приложение столкнулось с неожиданной ошибкой. Перезагрузка часто очищает временное состояние."
+        },
+        unavailable: {
+          eyebrow: "Недоступно",
+          title: "Сервис временно недоступен",
+          description: "Облачные сервисы сейчас недоступны. Локальные данные остаются доступны."
+        },
+        offline: {
+          eyebrow: "Офлайн",
+          title: "Нет подключения",
+          description: "Приложение продолжит работать локально. Синхронизация и облачный бэкап вернутся после подключения."
+        },
+        maintenance: {
+          eyebrow: "Обслуживание",
+          title: "Идет обслуживание",
+          description: "Этот раздел временно приостановлен из-за работ с инфраструктурой."
+        },
+        storage: {
+          eyebrow: "Локальное хранилище",
+          title: "Не удалось открыть локальные данные",
+          description: "IndexedDB может быть заблокирована, переполнена или повреждена. Экспортированные бэкапы помогут восстановиться позже."
+        },
+        runtime: {
+          eyebrow: "Runtime ошибка",
+          title: "Критическая ошибка приложения",
+          description: "Локальная runtime ошибка остановила этот экран. Детали ниже помогут найти причину."
+        }
+      }
+    }
+  }
+};
+
+export function getDictionary(locale: string): Dictionary {
+  return dictionaries[getLanguage(locale)];
+}

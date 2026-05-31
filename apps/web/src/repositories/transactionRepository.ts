@@ -9,11 +9,17 @@ export interface TransactionRepository {
   listTransactions(filter?: Partial<TransactionFilter>): Promise<Transaction[]>;
 }
 
+async function getWalletCurrency(walletId: string, fallback: string): Promise<string> {
+  const wallet = await financeDb.wallets.get(walletId);
+  return (wallet?.currency ?? fallback).toUpperCase();
+}
+
 export const transactionRepository: TransactionRepository = {
   async addTransaction(input) {
+    const currency = await getWalletCurrency(input.walletId, input.currency);
     const parsed = transactionInputSchema.parse({
       ...input,
-      currency: input.currency.toUpperCase()
+      currency
     });
     const transaction: Transaction = {
       ...createEntityBase(),
@@ -28,10 +34,13 @@ export const transactionRepository: TransactionRepository = {
     if (!current || current.deletedAt) {
       throw new Error("Transaction not found.");
     }
+    const walletId = input.walletId ?? current.walletId;
+    const currency = await getWalletCurrency(walletId, input.currency ?? current.currency);
     const next: Transaction = {
       ...current,
       ...input,
-      currency: input.currency?.toUpperCase() ?? current.currency,
+      walletId,
+      currency,
       updatedAt: nowIso(),
       syncStatus: "pending"
     };

@@ -6,17 +6,19 @@ import { WalletForm } from "../components/WalletForm";
 import { BottomSheet } from "../components/ui/BottomSheet";
 import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
+import type { Dictionary } from "../i18n";
 
 interface WalletsViewProps {
   wallets: Wallet[];
   transactions: Transaction[];
   settings: Settings;
+  t: Dictionary;
   onCreate: (input: WalletInput) => Promise<void>;
   onUpdate: (id: string, input: Partial<WalletInput>) => Promise<void>;
   onArchive: (id: string) => Promise<void>;
 }
 
-export function WalletsView({ wallets, transactions, settings, onCreate, onUpdate, onArchive }: WalletsViewProps) {
+export function WalletsView({ wallets, transactions, settings, t, onCreate, onUpdate, onArchive }: WalletsViewProps) {
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Wallet | null>(null);
 
@@ -24,9 +26,9 @@ export function WalletsView({ wallets, transactions, settings, onCreate, onUpdat
     <div className="grid gap-5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-foreground">Wallets</h2>
+          <h2 className="text-xl font-semibold text-foreground">{t.wallets.title}</h2>
         </div>
-        <Button size="icon" onClick={() => setCreating(true)} aria-label="Add wallet">
+        <Button size="icon" onClick={() => setCreating(true)} aria-label={t.wallets.add}>
           <Plus className="h-5 w-5" />
         </Button>
       </div>
@@ -43,26 +45,26 @@ export function WalletsView({ wallets, transactions, settings, onCreate, onUpdat
                     <p className="text-sm text-muted">{wallet.currency}</p>
                   </div>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => setEditing(wallet)} aria-label="Edit wallet">
+                    <Button variant="ghost" size="icon" onClick={() => setEditing(wallet)} aria-label={t.wallets.editTitle}>
                       <Edit3 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-sm">
                   <div>
-                    <p className="text-xs uppercase text-muted">Balance</p>
+                    <p className="text-xs uppercase text-muted">{t.common.balance}</p>
                     <p className="font-semibold text-foreground">
                       {formatMoney(totals.balanceMinor, wallet.currency, settings.locale)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase text-muted">Income</p>
+                    <p className="text-xs uppercase text-muted">{t.common.income}</p>
                     <p className="font-semibold text-income">
                       {formatMoney(totals.incomeMinor, wallet.currency, settings.locale)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase text-muted">Expenses</p>
+                    <p className="text-xs uppercase text-muted">{t.common.expenses}</p>
                     <p className="font-semibold text-expense">
                       {formatMoney(totals.expenseMinor, wallet.currency, settings.locale)}
                     </p>
@@ -72,25 +74,26 @@ export function WalletsView({ wallets, transactions, settings, onCreate, onUpdat
                   variant="secondary"
                   size="small"
                   onClick={() => {
-                    if (window.confirm("Archive this wallet?")) {
+                    if (window.confirm(t.wallets.confirmArchive)) {
                       void onArchive(wallet.id);
                     }
                   }}
                 >
-                  Archive
+                  {t.wallets.archive}
                 </Button>
               </article>
             );
           })}
         </div>
       ) : (
-        <EmptyState icon={WalletCards} title="Create a wallet to start tracking." />
+        <EmptyState icon={WalletCards} title={t.wallets.createEmpty} />
       )}
 
-      <BottomSheet open={creating} title="New wallet" onClose={() => setCreating(false)}>
+      <BottomSheet open={creating} title={t.wallets.newTitle} onClose={() => setCreating(false)}>
         <WalletForm
           defaultCurrency={settings.currency}
-          submitLabel="Create wallet"
+          t={t}
+          submitLabel={t.wallets.create}
           onSubmit={async (input) => {
             await onCreate(input);
             setCreating(false);
@@ -98,12 +101,13 @@ export function WalletsView({ wallets, transactions, settings, onCreate, onUpdat
         />
       </BottomSheet>
 
-      <BottomSheet open={Boolean(editing)} title="Edit wallet" onClose={() => setEditing(null)}>
+      <BottomSheet open={Boolean(editing)} title={t.wallets.editTitle} onClose={() => setEditing(null)}>
         {editing ? (
           <WalletForm
             initial={editing}
             defaultCurrency={settings.currency}
-            submitLabel="Update wallet"
+            t={t}
+            submitLabel={t.wallets.update}
             onSubmit={async (input) => {
               await onUpdate(editing.id, input);
               setEditing(null);

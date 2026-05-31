@@ -5,6 +5,8 @@ import { BottomNavigation } from "./components/BottomNavigation";
 import { HeaderNavigation } from "./components/HeaderNavigation";
 import { WalletSwitcher } from "./components/WalletSwitcher";
 import { ErrorScreen } from "./components/ErrorScreen";
+import { getDictionary } from "./i18n";
+import { useExchangeRates } from "./lib/exchangeRates";
 import { useAppStore } from "./state/appStore";
 import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
 import { AddTransactionView } from "./views/AddTransactionView";
@@ -27,6 +29,7 @@ export function App() {
     data.bootstrap.isLoading || data.settings.isLoading || data.wallets.isLoading || data.categories.isLoading;
   const isError =
     data.bootstrap.isError || data.settings.isError || data.wallets.isError || data.categories.isError;
+  const fallbackT = getDictionary(settings?.locale ?? (typeof navigator === "undefined" ? "en-US" : navigator.language));
 
   useEffect(() => {
     if (!settings) {
@@ -47,18 +50,28 @@ export function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activeView]);
 
-  if (isLoading || !settings) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-background px-6 text-foreground">
-        <div className="h-10 w-10 animate-pulse rounded-app bg-accent" />
-      </div>
-    );
-  }
+  const activeWalletId: WalletView =
+    settings && (settings.activeWalletId === "all" || wallets.some((wallet) => wallet.id === settings.activeWalletId))
+      ? settings.activeWalletId
+      : "all";
+  const activeWallet = activeWalletId === "all" ? undefined : wallets.find((wallet) => wallet.id === activeWalletId);
+  const displayCurrency = settings ? activeWallet?.currency ?? settings.currency : "USD";
+  const conversionNeeded = Boolean(
+    settings &&
+      transactions.some(
+        (transaction) =>
+          !transaction.deletedAt &&
+          (activeWalletId === "all" || transaction.walletId === activeWalletId) &&
+          transaction.currency.toUpperCase() !== displayCurrency
+      )
+  );
+  const exchangeRates = useExchangeRates(displayCurrency, conversionNeeded);
 
   if (isError) {
     return (
       <ErrorScreen
         kind="storage"
+        copy={fallbackT.errors}
         details={[
           data.bootstrap.error instanceof Error ? data.bootstrap.error.message : null,
           data.settings.error instanceof Error ? data.settings.error.message : null,
@@ -71,10 +84,15 @@ export function App() {
     );
   }
 
-  const activeWalletId: WalletView =
-    settings.activeWalletId === "all" || wallets.some((wallet) => wallet.id === settings.activeWalletId)
-      ? settings.activeWalletId
-      : "all";
+  if (isLoading || !settings) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background px-6 text-foreground">
+        <div className="h-10 w-10 animate-pulse rounded-app bg-accent" />
+      </div>
+    );
+  }
+
+  const t = getDictionary(settings.locale);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -83,19 +101,22 @@ export function App() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase text-muted">MyFinances</p>
-              <h1 className="text-2xl font-semibold text-foreground">Budget Tracker</h1>
+              <h1 className="text-2xl font-semibold text-foreground">{t.appName}</h1>
             </div>
           </div>
-          <HeaderNavigation activeView={activeView} onChange={setActiveView} />
-          <WalletSwitcher
-            wallets={wallets}
-            value={activeWalletId}
-            onChange={(activeWallet) => void mutations.updateSettings.mutateAsync({ activeWalletId: activeWallet })}
-          />
+          <HeaderNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
         </div>
       </header>
 
       <main className="mx-auto max-w-3xl px-4 pb-28 pt-5">
+        <div className="mb-5">
+          <WalletSwitcher
+            wallets={wallets}
+            value={activeWalletId}
+            allLabel={t.wallets.allWallets}
+            onChange={(activeWallet) => void mutations.updateSettings.mutateAsync({ activeWalletId: activeWallet })}
+          />
+        </div>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeView}
@@ -111,6 +132,11 @@ export function App() {
                 transactions={transactions}
                 settings={settings}
                 activeWalletId={activeWalletId}
+                displayCurrency={displayCurrency}
+                exchangeRates={exchangeRates.data}
+                isUpdatingExchangeRates={exchangeRates.isFetching && conversionNeeded}
+                hasExchangeRateError={exchangeRates.isError && conversionNeeded}
+                t={t}
                 onAdd={() => setActiveView("add")}
               />
             ) : null}
@@ -119,6 +145,7 @@ export function App() {
                 wallets={wallets}
                 categories={categories}
                 settings={{ ...settings, activeWalletId }}
+                t={t}
                 onSubmit={async (input) => {
                   await mutations.addTransaction.mutateAsync(input);
                 }}
@@ -131,6 +158,9 @@ export function App() {
                 transactions={transactions}
                 settings={settings}
                 activeWalletId={activeWalletId}
+                displayCurrency={displayCurrency}
+                exchangeRates={exchangeRates.data}
+                t={t}
                 onUpdate={async (id, input) => {
                   await mutations.updateTransaction.mutateAsync({ id, input });
                 }}
@@ -142,6 +172,7 @@ export function App() {
                 wallets={wallets}
                 transactions={transactions}
                 settings={settings}
+                t={t}
                 onCreate={async (input) => {
                   await mutations.createWallet.mutateAsync(input);
                 }}
@@ -155,6 +186,7 @@ export function App() {
               <SettingsView
                 settings={settings}
                 categories={categories}
+                t={t}
                 onUpdateSettings={async (input) => {
                   await mutations.updateSettings.mutateAsync(input);
                 }}
@@ -175,7 +207,7 @@ export function App() {
         </AnimatePresence>
       </main>
 
-      <BottomNavigation activeView={activeView} onChange={setActiveView} />
+      <BottomNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
     </div>
   );
 }
