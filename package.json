@@ -1,0 +1,18 @@
+{
+  "name": "myfinances",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.12.4",
+  "scripts": {
+    "dev": "corepack pnpm --filter @myfinances/web dev",
+    "dev:web": "corepack pnpm --filter @myfinances/web dev",
+    "build": "corepack pnpm -r build",
+    "test": "corepack pnpm -r test",
+    "typecheck": "corepack pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.1"
+  }
+}
