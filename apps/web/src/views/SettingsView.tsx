@@ -1,7 +1,8 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   Category,
   CategoryInput,
+  ColorThemePreference,
   DateFormatPreference,
   Settings,
   SettingsUpdate,
@@ -10,6 +11,9 @@ import type {
 import { Edit3, FileDown, FileUp, Tags, Trash2 } from "lucide-react";
 import { CategoryIcon } from "../lib/icons";
 import { currencyOptions } from "../lib/currencies";
+import { applyRootVisualTheme } from "../lib/colorThemes";
+import { resetLocalApplicationData } from "../lib/resetLocalData";
+import { ColorThemePicker } from "../components/ColorThemePicker";
 import { CategoryForm } from "../components/CategoryForm";
 import { BottomSheet } from "../components/ui/BottomSheet";
 import { Button } from "../components/ui/Button";
@@ -68,6 +72,8 @@ export function SettingsView({
   const [debugError, setDebugError] = useState<ErrorScreenKind | null>(null);
   const [shouldCrash, setShouldCrash] = useState(false);
   const [activeTab, setActiveTab] = useState<SettingsTab>("general");
+  const [visualTheme, setVisualTheme] = useState<ThemePreference>(settings.theme);
+  const [visualColorTheme, setVisualColorTheme] = useState<ColorThemePreference>(settings.colorTheme);
   const [importError, setImportError] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const displayedTimeZones = useMemo(
@@ -81,6 +87,29 @@ export function SettingsView({
     }),
     [categories]
   );
+
+  useEffect(() => {
+    setVisualTheme(settings.theme);
+    setVisualColorTheme(settings.colorTheme);
+  }, [settings.theme, settings.colorTheme]);
+
+  function handleThemeChange(theme: ThemePreference) {
+    setVisualTheme(theme);
+    applyRootVisualTheme(theme, visualColorTheme);
+    void onUpdateSettings({ theme }).catch(() => {
+      setVisualTheme(settings.theme);
+      applyRootVisualTheme(settings.theme, settings.colorTheme);
+    });
+  }
+
+  function handleColorThemeChange(colorTheme: ColorThemePreference) {
+    setVisualColorTheme(colorTheme);
+    applyRootVisualTheme(visualTheme, colorTheme);
+    void onUpdateSettings({ colorTheme }).catch(() => {
+      setVisualColorTheme(settings.colorTheme);
+      applyRootVisualTheme(settings.theme, settings.colorTheme);
+    });
+  }
 
   async function handleExport() {
     const backup = await onExportBackup();
@@ -117,6 +146,14 @@ export function SettingsView({
     throw new Error("Manual debug crash from Settings.");
   }
 
+  async function handleResetLocalData() {
+    if (!window.confirm(t.settings.resetLocalDataConfirm)) {
+      return;
+    }
+    await resetLocalApplicationData();
+    window.location.reload();
+  }
+
   return (
     <div className="grid gap-6">
       <div>
@@ -131,7 +168,7 @@ export function SettingsView({
               type="button"
               onClick={() => setActiveTab(tab.value)}
               className={`h-9 rounded-[6px] px-3 text-sm font-medium transition duration-200 active:scale-[0.98] ${
-                activeTab === tab.value ? "bg-surface text-foreground shadow-sm" : "text-muted"
+                activeTab === tab.value ? "bg-accent text-white shadow-sm" : "text-muted"
               }`}
             >
               {t.settings.tabs[tab.value]}
@@ -195,14 +232,22 @@ export function SettingsView({
         <Section title={t.settings.appearance}>
           <div className="grid gap-4 rounded-app border border-line bg-surface p-4">
             <SegmentedControl
-              value={settings.theme}
-              onChange={(theme: ThemePreference) => void onUpdateSettings({ theme })}
+              value={visualTheme}
+              onChange={handleThemeChange}
               options={[
                 { value: "system", label: t.settings.system },
                 { value: "light", label: t.settings.light },
                 { value: "dark", label: t.settings.dark }
               ]}
             />
+            <div className="grid gap-2">
+              <span className="text-sm font-medium text-foreground">{t.settings.colorTheme}</span>
+              <ColorThemePicker
+                value={visualColorTheme}
+                labels={t.settings.colorThemes}
+                onChange={handleColorThemeChange}
+              />
+            </div>
           </div>
         </Section>
       ) : null}
@@ -322,6 +367,9 @@ export function SettingsView({
             </div>
             <Button variant="danger" size="small" onClick={() => setShouldCrash(true)}>
               {t.settings.triggerRuntimeError}
+            </Button>
+            <Button variant="danger" size="small" onClick={() => void handleResetLocalData()}>
+              {t.settings.resetLocalData}
             </Button>
           </div>
         </Section>

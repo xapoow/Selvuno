@@ -1,3 +1,4 @@
+import type { ColorThemePreference } from "@myfinances/types";
 import type { AppView } from "./state/appStore";
 
 export type Language = "en" | "ru";
@@ -72,6 +73,25 @@ export interface Dictionary {
     uncategorized: string;
     wallet: string;
   };
+  onboarding: {
+    welcomeEyebrow: string;
+    welcomeTitle: string;
+    welcomeBody: string;
+    languageTitle: string;
+    start: string;
+    setupEyebrow: string;
+    setupTitle: string;
+    setupBody: string;
+    globalCurrency: string;
+    walletName: string;
+    walletNamePlaceholder: string;
+    walletCurrency: string;
+    theme: string;
+    colorTheme: string;
+    finish: string;
+    back: string;
+    error: string;
+  };
   greetings: {
     morning: string[];
     day: string[];
@@ -139,6 +159,8 @@ export interface Dictionary {
     system: string;
     light: string;
     dark: string;
+    colorTheme: string;
+    colorThemes: Record<ColorThemePreference, string>;
     backup: string;
     exportJson: string;
     importJson: string;
@@ -151,6 +173,8 @@ export interface Dictionary {
     debug: string;
     version: string;
     triggerRuntimeError: string;
+    resetLocalData: string;
+    resetLocalDataConfirm: string;
     errorPreview: string;
     closePreview: string;
   };
@@ -209,6 +233,25 @@ export const dictionaries: Record<Language, Dictionary> = {
       timeZone: "Time zone",
       uncategorized: "Uncategorized",
       wallet: "Wallet"
+    },
+    onboarding: {
+      welcomeEyebrow: "Welcome",
+      welcomeTitle: "Let’s set up your finance space",
+      welcomeBody: "Choose the language first. The next step will prepare currency, theme, and your first wallet.",
+      languageTitle: "Language",
+      start: "Start setup",
+      setupEyebrow: "First setup",
+      setupTitle: "Make it yours",
+      setupBody: "These choices can be changed later in settings.",
+      globalCurrency: "Global currency",
+      walletName: "First wallet name",
+      walletNamePlaceholder: "Everyday",
+      walletCurrency: "Wallet currency",
+      theme: "Theme",
+      colorTheme: "Color theme",
+      finish: "Finish setup",
+      back: "Back",
+      error: "Unable to finish setup."
     },
     greetings: {
       morning: ["Good morning", "Morning check-in", "Fresh start", "Ready for today"],
@@ -297,6 +340,17 @@ export const dictionaries: Record<Language, Dictionary> = {
       system: "System",
       light: "Light",
       dark: "Dark",
+      colorTheme: "Color theme",
+      colorThemes: {
+        sage: "Sage",
+        rose: "Rose",
+        violet: "Violet",
+        sky: "Sky",
+        amber: "Amber",
+        graphite: "Graphite",
+        mint: "Mint",
+        coral: "Coral"
+      },
       backup: "Backup",
       exportJson: "Export JSON",
       importJson: "Import JSON",
@@ -309,6 +363,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       debug: "Debug",
       version: "Version",
       triggerRuntimeError: "Trigger runtime error",
+      resetLocalData: "Reset local data",
+      resetLocalDataConfirm: "Clear local data, cookies, and restart onboarding?",
       errorPreview: "Error preview",
       closePreview: "Close preview"
     },
@@ -414,6 +470,25 @@ export const dictionaries: Record<Language, Dictionary> = {
       uncategorized: "Без категории",
       wallet: "Кошелек"
     },
+    onboarding: {
+      welcomeEyebrow: "Добро пожаловать",
+      welcomeTitle: "Давай настроим твое финансовое пространство",
+      welcomeBody: "Сначала выбери язык. На следующем шаге подготовим валюту, тему и первый кошелек.",
+      languageTitle: "Язык",
+      start: "Начать настройку",
+      setupEyebrow: "Первый запуск",
+      setupTitle: "Настроим под тебя",
+      setupBody: "Все это потом можно будет изменить в настройках.",
+      globalCurrency: "Общая валюта",
+      walletName: "Название первого кошелька",
+      walletNamePlaceholder: "Основной",
+      walletCurrency: "Валюта кошелька",
+      theme: "Тема",
+      colorTheme: "Цветовая тема",
+      finish: "Завершить настройку",
+      back: "Назад",
+      error: "Не удалось завершить настройку."
+    },
     greetings: {
       morning: ["Доброе утро", "Утренний чек-ин", "Свежий старт", "План на день готов"],
       day: ["Добрый день", "Дневной срез финансов", "Фокус на сегодня"],
@@ -501,6 +576,17 @@ export const dictionaries: Record<Language, Dictionary> = {
       system: "Система",
       light: "Светлая",
       dark: "Темная",
+      colorTheme: "Цветовая тема",
+      colorThemes: {
+        sage: "Шалфей",
+        rose: "Розовая",
+        violet: "Фиолетовая",
+        sky: "Небо",
+        amber: "Янтарная",
+        graphite: "Графит",
+        mint: "Мятная",
+        coral: "Коралловая"
+      },
       backup: "Бэкап",
       exportJson: "Экспорт JSON",
       importJson: "Импорт JSON",
@@ -513,6 +599,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       debug: "Дебаг",
       version: "Версия",
       triggerRuntimeError: "Вызвать runtime ошибку",
+      resetLocalData: "Сбросить локальные данные",
+      resetLocalDataConfirm: "Очистить локальные данные, cookies и запустить onboarding заново?",
       errorPreview: "Превью ошибки",
       closePreview: "Закрыть превью"
     },

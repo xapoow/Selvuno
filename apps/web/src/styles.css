@@ -30,6 +30,134 @@
   --color-warning: 236 178 81;
 }
 
+.theme-sage {
+  --color-accent: 32 122 111;
+  --color-accent-soft: 212 242 235;
+  --color-income: 31 143 102;
+  --color-expense: 196 74 66;
+  --color-warning: 183 121 31;
+}
+
+.dark.theme-sage {
+  --color-accent: 97 208 182;
+  --color-accent-soft: 33 67 60;
+  --color-income: 174 239 193;
+  --color-expense: 255 118 109;
+  --color-warning: 236 178 81;
+}
+
+.theme-rose {
+  --color-accent: 214 76 134;
+  --color-accent-soft: 253 226 239;
+  --color-income: 36 145 106;
+  --color-expense: 199 68 88;
+  --color-warning: 176 111 31;
+}
+
+.dark.theme-rose {
+  --color-accent: 244 132 183;
+  --color-accent-soft: 82 36 58;
+  --color-income: 145 231 187;
+  --color-expense: 255 126 145;
+  --color-warning: 235 176 84;
+}
+
+.theme-violet {
+  --color-accent: 121 96 217;
+  --color-accent-soft: 236 231 255;
+  --color-income: 38 143 111;
+  --color-expense: 199 78 73;
+  --color-warning: 174 112 28;
+}
+
+.dark.theme-violet {
+  --color-accent: 171 151 255;
+  --color-accent-soft: 55 48 91;
+  --color-income: 142 230 194;
+  --color-expense: 255 127 118;
+  --color-warning: 232 178 79;
+}
+
+.theme-sky {
+  --color-accent: 35 120 183;
+  --color-accent-soft: 223 241 255;
+  --color-income: 20 143 115;
+  --color-expense: 200 72 72;
+  --color-warning: 178 116 30;
+}
+
+.dark.theme-sky {
+  --color-accent: 110 190 247;
+  --color-accent-soft: 31 61 83;
+  --color-income: 136 226 196;
+  --color-expense: 255 123 123;
+  --color-warning: 234 178 82;
+}
+
+.theme-amber {
+  --color-accent: 184 112 20;
+  --color-accent-soft: 255 240 207;
+  --color-income: 47 138 107;
+  --color-expense: 194 77 66;
+  --color-warning: 184 112 20;
+}
+
+.dark.theme-amber {
+  --color-accent: 242 178 83;
+  --color-accent-soft: 79 55 28;
+  --color-income: 147 225 192;
+  --color-expense: 255 125 114;
+  --color-warning: 242 178 83;
+}
+
+.theme-graphite {
+  --color-accent: 96 106 118;
+  --color-accent-soft: 231 235 239;
+  --color-income: 42 136 103;
+  --color-expense: 188 74 76;
+  --color-warning: 164 107 44;
+}
+
+.dark.theme-graphite {
+  --color-accent: 185 193 202;
+  --color-accent-soft: 56 61 67;
+  --color-income: 142 224 190;
+  --color-expense: 247 123 127;
+  --color-warning: 224 170 91;
+}
+
+.theme-mint {
+  --color-accent: 21 156 127;
+  --color-accent-soft: 217 248 239;
+  --color-income: 31 143 102;
+  --color-expense: 198 78 70;
+  --color-warning: 177 118 28;
+}
+
+.dark.theme-mint {
+  --color-accent: 99 222 190;
+  --color-accent-soft: 33 75 65;
+  --color-income: 151 234 194;
+  --color-expense: 255 126 116;
+  --color-warning: 235 178 78;
+}
+
+.theme-coral {
+  --color-accent: 216 94 71;
+  --color-accent-soft: 255 225 217;
+  --color-income: 34 139 109;
+  --color-expense: 196 72 65;
+  --color-warning: 176 111 31;
+}
+
+.dark.theme-coral {
+  --color-accent: 255 143 120;
+  --color-accent-soft: 83 42 35;
+  --color-income: 145 226 193;
+  --color-expense: 255 127 119;
+  --color-warning: 232 177 82;
+}
+
 * {
   box-sizing: border-box;
 }

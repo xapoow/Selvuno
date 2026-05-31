@@ -78,7 +78,9 @@ export async function seedLocalData(db = financeDb): Promise<void> {
       dateFormat: defaults.dateFormat,
       timeZone: defaults.timeZone,
       theme: "system",
+      colorTheme: "sage",
       activeWalletId: "all",
+      onboardingCompleted: false,
       defaultsVersion: 2,
       createdAt: now,
       updatedAt: now
@@ -104,8 +106,14 @@ export async function seedLocalData(db = financeDb): Promise<void> {
     if (!settings.theme) {
       repairedSettings.theme = "system";
     }
+    if (!settings.colorTheme) {
+      repairedSettings.colorTheme = "sage";
+    }
     if (!settings.activeWalletId) {
       repairedSettings.activeWalletId = "all";
+    }
+    if (typeof settings.onboardingCompleted !== "boolean") {
+      repairedSettings.onboardingCompleted = true;
     }
     if (!settings.defaultsVersion) {
       repairedSettings.defaultsVersion = 2;

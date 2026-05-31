@@ -17,7 +17,7 @@ export function WalletSwitcher({ wallets, value, allLabel, onChange }: WalletSwi
           onClick={() => onChange("all")}
           className={cn(
             "h-10 rounded-app border border-line bg-surface px-4 text-sm font-medium text-muted transition active:scale-[0.98]",
-            value === "all" && "border-foreground bg-foreground text-background"
+            value === "all" && "border-accent bg-accent text-white shadow-sm"
           )}
         >
           {allLabel}
@@ -29,7 +29,7 @@ export function WalletSwitcher({ wallets, value, allLabel, onChange }: WalletSwi
             onClick={() => onChange(wallet.id)}
             className={cn(
               "h-10 rounded-app border border-line bg-surface px-4 text-sm font-medium text-muted transition active:scale-[0.98]",
-              value === wallet.id && "border-foreground bg-foreground text-background"
+              value === wallet.id && "border-accent bg-accent text-white shadow-sm"
             )}
           >
             {wallet.name}

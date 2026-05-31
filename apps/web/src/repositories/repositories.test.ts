@@ -16,7 +16,9 @@ describe("finance repositories", () => {
 
     expect(await settingsRepository.getSettings()).toMatchObject({
       id: "default",
-      activeWalletId: "all"
+      activeWalletId: "all",
+      colorTheme: "sage",
+      onboardingCompleted: false
     });
     expect(await walletRepository.listWallets()).toHaveLength(1);
     expect(await categoryRepository.listCategories("expense")).not.toHaveLength(0);
@@ -45,6 +47,31 @@ describe("finance repositories", () => {
     const after = await settingsRepository.updateSettings({ activeWalletId: "all" });
 
     expect(after.currency).toBe(before.currency);
+  });
+
+  it("can complete onboarding through settings", async () => {
+    await seedLocalData();
+    const [wallet] = await walletRepository.listWallets();
+
+    const updatedWallet = await walletRepository.updateWallet(wallet.id, { name: "Main", currency: "eur" });
+    const settings = await settingsRepository.updateSettings({
+      locale: "ru-RU",
+      currency: "usd",
+      theme: "dark",
+      colorTheme: "rose",
+      activeWalletId: updatedWallet.id,
+      onboardingCompleted: true
+    });
+
+    expect(updatedWallet).toMatchObject({ name: "Main", currency: "EUR" });
+    expect(settings).toMatchObject({
+      locale: "ru-RU",
+      currency: "USD",
+      theme: "dark",
+      colorTheme: "rose",
+      activeWalletId: updatedWallet.id,
+      onboardingCompleted: true
+    });
   });
 
   it("keeps wallet currency independent from the global settings currency", async () => {
@@ -87,13 +114,14 @@ describe("finance repositories", () => {
       transactionDate: new Date("2026-05-31T00:00:00.000Z").toISOString()
     });
 
-    await financeDb.settings.put({ ...settings, currency: undefined } as never);
+    await financeDb.settings.put({ ...settings, currency: undefined, colorTheme: undefined } as never);
     await financeDb.wallets.put({ ...wallet, currency: undefined } as never);
     await financeDb.transactions.put({ ...transaction, currency: undefined } as never);
 
     await seedLocalData();
 
     expect((await settingsRepository.getSettings()).currency).toBeTruthy();
+    expect((await settingsRepository.getSettings()).colorTheme).toBe("sage");
     expect((await walletRepository.listWallets())[0].currency).toBeTruthy();
     expect((await transactionRepository.listTransactions({ includeDeleted: true }))[0].currency).toBeTruthy();
   });

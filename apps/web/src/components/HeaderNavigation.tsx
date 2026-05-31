@@ -21,7 +21,7 @@ export function HeaderNavigation({ activeView, labels, onChange }: HeaderNavigat
             onClick={() => onChange(item.view)}
             className={cn(
               "inline-flex h-10 items-center justify-center gap-2 rounded-[6px] px-3 text-sm font-medium text-muted transition duration-200 active:scale-[0.98]",
-              isActive && "bg-surface text-foreground shadow-sm"
+              isActive && "bg-accent text-white shadow-sm"
             )}
             >
             <Icon className="h-4 w-4" />

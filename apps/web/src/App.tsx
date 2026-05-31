@@ -1,17 +1,19 @@
 import { useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import type { WalletView } from "@myfinances/types";
 import { BottomNavigation } from "./components/BottomNavigation";
 import { HeaderNavigation } from "./components/HeaderNavigation";
 import { WalletSwitcher } from "./components/WalletSwitcher";
 import { ErrorScreen } from "./components/ErrorScreen";
 import { getDictionary } from "./i18n";
+import { applyRootVisualTheme } from "./lib/colorThemes";
 import { useExchangeRates } from "./lib/exchangeRates";
 import { useAppStore } from "./state/appStore";
 import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
 import { AddTransactionView } from "./views/AddTransactionView";
 import { DashboardView } from "./views/DashboardView";
 import { HistoryView } from "./views/HistoryView";
+import { OnboardingView } from "./views/OnboardingView";
 import { SettingsView } from "./views/SettingsView";
 import { WalletsView } from "./views/WalletsView";
 
@@ -37,9 +39,7 @@ export function App() {
     }
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     const applyTheme = () => {
-      const shouldUseDark = settings.theme === "dark" || (settings.theme === "system" && media.matches);
-      document.documentElement.classList.toggle("dark", shouldUseDark);
-      document.documentElement.style.colorScheme = shouldUseDark ? "dark" : "light";
+      applyRootVisualTheme(settings.theme, settings.colorTheme);
     };
     applyTheme();
     media.addEventListener("change", applyTheme);
@@ -94,6 +94,18 @@ export function App() {
 
   const t = getDictionary(settings.locale);
 
+  if (!settings.onboardingCompleted) {
+    return (
+      <OnboardingView
+        settings={settings}
+        wallets={wallets}
+        onUpdateSettings={async (input) => mutations.updateSettings.mutateAsync(input)}
+        onCreateWallet={(input) => mutations.createWallet.mutateAsync(input)}
+        onUpdateWallet={(id, input) => mutations.updateWallet.mutateAsync({ id, input })}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-30 border-b border-line bg-background/88 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+14px)] backdrop-blur-xl">
@@ -117,94 +129,91 @@ export function App() {
             onChange={(activeWallet) => void mutations.updateSettings.mutateAsync({ activeWalletId: activeWallet })}
           />
         </div>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeView}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-          >
-            {activeView === "dashboard" ? (
-              <DashboardView
-                wallets={wallets}
-                categories={categories}
-                transactions={transactions}
-                settings={settings}
-                activeWalletId={activeWalletId}
-                displayCurrency={displayCurrency}
-                exchangeRates={exchangeRates.data}
-                isUpdatingExchangeRates={exchangeRates.isFetching && conversionNeeded}
-                hasExchangeRateError={exchangeRates.isError && conversionNeeded}
-                t={t}
-                onAdd={() => setActiveView("add")}
-              />
-            ) : null}
-            {activeView === "add" ? (
-              <AddTransactionView
-                wallets={wallets}
-                categories={categories}
-                settings={{ ...settings, activeWalletId }}
-                t={t}
-                onSubmit={async (input) => {
-                  await mutations.addTransaction.mutateAsync(input);
-                }}
-              />
-            ) : null}
-            {activeView === "history" ? (
-              <HistoryView
-                wallets={wallets}
-                categories={categories}
-                transactions={transactions}
-                settings={settings}
-                activeWalletId={activeWalletId}
-                displayCurrency={displayCurrency}
-                exchangeRates={exchangeRates.data}
-                t={t}
-                onUpdate={async (id, input) => {
-                  await mutations.updateTransaction.mutateAsync({ id, input });
-                }}
-                onDelete={(id) => mutations.deleteTransaction.mutateAsync(id)}
-              />
-            ) : null}
-            {activeView === "wallets" ? (
-              <WalletsView
-                wallets={wallets}
-                transactions={transactions}
-                settings={settings}
-                t={t}
-                onCreate={async (input) => {
-                  await mutations.createWallet.mutateAsync(input);
-                }}
-                onUpdate={async (id, input) => {
-                  await mutations.updateWallet.mutateAsync({ id, input });
-                }}
-                onArchive={(id) => mutations.archiveWallet.mutateAsync(id)}
-              />
-            ) : null}
-            {activeView === "settings" ? (
-              <SettingsView
-                settings={settings}
-                categories={categories}
-                t={t}
-                onUpdateSettings={async (input) => {
-                  await mutations.updateSettings.mutateAsync(input);
-                }}
-                onCreateCategory={async (input) => {
-                  await mutations.createCategory.mutateAsync(input);
-                }}
-                onUpdateCategory={async (id, input) => {
-                  await mutations.updateCategory.mutateAsync({ id, input });
-                }}
-                onDeleteCategory={(id) => mutations.deleteCategory.mutateAsync(id)}
-                onExportBackup={() => mutations.exportBackup.mutateAsync()}
-                onImportBackup={async (backup) => {
-                  await mutations.importBackup.mutateAsync(backup);
-                }}
-              />
-            ) : null}
-          </motion.div>
-        </AnimatePresence>
+        <motion.div
+          key={activeView}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
+        >
+          {activeView === "dashboard" ? (
+            <DashboardView
+              wallets={wallets}
+              categories={categories}
+              transactions={transactions}
+              settings={settings}
+              activeWalletId={activeWalletId}
+              displayCurrency={displayCurrency}
+              exchangeRates={exchangeRates.data}
+              isUpdatingExchangeRates={exchangeRates.isFetching && conversionNeeded}
+              hasExchangeRateError={exchangeRates.isError && conversionNeeded}
+              t={t}
+              onAdd={() => setActiveView("add")}
+            />
+          ) : null}
+          {activeView === "add" ? (
+            <AddTransactionView
+              wallets={wallets}
+              categories={categories}
+              settings={{ ...settings, activeWalletId }}
+              t={t}
+              onSubmit={async (input) => {
+                await mutations.addTransaction.mutateAsync(input);
+              }}
+            />
+          ) : null}
+          {activeView === "history" ? (
+            <HistoryView
+              wallets={wallets}
+              categories={categories}
+              transactions={transactions}
+              settings={settings}
+              activeWalletId={activeWalletId}
+              displayCurrency={displayCurrency}
+              exchangeRates={exchangeRates.data}
+              t={t}
+              onUpdate={async (id, input) => {
+                await mutations.updateTransaction.mutateAsync({ id, input });
+              }}
+              onDelete={(id) => mutations.deleteTransaction.mutateAsync(id)}
+            />
+          ) : null}
+          {activeView === "wallets" ? (
+            <WalletsView
+              wallets={wallets}
+              transactions={transactions}
+              settings={settings}
+              t={t}
+              onCreate={async (input) => {
+                await mutations.createWallet.mutateAsync(input);
+              }}
+              onUpdate={async (id, input) => {
+                await mutations.updateWallet.mutateAsync({ id, input });
+              }}
+              onArchive={(id) => mutations.archiveWallet.mutateAsync(id)}
+            />
+          ) : null}
+          {activeView === "settings" ? (
+            <SettingsView
+              settings={settings}
+              categories={categories}
+              t={t}
+              onUpdateSettings={async (input) => {
+                await mutations.updateSettings.mutateAsync(input);
+              }}
+              onCreateCategory={async (input) => {
+                await mutations.createCategory.mutateAsync(input);
+              }}
+              onUpdateCategory={async (id, input) => {
+                await mutations.updateCategory.mutateAsync({ id, input });
+              }}
+              onDeleteCategory={(id) => mutations.deleteCategory.mutateAsync(id)}
+              onExportBackup={() => mutations.exportBackup.mutateAsync()}
+              onImportBackup={async (backup) => {
+                await mutations.importBackup.mutateAsync(backup);
+              }}
+            />
+          ) : null}
+        </motion.div>
       </main>
 
       <BottomNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />

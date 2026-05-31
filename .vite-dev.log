@@ -84,3 +84,30 @@
 [2m19:45:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx, /src/views/DashboardView.tsx, /src/views/HistoryView.tsx[22m
 [2m19:49:31[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx, /src/views/SettingsView.tsx, /src/components/AppErrorBoundary.tsx, /src/AppRouter.tsx, /src/components/TransactionForm.tsx, /src/views/HistoryView.tsx, /src/views/DashboardView.tsx, /src/components/TransactionRow.tsx[22m
 [2m19:49:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/SettingsView.tsx, /src/styles.css[22m
+[2m22:38:27[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx[22m
+[2m22:38:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx[22m
+[2m22:38:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx, /src/views/SettingsView.tsx, /src/components/AppErrorBoundary.tsx, /src/AppRouter.tsx, /src/components/TransactionForm.tsx, /src/views/HistoryView.tsx, /src/views/DashboardView.tsx, /src/components/TransactionRow.tsx[22m
+[2m22:39:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/SettingsView.tsx, /src/styles.css[22m
+[2m22:40:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/views/OnboardingView.tsx[22m
+[2m22:40:34[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/repositories/repositories.test.ts[22m
+[2m22:42:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/styles.css[22m
+[2m22:55:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx[22m
+[2m22:55:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx, /src/views/SettingsView.tsx[22m
+[2m22:56:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[2m22:57:05[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/styles.css[22m
+[2m22:57:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx, /src/views/SettingsView.tsx, /src/components/AppErrorBoundary.tsx, /src/AppRouter.tsx, /src/components/TransactionForm.tsx, /src/views/HistoryView.tsx, /src/views/DashboardView.tsx, /src/components/TransactionRow.tsx, /src/views/OnboardingView.tsx[22m
+[2m22:57:20[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx, /src/views/SettingsView.tsx, /src/components/AppErrorBoundary.tsx, /src/AppRouter.tsx, /src/components/TransactionForm.tsx, /src/views/HistoryView.tsx, /src/views/DashboardView.tsx, /src/components/TransactionRow.tsx, /src/views/OnboardingView.tsx[22m
+[2m22:57:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css, /src/App.tsx, /src/views/SettingsView.tsx, /src/components/AppErrorBoundary.tsx, /src/AppRouter.tsx, /src/components/TransactionForm.tsx, /src/views/HistoryView.tsx, /src/views/DashboardView.tsx, /src/components/TransactionRow.tsx, /src/views/OnboardingView.tsx[22m
+[2m22:57:33[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/SettingsView.tsx, /src/styles.css[22m
+[2m22:57:49[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/OnboardingView.tsx, /src/styles.css[22m
+[2m22:57:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/repositories/repositories.test.ts[22m
+[2m22:58:03[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/repositories/repositories.test.ts[22m
+[2m23:02:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ui/Button.tsx, /src/styles.css[22m
+[2m23:02:54[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ui/SegmentedControl.tsx, /src/styles.css[22m
+[2m23:03:00[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/HeaderNavigation.tsx, /src/styles.css[22m
+[2m23:03:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/BottomNavigation.tsx, /src/styles.css[22m
+[2m23:03:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/WalletSwitcher.tsx, /src/styles.css[22m
+[2m23:03:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/OnboardingView.tsx, /src/styles.css[22m
+[2m23:03:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/SettingsView.tsx, /src/styles.css[22m
+[2m23:03:28[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/SettingsView.tsx, /src/styles.css[22m
+[2m23:03:38[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/views/SettingsView.tsx, /src/styles.css[22m

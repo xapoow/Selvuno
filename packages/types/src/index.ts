@@ -9,6 +9,18 @@ export type TransactionType = z.infer<typeof transactionTypeSchema>;
 export const themePreferenceSchema = z.enum(["light", "dark", "system"]);
 export type ThemePreference = z.infer<typeof themePreferenceSchema>;
 
+export const colorThemePreferenceSchema = z.enum([
+  "sage",
+  "rose",
+  "violet",
+  "sky",
+  "amber",
+  "graphite",
+  "mint",
+  "coral"
+]);
+export type ColorThemePreference = z.infer<typeof colorThemePreferenceSchema>;
+
 export const walletViewSchema = z.union([z.literal("all"), z.string().uuid()]);
 export type WalletView = z.infer<typeof walletViewSchema>;
 
@@ -92,7 +104,9 @@ export const settingsSchema = z.object({
   dateFormat: dateFormatPreferenceSchema,
   timeZone: z.string().min(1).default("UTC"),
   theme: themePreferenceSchema,
+  colorTheme: colorThemePreferenceSchema.default("sage"),
   activeWalletId: walletViewSchema,
+  onboardingCompleted: z.boolean().default(false),
   defaultsVersion: z.number().int().default(2),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime()

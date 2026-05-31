@@ -22,7 +22,7 @@ export function BottomNavigation({ activeView, labels, onChange }: BottomNavigat
               onClick={() => onChange(item.view)}
               className={cn(
                 "grid h-12 place-items-center rounded-app text-[11px] font-medium text-muted transition duration-200 active:scale-[0.98]",
-                isActive && "bg-elevated text-foreground"
+                isActive && "bg-accentSoft text-accent"
               )}
             >
               <Icon className="h-5 w-5" />
