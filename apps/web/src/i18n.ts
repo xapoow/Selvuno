@@ -113,7 +113,9 @@ export interface Dictionary {
     addTitle: string;
     editTitle: string;
     amount: string;
+    chooseCategory: string;
     chooseWalletAndCategory: string;
+    selectWalletFirst: string;
     save: string;
     update: string;
     saveError: string;
@@ -283,7 +285,9 @@ export const dictionaries: Record<Language, Dictionary> = {
       addTitle: "Add transaction",
       editTitle: "Edit transaction",
       amount: "Amount",
+      chooseCategory: "Choose a category.",
       chooseWalletAndCategory: "Choose a wallet and category.",
+      selectWalletFirst: "Choose a specific wallet above before adding a transaction.",
       save: "Save transaction",
       update: "Update transaction",
       saveError: "Unable to save transaction."
@@ -519,7 +523,9 @@ export const dictionaries: Record<Language, Dictionary> = {
       addTitle: "Добавить операцию",
       editTitle: "Редактировать операцию",
       amount: "Сумма",
+      chooseCategory: "Выбери категорию.",
       chooseWalletAndCategory: "Выбери кошелек и категорию.",
+      selectWalletFirst: "Выбери конкретный кошелек сверху, чтобы добавить операцию.",
       save: "Сохранить операцию",
       update: "Обновить операцию",
       saveError: "Не удалось сохранить операцию."

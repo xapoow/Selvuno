@@ -5,7 +5,8 @@ import type {
   Transaction,
   TransactionInput,
   TransactionType,
-  Wallet
+  Wallet,
+  WalletView
 } from "@myfinances/types";
 import { minorToDecimal, parseAmountToMinor } from "@myfinances/utils";
 import { fromDateInputValue, toDateInputValue } from "../lib/dates";
@@ -21,7 +22,8 @@ interface TransactionFormProps {
   settings: Settings;
   t: Dictionary;
   initial?: Transaction;
-  activeWalletId: string;
+  activeWalletId: WalletView;
+  lockWalletToActive?: boolean;
   submitLabel: string;
   onSubmit: (input: TransactionInput) => Promise<void>;
 }
@@ -33,6 +35,7 @@ export function TransactionForm({
   t,
   initial,
   activeWalletId,
+  lockWalletToActive = false,
   submitLabel,
   onSubmit
 }: TransactionFormProps) {
@@ -62,13 +65,19 @@ export function TransactionForm({
     }
   }, [categoryId, typeCategories]);
 
+  useEffect(() => {
+    if (!initial && lockWalletToActive && activeWalletId !== "all") {
+      setWalletId(activeWalletId);
+    }
+  }, [activeWalletId, initial, lockWalletToActive]);
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setSaved(false);
     try {
       if (!walletId || !categoryId) {
-        throw new Error(t.transaction.chooseWalletAndCategory);
+        throw new Error(walletId ? t.transaction.chooseCategory : t.transaction.chooseWalletAndCategory);
       }
       await onSubmit({
         walletId,
@@ -106,14 +115,16 @@ export function TransactionForm({
         value={amount}
         onChange={(event) => setAmount(event.target.value)}
       />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <SelectField label={t.common.wallet} value={walletId} onChange={(event) => setWalletId(event.target.value)}>
-          {wallets.map((wallet) => (
-            <option key={wallet.id} value={wallet.id}>
-              {wallet.name}
-            </option>
-          ))}
-        </SelectField>
+      <div className={lockWalletToActive ? "grid gap-4" : "grid grid-cols-1 gap-4 sm:grid-cols-2"}>
+        {!lockWalletToActive ? (
+          <SelectField label={t.common.wallet} value={walletId} onChange={(event) => setWalletId(event.target.value)}>
+            {wallets.map((wallet) => (
+              <option key={wallet.id} value={wallet.id}>
+                {wallet.name}
+              </option>
+            ))}
+          </SelectField>
+        ) : null}
         <SelectField label={t.common.category} value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
           {typeCategories.map((category) => (
             <option key={category.id} value={category.id}>
