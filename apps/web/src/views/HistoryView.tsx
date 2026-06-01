@@ -32,6 +32,15 @@ interface HistoryViewProps {
 }
 
 type TypeFilter = TransactionType | "all";
+type HistorySort =
+  | "date-desc"
+  | "date-asc"
+  | "amount-desc"
+  | "amount-asc"
+  | "category-asc"
+  | "category-desc"
+  | "wallet-asc"
+  | "wallet-desc";
 
 export function HistoryView({
   wallets,
@@ -47,6 +56,7 @@ export function HistoryView({
 }: HistoryViewProps) {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [sortBy, setSortBy] = useState<HistorySort>("date-desc");
   const [editing, setEditing] = useState<Transaction | null>(null);
 
   const visibleTransactions = useMemo(
@@ -68,20 +78,67 @@ export function HistoryView({
       }),
     [activeWalletId, categoryFilter, transactions, typeFilter]
   );
-  const displayTransactions = visibleTransactions.map((transaction) => {
-    const convertedAmountMinor = convertMinorToBaseCurrency(
-      transaction.amountMinor,
-      transaction.currency,
-      displayCurrency,
-      exchangeRates
-    );
-    return {
-      transaction,
-      amountMinor: convertedAmountMinor ?? transaction.amountMinor,
-      currency: convertedAmountMinor === null ? transaction.currency : displayCurrency,
-      conversionMissing: convertedAmountMinor === null && transaction.currency.toUpperCase() !== displayCurrency
-    };
-  });
+  const displayTransactions = useMemo(() => {
+    const collator = new Intl.Collator(settings.locale, { numeric: true, sensitivity: "base" });
+    const byNewest = (left: Transaction, right: Transaction) =>
+      Date.parse(right.transactionDate) - Date.parse(left.transactionDate);
+    const getCategoryLabel = (transaction: Transaction) =>
+      getCategoryName(categories.find((category) => category.id === transaction.categoryId)?.name, t);
+    const getWalletLabel = (transaction: Transaction) =>
+      wallets.find((wallet) => wallet.id === transaction.walletId)?.name ?? "";
+
+    return visibleTransactions
+      .map((transaction) => {
+        const convertedAmountMinor = convertMinorToBaseCurrency(
+          transaction.amountMinor,
+          transaction.currency,
+          displayCurrency,
+          exchangeRates
+        );
+        return {
+          transaction,
+          amountMinor: convertedAmountMinor ?? transaction.amountMinor,
+          currency: convertedAmountMinor === null ? transaction.currency : displayCurrency,
+          conversionMissing: convertedAmountMinor === null && transaction.currency.toUpperCase() !== displayCurrency
+        };
+      })
+      .sort((left, right) => {
+        if (sortBy === "date-desc") {
+          return byNewest(left.transaction, right.transaction);
+        }
+        if (sortBy === "date-asc") {
+          return byNewest(right.transaction, left.transaction);
+        }
+        if (sortBy === "amount-desc") {
+          return right.amountMinor - left.amountMinor || byNewest(left.transaction, right.transaction);
+        }
+        if (sortBy === "amount-asc") {
+          return left.amountMinor - right.amountMinor || byNewest(left.transaction, right.transaction);
+        }
+        if (sortBy === "category-asc") {
+          return (
+            collator.compare(getCategoryLabel(left.transaction), getCategoryLabel(right.transaction)) ||
+            byNewest(left.transaction, right.transaction)
+          );
+        }
+        if (sortBy === "category-desc") {
+          return (
+            collator.compare(getCategoryLabel(right.transaction), getCategoryLabel(left.transaction)) ||
+            byNewest(left.transaction, right.transaction)
+          );
+        }
+        if (sortBy === "wallet-asc") {
+          return (
+            collator.compare(getWalletLabel(left.transaction), getWalletLabel(right.transaction)) ||
+            byNewest(left.transaction, right.transaction)
+          );
+        }
+        return (
+          collator.compare(getWalletLabel(right.transaction), getWalletLabel(left.transaction)) ||
+          byNewest(left.transaction, right.transaction)
+        );
+      });
+  }, [categories, displayCurrency, exchangeRates, settings.locale, sortBy, t, visibleTransactions, wallets]);
 
   async function handleDelete(transaction: Transaction) {
     if (window.confirm(t.history.confirmDelete)) {
@@ -104,14 +161,26 @@ export function HistoryView({
             { value: "income", label: t.common.income }
           ]}
         />
-        <SelectField label={t.common.category} value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
-          <option value="all">{t.history.allCategories}</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {getCategoryName(category.name, t)}
-            </option>
-          ))}
-        </SelectField>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <SelectField label={t.common.category} value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
+            <option value="all">{t.history.allCategories}</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {getCategoryName(category.name, t)}
+              </option>
+            ))}
+          </SelectField>
+          <SelectField label={t.history.sort} value={sortBy} onChange={(event) => setSortBy(event.target.value as HistorySort)}>
+            <option value="date-desc">{t.history.sortOptions.dateDesc}</option>
+            <option value="date-asc">{t.history.sortOptions.dateAsc}</option>
+            <option value="amount-desc">{t.history.sortOptions.amountDesc}</option>
+            <option value="amount-asc">{t.history.sortOptions.amountAsc}</option>
+            <option value="category-asc">{t.history.sortOptions.categoryAsc}</option>
+            <option value="category-desc">{t.history.sortOptions.categoryDesc}</option>
+            <option value="wallet-asc">{t.history.sortOptions.walletAsc}</option>
+            <option value="wallet-desc">{t.history.sortOptions.walletDesc}</option>
+          </SelectField>
+        </div>
       </div>
       {displayTransactions.length ? (
         <div className="grid gap-2">

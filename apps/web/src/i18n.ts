@@ -125,6 +125,17 @@ export interface Dictionary {
     allCategories: string;
     empty: string;
     confirmDelete: string;
+    sort: string;
+    sortOptions: {
+      dateDesc: string;
+      dateAsc: string;
+      amountDesc: string;
+      amountAsc: string;
+      categoryAsc: string;
+      categoryDesc: string;
+      walletAsc: string;
+      walletDesc: string;
+    };
   };
   wallets: {
     title: string;
@@ -296,7 +307,18 @@ export const dictionaries: Record<Language, Dictionary> = {
       title: "History",
       allCategories: "All categories",
       empty: "No transactions match these filters.",
-      confirmDelete: "Delete this transaction?"
+      confirmDelete: "Delete this transaction?",
+      sort: "Sort",
+      sortOptions: {
+        dateDesc: "Newest first",
+        dateAsc: "Oldest first",
+        amountDesc: "Amount high to low",
+        amountAsc: "Amount low to high",
+        categoryAsc: "Category A-Z",
+        categoryDesc: "Category Z-A",
+        walletAsc: "Wallet A-Z",
+        walletDesc: "Wallet Z-A"
+      }
     },
     wallets: {
       title: "Wallets",
@@ -534,7 +556,18 @@ export const dictionaries: Record<Language, Dictionary> = {
       title: "История",
       allCategories: "Все категории",
       empty: "Операций по этим фильтрам нет.",
-      confirmDelete: "Удалить эту операцию?"
+      confirmDelete: "Удалить эту операцию?",
+      sort: "Сортировка",
+      sortOptions: {
+        dateDesc: "Сначала новые",
+        dateAsc: "Сначала старые",
+        amountDesc: "Сумма по убыванию",
+        amountAsc: "Сумма по возрастанию",
+        categoryAsc: "Категория А-Я",
+        categoryDesc: "Категория Я-А",
+        walletAsc: "Кошелек А-Я",
+        walletDesc: "Кошелек Я-А"
+      }
     },
     wallets: {
       title: "Кошельки",
