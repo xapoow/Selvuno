@@ -125,7 +125,10 @@ export function App() {
           <WalletSwitcher
             wallets={wallets}
             value={activeWalletId}
+            label={t.common.wallet}
             allLabel={t.wallets.allWallets}
+            allCurrency={settings.currency}
+            className="w-full"
             onChange={(activeWallet) => void mutations.updateSettings.mutateAsync({ activeWalletId: activeWallet })}
           />
         </div>
