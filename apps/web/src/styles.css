@@ -31,6 +31,11 @@
 }
 
 .theme-sage {
+  --color-background: 245 248 245;
+  --color-surface: 253 255 252;
+  --color-elevated: 235 241 237;
+  --color-muted: 96 105 99;
+  --color-line: 215 224 218;
   --color-accent: 32 122 111;
   --color-accent-soft: 212 242 235;
   --color-income: 31 143 102;
@@ -39,6 +44,11 @@
 }
 
 .dark.theme-sage {
+  --color-background: 16 20 18;
+  --color-surface: 25 30 27;
+  --color-elevated: 35 42 37;
+  --color-muted: 162 174 166;
+  --color-line: 55 67 60;
   --color-accent: 97 208 182;
   --color-accent-soft: 33 67 60;
   --color-income: 174 239 193;
@@ -47,6 +57,11 @@
 }
 
 .theme-rose {
+  --color-background: 250 246 248;
+  --color-surface: 255 252 254;
+  --color-elevated: 244 235 240;
+  --color-muted: 108 96 103;
+  --color-line: 228 216 223;
   --color-accent: 214 76 134;
   --color-accent-soft: 253 226 239;
   --color-income: 36 145 106;
@@ -55,6 +70,11 @@
 }
 
 .dark.theme-rose {
+  --color-background: 21 18 20;
+  --color-surface: 31 27 30;
+  --color-elevated: 43 36 41;
+  --color-muted: 178 164 172;
+  --color-line: 68 55 63;
   --color-accent: 244 132 183;
   --color-accent-soft: 82 36 58;
   --color-income: 145 231 187;
@@ -63,6 +83,11 @@
 }
 
 .theme-violet {
+  --color-background: 247 246 251;
+  --color-surface: 254 253 255;
+  --color-elevated: 237 235 247;
+  --color-muted: 101 98 113;
+  --color-line: 220 217 232;
   --color-accent: 121 96 217;
   --color-accent-soft: 236 231 255;
   --color-income: 38 143 111;
@@ -71,6 +96,11 @@
 }
 
 .dark.theme-violet {
+  --color-background: 19 18 23;
+  --color-surface: 28 27 34;
+  --color-elevated: 39 37 50;
+  --color-muted: 169 164 185;
+  --color-line: 61 56 78;
   --color-accent: 171 151 255;
   --color-accent-soft: 55 48 91;
   --color-income: 142 230 194;
@@ -79,6 +109,11 @@
 }
 
 .theme-sky {
+  --color-background: 244 248 250;
+  --color-surface: 252 254 255;
+  --color-elevated: 233 240 245;
+  --color-muted: 94 104 112;
+  --color-line: 214 224 232;
   --color-accent: 35 120 183;
   --color-accent-soft: 223 241 255;
   --color-income: 20 143 115;
@@ -87,6 +122,11 @@
 }
 
 .dark.theme-sky {
+  --color-background: 16 19 22;
+  --color-surface: 24 29 33;
+  --color-elevated: 34 42 49;
+  --color-muted: 158 172 181;
+  --color-line: 53 66 76;
   --color-accent: 110 190 247;
   --color-accent-soft: 31 61 83;
   --color-income: 136 226 196;
@@ -95,6 +135,11 @@
 }
 
 .theme-amber {
+  --color-background: 250 248 243;
+  --color-surface: 255 254 250;
+  --color-elevated: 244 238 226;
+  --color-muted: 108 101 90;
+  --color-line: 228 220 204;
   --color-accent: 184 112 20;
   --color-accent-soft: 255 240 207;
   --color-income: 47 138 107;
@@ -103,6 +148,11 @@
 }
 
 .dark.theme-amber {
+  --color-background: 21 19 16;
+  --color-surface: 31 28 23;
+  --color-elevated: 44 39 30;
+  --color-muted: 180 170 153;
+  --color-line: 68 59 43;
   --color-accent: 242 178 83;
   --color-accent-soft: 79 55 28;
   --color-income: 147 225 192;
@@ -111,6 +161,11 @@
 }
 
 .theme-graphite {
+  --color-background: 246 247 248;
+  --color-surface: 254 254 254;
+  --color-elevated: 235 238 241;
+  --color-muted: 99 103 108;
+  --color-line: 219 223 226;
   --color-accent: 96 106 118;
   --color-accent-soft: 231 235 239;
   --color-income: 42 136 103;
@@ -119,6 +174,11 @@
 }
 
 .dark.theme-graphite {
+  --color-background: 18 19 20;
+  --color-surface: 27 29 31;
+  --color-elevated: 39 42 45;
+  --color-muted: 166 171 176;
+  --color-line: 59 64 69;
   --color-accent: 185 193 202;
   --color-accent-soft: 56 61 67;
   --color-income: 142 224 190;
@@ -127,6 +187,11 @@
 }
 
 .theme-mint {
+  --color-background: 244 249 247;
+  --color-surface: 252 255 254;
+  --color-elevated: 232 242 238;
+  --color-muted: 93 106 101;
+  --color-line: 211 225 220;
   --color-accent: 21 156 127;
   --color-accent-soft: 217 248 239;
   --color-income: 31 143 102;
@@ -135,6 +200,11 @@
 }
 
 .dark.theme-mint {
+  --color-background: 15 21 19;
+  --color-surface: 23 32 29;
+  --color-elevated: 32 45 40;
+  --color-muted: 157 177 168;
+  --color-line: 51 72 63;
   --color-accent: 99 222 190;
   --color-accent-soft: 33 75 65;
   --color-income: 151 234 194;
@@ -143,6 +213,11 @@
 }
 
 .theme-coral {
+  --color-background: 250 246 244;
+  --color-surface: 255 253 252;
+  --color-elevated: 244 235 231;
+  --color-muted: 109 97 93;
+  --color-line: 228 216 211;
   --color-accent: 216 94 71;
   --color-accent-soft: 255 225 217;
   --color-income: 34 139 109;
@@ -151,6 +226,11 @@
 }
 
 .dark.theme-coral {
+  --color-background: 22 18 17;
+  --color-surface: 32 27 25;
+  --color-elevated: 45 36 33;
+  --color-muted: 181 164 158;
+  --color-line: 70 56 51;
   --color-accent: 255 143 120;
   --color-accent-soft: 83 42 35;
   --color-income: 145 226 193;
@@ -179,6 +259,9 @@ body {
   margin: 0;
   background: rgb(var(--color-background));
   color: rgb(var(--color-foreground));
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
 }
 
 button,
