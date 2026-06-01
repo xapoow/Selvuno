@@ -31,7 +31,7 @@ export function ColorThemePicker({ value, labels, onChange }: ColorThemePickerPr
               <span
                 className="h-7 w-7 rounded-full ring-1 ring-line"
                 style={{
-                  background: `linear-gradient(135deg, ${option.accent} 0 54%, ${option.soft} 54% 100%)`
+                  background: `linear-gradient(135deg, ${option.background} 0 28%, ${option.soft} 28% 60%, ${option.accent} 60% 100%)`
                 }}
               />
               <span
