@@ -10,6 +10,7 @@ import type {
 } from "@myfinances/types";
 import { minorToDecimal, parseAmountToMinor } from "@myfinances/utils";
 import { fromDateInputValue, toDateInputValue } from "../lib/dates";
+import { formatTagsInput, parseTagsInput } from "../lib/tags";
 import { Button } from "./ui/Button";
 import { SelectField } from "./ui/SelectField";
 import { SegmentedControl } from "./ui/SegmentedControl";
@@ -49,6 +50,7 @@ export function TransactionForm({
   );
   const [date, setDate] = useState(toDateInputValue(initial?.transactionDate ?? new Date().toISOString()));
   const [note, setNote] = useState(initial?.note ?? "");
+  const [tagsInput, setTagsInput] = useState(formatTagsInput(initial?.tags));
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
   const selectedWallet = wallets.find((wallet) => wallet.id === walletId);
@@ -86,11 +88,13 @@ export function TransactionForm({
         amountMinor: parseAmountToMinor(amount, currency),
         currency,
         transactionDate: fromDateInputValue(date),
-        note: note.trim() || undefined
+        note: note.trim() || undefined,
+        tags: parseTagsInput(tagsInput)
       });
       if (!initial) {
         setAmount("");
         setNote("");
+        setTagsInput("");
       }
       setSaved(true);
     } catch (cause) {
@@ -137,6 +141,13 @@ export function TransactionForm({
         <TextField label={t.common.date} type="date" value={date} onChange={(event) => setDate(event.target.value)} />
         <TextField label={t.common.note} value={note} onChange={(event) => setNote(event.target.value)} maxLength={240} />
       </div>
+      <TextField
+        label={t.transaction.tags}
+        value={tagsInput}
+        placeholder={t.transaction.tagsPlaceholder}
+        onChange={(event) => setTagsInput(event.target.value)}
+        maxLength={220}
+      />
       {error ? <p className="text-sm font-medium text-expense">{error}</p> : null}
       {saved ? <p className="text-sm font-medium text-income">{t.common.saved}</p> : null}
       <Button type="submit" disabled={!wallets.length || !typeCategories.length}>

@@ -5,6 +5,7 @@ export type SyncStatus = z.infer<typeof syncStatusSchema>;
 
 export const transactionTypeSchema = z.enum(["expense", "income"]);
 export type TransactionType = z.infer<typeof transactionTypeSchema>;
+export const transactionTagSchema = z.string().trim().min(1).max(32);
 
 export const themePreferenceSchema = z.enum(["light", "dark", "system"]);
 export type ThemePreference = z.infer<typeof themePreferenceSchema>;
@@ -72,6 +73,7 @@ export const transactionSchema = baseEntitySchema.extend({
   currency: z.string().length(3),
   type: transactionTypeSchema,
   note: z.string().max(240).optional(),
+  tags: z.array(transactionTagSchema).max(12).default([]),
   transactionDate: z.string().datetime()
 });
 export type Transaction = z.infer<typeof transactionSchema>;
@@ -83,6 +85,7 @@ export const transactionInputSchema = z.object({
   currency: z.string().length(3),
   type: transactionTypeSchema,
   note: z.string().max(240).optional(),
+  tags: z.array(transactionTagSchema).max(12).optional(),
   transactionDate: z.string().datetime()
 });
 export type TransactionInput = z.infer<typeof transactionInputSchema>;

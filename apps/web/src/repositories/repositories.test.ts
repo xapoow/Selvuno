@@ -117,7 +117,7 @@ describe("finance repositories", () => {
 
     await financeDb.settings.put({ ...settings, currency: undefined, colorTheme: undefined } as never);
     await financeDb.wallets.put({ ...wallet, currency: undefined } as never);
-    await financeDb.transactions.put({ ...transaction, currency: undefined } as never);
+    await financeDb.transactions.put({ ...transaction, currency: undefined, tags: undefined } as never);
 
     await seedLocalData();
 
@@ -125,6 +125,7 @@ describe("finance repositories", () => {
     expect((await settingsRepository.getSettings()).colorTheme).toBe("sage");
     expect((await walletRepository.listWallets())[0].currency).toBeTruthy();
     expect((await transactionRepository.listTransactions({ includeDeleted: true }))[0].currency).toBeTruthy();
+    expect((await transactionRepository.listTransactions({ includeDeleted: true }))[0].tags).toEqual([]);
   });
 
   it("adds, lists, updates, and soft deletes transactions", async () => {
@@ -139,13 +140,19 @@ describe("finance repositories", () => {
       amountMinor: 2500,
       currency: wallet.currency,
       transactionDate: new Date("2026-05-31T00:00:00.000Z").toISOString(),
-      note: "Lunch"
+      note: "Lunch",
+      tags: [" Coffee ", "#Work", "coffee"]
     });
 
     expect(await transactionRepository.listTransactions({ walletId: wallet.id })).toHaveLength(1);
+    expect(transaction.tags).toEqual(["Coffee", "Work"]);
 
-    const updated = await transactionRepository.updateTransaction(transaction.id, { amountMinor: 3000 });
+    const updated = await transactionRepository.updateTransaction(transaction.id, {
+      amountMinor: 3000,
+      tags: ["team", "Team", "#Q2"]
+    });
     expect(updated.amountMinor).toBe(3000);
+    expect(updated.tags).toEqual(["team", "Q2"]);
 
     await transactionRepository.deleteTransaction(transaction.id);
 

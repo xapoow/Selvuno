@@ -162,11 +162,12 @@ export async function seedLocalData(db = financeDb): Promise<void> {
   const transactions = await db.transactions.toArray();
   await Promise.all(
     transactions
-      .filter((transaction) => !transaction.currency)
+      .filter((transaction) => !transaction.currency || !Array.isArray((transaction as Partial<Transaction>).tags))
       .map((transaction) =>
         db.transactions.put({
           ...transaction,
-          currency: walletCurrencyById.get(transaction.walletId) ?? DEFAULT_CURRENCY,
+          currency: transaction.currency ?? walletCurrencyById.get(transaction.walletId) ?? DEFAULT_CURRENCY,
+          tags: Array.isArray((transaction as Partial<Transaction>).tags) ? transaction.tags : [],
           updatedAt: now
         })
       )

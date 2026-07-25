@@ -1,6 +1,7 @@
 import type { Transaction, TransactionFilter, TransactionInput } from "@myfinances/types";
 import { transactionFilterSchema, transactionInputSchema } from "@myfinances/types";
 import { createEntityBase, financeDb, nowIso } from "../db/database";
+import { normalizeTags } from "../lib/tags";
 
 export interface TransactionRepository {
   addTransaction(input: TransactionInput): Promise<Transaction>;
@@ -19,11 +20,13 @@ export const transactionRepository: TransactionRepository = {
     const currency = await getWalletCurrency(input.walletId, input.currency);
     const parsed = transactionInputSchema.parse({
       ...input,
-      currency
+      currency,
+      tags: normalizeTags(input.tags)
     });
     const transaction: Transaction = {
       ...createEntityBase(),
-      ...parsed
+      ...parsed,
+      tags: parsed.tags ?? []
     };
     await financeDb.transactions.add(transaction);
     return transaction;
@@ -41,6 +44,7 @@ export const transactionRepository: TransactionRepository = {
       ...input,
       walletId,
       currency,
+      tags: input.tags ? normalizeTags(input.tags) : current.tags ?? [],
       updatedAt: nowIso(),
       syncStatus: "pending"
     };
@@ -51,6 +55,7 @@ export const transactionRepository: TransactionRepository = {
       currency: next.currency,
       type: next.type,
       note: next.note,
+      tags: next.tags,
       transactionDate: next.transactionDate
     });
     await financeDb.transactions.put(next);

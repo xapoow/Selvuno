@@ -34,6 +34,7 @@ export function TransactionRow({
   const categoryName = t ? getCategoryName(category?.name, t) : category?.name ?? "Uncategorized";
   const amountMinor = displayAmountMinor ?? transaction.amountMinor;
   const currency = displayCurrency ?? transaction.currency;
+  const tags = Array.isArray(transaction.tags) ? transaction.tags : [];
 
   return (
     <article className="app-surface grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-app p-3">
@@ -54,6 +55,15 @@ export function TransactionRow({
           {formatDate(transaction.transactionDate, settings.locale, settings.dateFormat, settings.timeZone)}
           {transaction.note ? ` · ${transaction.note}` : ""}
         </p>
+        {tags.length ? (
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {tags.map((tag) => (
+              <span key={tag} className="app-control rounded-[6px] px-1.5 py-0.5 text-[11px] font-medium text-muted">
+                #{tag}
+              </span>
+            ))}
+          </div>
+        ) : null}
       </div>
       <div className="grid justify-items-end gap-2">
         <p className={`text-sm font-semibold ${amountClass}`}>

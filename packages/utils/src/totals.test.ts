@@ -11,6 +11,7 @@ const base = {
   categoryId: "11111111-1111-4111-8111-111111111111",
   currency: "USD",
   note: "",
+  tags: [],
   transactionDate: "2026-05-31T00:00:00.000Z"
 };
 

@@ -113,6 +113,8 @@ export interface Dictionary {
     addTitle: string;
     editTitle: string;
     amount: string;
+    tags: string;
+    tagsPlaceholder: string;
     chooseCategory: string;
     chooseWalletAndCategory: string;
     selectWalletFirst: string;
@@ -296,6 +298,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       addTitle: "Add transaction",
       editTitle: "Edit transaction",
       amount: "Amount",
+      tags: "Tags",
+      tagsPlaceholder: "coffee, travel, work",
       chooseCategory: "Choose a category.",
       chooseWalletAndCategory: "Choose a wallet and category.",
       selectWalletFirst: "Choose a specific wallet above before adding a transaction.",
@@ -545,6 +549,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       addTitle: "Добавить операцию",
       editTitle: "Редактировать операцию",
       amount: "Сумма",
+      tags: "Теги",
+      tagsPlaceholder: "кофе, поездка, работа",
       chooseCategory: "Выбери категорию.",
       chooseWalletAndCategory: "Выбери кошелек и категорию.",
       selectWalletFirst: "Выбери конкретный кошелек сверху, чтобы добавить операцию.",
