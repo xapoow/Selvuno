@@ -71,6 +71,16 @@ export function CategoryForm({ initial, t, submitLabel, onSubmit }: CategoryForm
             />
           ))}
         </div>
+        <label className="app-field app-focus flex h-11 items-center justify-between rounded-app px-3 text-sm font-medium text-foreground">
+          <span>{color.toUpperCase()}</span>
+          <input
+            type="color"
+            aria-label={t.common.color}
+            value={color}
+            onChange={(event) => setColor(event.target.value)}
+            className="h-7 w-9 cursor-pointer rounded-md border-0 bg-transparent p-0"
+          />
+        </label>
       </div>
       {error ? <p className="text-sm font-medium text-expense">{error}</p> : null}
       <Button type="submit">{submitLabel}</Button>
