@@ -19,9 +19,10 @@ export function HeaderNavigation({ activeView, labels, onChange }: HeaderNavigat
             key={item.view}
             type="button"
             onClick={() => onChange(item.view)}
+            aria-current={isActive ? "page" : undefined}
             className={cn(
               "app-focus inline-flex h-10 items-center justify-center gap-2 rounded-[6px] px-3 text-sm font-medium text-muted active:scale-[0.98]",
-              isActive && "app-selected-control text-foreground"
+              isActive && "app-navigation-active"
             )}
             >
             <Icon className="h-4 w-4" />

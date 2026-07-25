@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import type { WalletView } from "@myfinances/types";
 import { BottomNavigation } from "./components/BottomNavigation";
+import { CookieNotice } from "./components/CookieNotice";
 import { HeaderNavigation } from "./components/HeaderNavigation";
 import { MobileWalletDashboardPager } from "./components/MobileWalletDashboardPager";
 import { MobileWalletHistoryPager } from "./components/MobileWalletHistoryPager";
@@ -93,7 +94,7 @@ export function App() {
 
   if (isLoading || !settings) {
     return (
-      <div className="app-page-bg grid min-h-screen place-items-center px-6 text-foreground">
+      <div className="app-page-bg grid min-h-dvh place-items-center px-6 text-foreground">
         <div className="h-10 w-10 animate-pulse rounded-app bg-accent" />
       </div>
     );
@@ -103,18 +104,21 @@ export function App() {
 
   if (!settings.onboardingCompleted) {
     return (
-      <OnboardingView
-        settings={settings}
-        wallets={wallets}
-        onUpdateSettings={async (input) => mutations.updateSettings.mutateAsync(input)}
-        onCreateWallet={(input) => mutations.createWallet.mutateAsync(input)}
-        onUpdateWallet={(id, input) => mutations.updateWallet.mutateAsync({ id, input })}
-      />
+      <>
+        <OnboardingView
+          settings={settings}
+          wallets={wallets}
+          onUpdateSettings={async (input) => mutations.updateSettings.mutateAsync(input)}
+          onCreateWallet={(input) => mutations.createWallet.mutateAsync(input)}
+          onUpdateWallet={(id, input) => mutations.updateWallet.mutateAsync({ id, input })}
+        />
+        <CookieNotice />
+      </>
     );
   }
 
   return (
-    <div className="app-page-bg min-h-screen text-foreground">
+    <div className="app-page-bg min-h-dvh text-foreground">
       <header className="app-chrome sticky top-0 z-30 hidden px-4 pb-3 pt-[calc(env(safe-area-inset-top)+14px)] md:block">
         <div className="mx-auto grid max-w-3xl gap-3">
           <div className="flex items-center justify-between gap-3">
@@ -232,10 +236,7 @@ export function App() {
                   wallets={wallets}
                   transactions={transactions}
                   settings={settings}
-                  activeWalletId={activeWalletId}
-                  allLabel={t.wallets.allWallets}
                   t={t}
-                  onChange={handleWalletChange}
                   onCreate={async (input) => {
                     await mutations.createWallet.mutateAsync(input);
                   }}
@@ -287,6 +288,7 @@ export function App() {
       </main>
 
       <BottomNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
+      <CookieNotice />
     </div>
   );
 }

@@ -12,6 +12,7 @@ import { minorToDecimal, parseAmountToMinor } from "@myfinances/utils";
 import { fromDateInputValue, toDateInputValue } from "../lib/dates";
 import { formatTagsInput, parseTagsInput } from "../lib/tags";
 import { Button } from "./ui/Button";
+import { DatePicker } from "./ui/DatePicker";
 import { SelectField } from "./ui/SelectField";
 import { SegmentedControl } from "./ui/SegmentedControl";
 import { TextField } from "./ui/TextField";
@@ -138,7 +139,15 @@ export function TransactionForm({
         </SelectField>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <TextField label={t.common.date} type="date" value={date} onChange={(event) => setDate(event.target.value)} />
+        <DatePicker
+          label={t.common.date}
+          value={date}
+          locale={settings.locale}
+          previousMonthLabel={t.common.previousMonth}
+          nextMonthLabel={t.common.nextMonth}
+          todayLabel={t.common.today}
+          onChange={setDate}
+        />
         <TextField label={t.common.note} value={note} onChange={(event) => setNote(event.target.value)} maxLength={240} />
       </div>
       <TextField
