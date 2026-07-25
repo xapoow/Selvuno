@@ -124,6 +124,8 @@ export interface Dictionary {
   };
   history: {
     title: string;
+    search: string;
+    searchPlaceholder: string;
     allCategories: string;
     empty: string;
     confirmDelete: string;
@@ -310,6 +312,8 @@ export const dictionaries: Record<Language, Dictionary> = {
     },
     history: {
       title: "History",
+      search: "Search",
+      searchPlaceholder: "Tag, category, wallet, or note",
       allCategories: "All categories",
       empty: "No transactions match these filters.",
       confirmDelete: "Delete this transaction?",
@@ -562,6 +566,8 @@ export const dictionaries: Record<Language, Dictionary> = {
     },
     history: {
       title: "История",
+      search: "Поиск",
+      searchPlaceholder: "Тег, категория, кошелек или заметка",
       allCategories: "Все категории",
       empty: "Операций по этим фильтрам нет.",
       confirmDelete: "Удалить эту операцию?",

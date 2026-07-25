@@ -15,6 +15,7 @@ import { BottomSheet } from "../components/ui/BottomSheet";
 import { EmptyState } from "../components/ui/EmptyState";
 import { SegmentedControl } from "../components/ui/SegmentedControl";
 import { SelectField } from "../components/ui/SelectField";
+import { TextField } from "../components/ui/TextField";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { convertMinorToBaseCurrency, type ExchangeRateTable } from "../lib/exchangeRates";
 
@@ -58,12 +59,19 @@ export function HistoryView({
 }: HistoryViewProps) {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<HistorySort>("date-desc");
   const [editing, setEditing] = useState<Transaction | null>(null);
 
   const visibleTransactions = useMemo(
-    () =>
-      transactions.filter((transaction) => {
+    () => {
+      const searchTerms = searchQuery
+        .toLocaleLowerCase(settings.locale)
+        .split(/[\s,;]+/)
+        .map((term) => term.trim().replace(/^#+/, ""))
+        .filter(Boolean);
+
+      return transactions.filter((transaction) => {
         if (transaction.deletedAt) {
           return false;
         }
@@ -76,9 +84,30 @@ export function HistoryView({
         if (categoryFilter !== "all" && transaction.categoryId !== categoryFilter) {
           return false;
         }
+        if (searchTerms.length) {
+          const category = categories.find((item) => item.id === transaction.categoryId);
+          const wallet = wallets.find((item) => item.id === transaction.walletId);
+          const tags = Array.isArray(transaction.tags) ? transaction.tags : [];
+          const searchable = [
+            transaction.note,
+            category?.name,
+            getCategoryName(category?.name, t),
+            wallet?.name,
+            ...tags,
+            ...tags.map((tag) => `#${tag}`)
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .toLocaleLowerCase(settings.locale);
+
+          if (!searchTerms.every((term) => searchable.includes(term))) {
+            return false;
+          }
+        }
         return true;
-      }),
-    [activeWalletId, categoryFilter, transactions, typeFilter]
+      });
+    },
+    [activeWalletId, categories, categoryFilter, searchQuery, settings.locale, t, transactions, typeFilter, wallets]
   );
   const displayTransactions = useMemo(() => {
     const collator = new Intl.Collator(settings.locale, { numeric: true, sensitivity: "base" });
@@ -164,6 +193,12 @@ export function HistoryView({
             { value: "expense", label: t.common.expense },
             { value: "income", label: t.common.income }
           ]}
+        />
+        <TextField
+          label={t.history.search}
+          value={searchQuery}
+          placeholder={t.history.searchPlaceholder}
+          onChange={(event) => setSearchQuery(event.target.value)}
         />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <SelectField label={t.common.category} value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
