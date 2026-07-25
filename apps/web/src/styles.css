@@ -307,18 +307,18 @@ button {
   }
 
   .app-chrome {
-    background: rgb(var(--color-surface) / 0.78);
+    background: rgb(var(--color-surface) / 0.94);
     box-shadow: 0 1px 0 rgb(var(--color-foreground) / 0.055);
     backdrop-filter: blur(22px) saturate(1.35);
   }
 
   .dark .app-chrome {
-    background: rgb(var(--color-surface) / 0.74);
+    background: rgb(var(--color-surface) / 0.92);
     box-shadow: 0 1px 0 rgb(255 255 255 / 0.055);
   }
 
   .app-surface {
-    background: rgb(var(--color-surface) / 0.82);
+    background: rgb(var(--color-surface) / 0.96);
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.52),
       0 1px 2px rgb(0 0 0 / 0.035),
@@ -326,35 +326,35 @@ button {
   }
 
   .dark .app-surface {
-    background: rgb(var(--color-surface) / 0.82);
+    background: rgb(var(--color-surface) / 0.94);
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.055),
       0 14px 34px rgb(0 0 0 / 0.22);
   }
 
   .app-control {
-    background: rgb(var(--color-elevated) / 0.72);
+    background: rgb(var(--color-elevated) / 0.94);
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.38),
       inset 0 0 0 1px rgb(var(--color-foreground) / 0.035);
   }
 
   .dark .app-control {
-    background: rgb(var(--color-elevated) / 0.7);
+    background: rgb(var(--color-elevated) / 0.92);
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.055),
       inset 0 0 0 1px rgb(255 255 255 / 0.035);
   }
 
   .app-field {
-    background: rgb(var(--color-elevated) / 0.62);
+    background: rgb(var(--color-elevated) / 0.94);
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.42),
       inset 0 0 0 1px rgb(var(--color-foreground) / 0.045);
   }
 
   .dark .app-field {
-    background: rgb(var(--color-elevated) / 0.66);
+    background: rgb(var(--color-elevated) / 0.92);
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.05),
       inset 0 0 0 1px rgb(255 255 255 / 0.045);
@@ -373,7 +373,7 @@ button {
   }
 
   .app-selected-control {
-    background: rgb(var(--color-surface) / 0.9);
+    background: rgb(var(--color-surface) / 0.98);
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.54),
       0 1px 2px rgb(0 0 0 / 0.06);
@@ -388,7 +388,7 @@ button {
   }
 
   .dark .app-selected-control {
-    background: rgb(var(--color-surface) / 0.88);
+    background: rgb(var(--color-surface) / 0.96);
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.065),
       0 1px 2px rgb(0 0 0 / 0.24);
