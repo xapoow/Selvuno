@@ -1,8 +1,7 @@
 import { useState } from "react";
 import type { Category, CategoryInput, TransactionType } from "@myfinances/types";
-import { categoryIconNames } from "../lib/icons";
+import { CategoryIcon, categoryIconNames } from "../lib/icons";
 import { Button } from "./ui/Button";
-import { SelectField } from "./ui/SelectField";
 import { SegmentedControl } from "./ui/SegmentedControl";
 import { TextField } from "./ui/TextField";
 import type { Dictionary } from "../i18n";
@@ -47,13 +46,29 @@ export function CategoryForm({ initial, t, submitLabel, onSubmit }: CategoryForm
         ]}
       />
       <TextField label={t.common.name} value={name} onChange={(event) => setName(event.target.value)} maxLength={48} />
-      <SelectField label={t.categories.icon} value={icon} onChange={(event) => setIcon(event.target.value)}>
-        {categoryIconNames.map((iconName) => (
-          <option key={iconName} value={iconName}>
-            {iconName}
-          </option>
-        ))}
-      </SelectField>
+      <fieldset className="grid gap-2">
+        <legend className="text-sm font-medium text-foreground">{t.categories.icon}</legend>
+        <div className="app-field grid grid-cols-5 gap-2 rounded-app p-2 sm:grid-cols-10">
+          {categoryIconNames.map((iconName) => {
+            const selected = icon === iconName;
+            return (
+              <button
+                key={iconName}
+                type="button"
+                aria-label={iconName}
+                aria-pressed={selected}
+                title={iconName}
+                onClick={() => setIcon(iconName)}
+                className={`app-focus grid aspect-square place-items-center rounded-app ${
+                  selected ? "app-navigation-active" : "text-muted hover:bg-surface hover:text-foreground"
+                }`}
+              >
+                <CategoryIcon name={iconName} className="h-5 w-5" />
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
       <div className="grid gap-2">
         <span className="text-sm font-medium text-foreground">{t.common.color}</span>
         <div className="grid grid-cols-6 gap-2">
