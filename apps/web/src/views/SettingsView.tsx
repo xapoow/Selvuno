@@ -10,7 +10,7 @@ import type {
 } from "@myfinances/types";
 import { Edit3, FileDown, FileUp, Tags, Trash2 } from "lucide-react";
 import { CategoryIcon } from "../lib/icons";
-import { currencyOptions } from "../lib/currencies";
+import { currencyOptions, getCurrencyLabel } from "../lib/currencies";
 import { applyRootVisualTheme } from "../lib/colorThemes";
 import { resetLocalApplicationData } from "../lib/resetLocalData";
 import { ColorThemePicker } from "../components/ColorThemePicker";
@@ -198,7 +198,7 @@ export function SettingsView({
             >
               {currencyOptions.map((currency) => (
                 <option key={currency} value={currency}>
-                  {currency}
+                  {getCurrencyLabel(currency)}
                 </option>
               ))}
             </SelectField>

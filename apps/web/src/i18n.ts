@@ -8,8 +8,8 @@ export type DateFormatLabel = "short" | "medium" | "long";
 export const appVersion = "0.1.0";
 
 export const languageOptions = [
-  { value: "en-US", label: "🇺🇸 English", language: "en" },
-  { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" }
+  { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
+  { value: "en-US", label: "🇺🇸 English", language: "en" }
 ] as const;
 
 interface ErrorCopy {
@@ -199,7 +199,7 @@ export function getLanguage(locale: string): Language {
 }
 
 export function getLanguageLabel(locale: string): string {
-  return languageOptions.find((option) => option.value === locale)?.label ?? "🇺🇸 English";
+  return languageOptions.find((option) => option.value === locale)?.label ?? "🇷🇺 Русский";
 }
 
 export function getCategoryName(name: string | undefined, t: Dictionary): string {

@@ -9,7 +9,7 @@ import type {
 } from "@myfinances/types";
 import { Check, ChevronLeft, Languages, WalletCards } from "lucide-react";
 import { ColorThemePicker } from "../components/ColorThemePicker";
-import { currencyOptions } from "../lib/currencies";
+import { currencyOptions, getCurrencyLabel } from "../lib/currencies";
 import { applyRootVisualTheme } from "../lib/colorThemes";
 import { getDictionary, languageOptions } from "../i18n";
 import { Button } from "../components/ui/Button";
@@ -33,7 +33,7 @@ export function OnboardingView({
   onUpdateWallet
 }: OnboardingViewProps) {
   const [step, setStep] = useState<1 | 2>(1);
-  const [locale, setLocale] = useState(settings.locale);
+  const [locale, setLocale] = useState("ru-RU");
   const [globalCurrency, setGlobalCurrency] = useState(settings.currency);
   const [walletCurrency, setWalletCurrency] = useState(wallets[0]?.currency ?? settings.currency);
   const [walletName, setWalletName] = useState(wallets[0]?.name === "Everyday" ? "" : wallets[0]?.name ?? "");
@@ -132,7 +132,7 @@ export function OnboardingView({
               >
                 {currencyOptions.map((currency) => (
                   <option key={currency} value={currency}>
-                    {currency}
+                    {getCurrencyLabel(currency)}
                   </option>
                 ))}
               </SelectField>
@@ -150,7 +150,7 @@ export function OnboardingView({
               >
                 {currencyOptions.map((currency) => (
                   <option key={currency} value={currency}>
-                    {currency}
+                    {getCurrencyLabel(currency)}
                   </option>
                 ))}
               </SelectField>

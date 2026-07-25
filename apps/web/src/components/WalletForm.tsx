@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Wallet, WalletInput } from "@myfinances/types";
-import { currencyOptions } from "../lib/currencies";
+import { currencyOptions, getCurrencyLabel } from "../lib/currencies";
 import { Button } from "./ui/Button";
 import { SelectField } from "./ui/SelectField";
 import { TextField } from "./ui/TextField";
@@ -38,7 +38,7 @@ export function WalletForm({ initial, defaultCurrency, t, submitLabel, onSubmit 
       <SelectField label={t.common.currency} value={currency} onChange={(event) => setCurrency(event.target.value)}>
         {currencyOptions.map((option) => (
           <option key={option} value={option}>
-            {option}
+            {getCurrencyLabel(option)}
           </option>
         ))}
       </SelectField>

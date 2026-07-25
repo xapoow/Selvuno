@@ -2,6 +2,8 @@ import Dexie, { type Table } from "dexie";
 import type { Category, Settings, Transaction, Wallet } from "@myfinances/types";
 import { DEFAULT_CURRENCY, detectDefaultLocaleSettings, inferCurrencyFromLocale } from "@myfinances/utils";
 
+const DEFAULT_LOCALE = "ru-RU";
+
 export class FinanceDatabase extends Dexie {
   wallets!: Table<Wallet, string>;
   categories!: Table<Category, string>;
@@ -73,7 +75,7 @@ export async function seedLocalData(db = financeDb): Promise<void> {
   if (!settings) {
     await db.settings.put({
       id: "default",
-      locale: defaults.locale,
+      locale: DEFAULT_LOCALE,
       currency: DEFAULT_CURRENCY,
       dateFormat: defaults.dateFormat,
       timeZone: defaults.timeZone,

@@ -16,6 +16,7 @@ describe("finance repositories", () => {
 
     expect(await settingsRepository.getSettings()).toMatchObject({
       id: "default",
+      locale: "ru-RU",
       activeWalletId: "all",
       colorTheme: "sage",
       onboardingCompleted: false
