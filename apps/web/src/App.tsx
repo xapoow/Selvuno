@@ -125,7 +125,7 @@ export function App() {
       </header>
 
       <main className="mx-auto max-w-3xl px-4 pb-28 pt-5">
-        <div className={activeView === "dashboard" ? "mb-5 hidden md:block" : "mb-5"}>
+        <div className={activeView === "dashboard" || activeView === "settings" ? "mb-5 hidden md:block" : "mb-5"}>
           <WalletSwitcher
             wallets={wallets}
             value={activeWalletId}
