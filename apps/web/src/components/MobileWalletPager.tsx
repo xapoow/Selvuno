@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Layers3, WalletCards } from "lucide-react";
 import { getCurrencyLabel } from "../lib/currencies";
 
+const PAGE_GAP_PX = 16;
+
 export interface MobileWalletPageOption {
   value: WalletView;
   name: string;
@@ -61,12 +63,29 @@ export function MobileWalletPager({
   const activeOption = options[activeIndex] ?? options[0];
   const ActiveIcon = activeOption?.kind === "all" ? Layers3 : WalletCards;
 
+  function getSlideLeft(scroller: HTMLDivElement, index: number) {
+    const slide = scroller.children[index] as HTMLElement | undefined;
+    return slide?.offsetLeft ?? index * (scroller.clientWidth + PAGE_GAP_PX);
+  }
+
+  function getNearestSlideIndex(scroller: HTMLDivElement) {
+    return Array.from(scroller.children).reduce((nearestIndex, child, index) => {
+      const slide = child as HTMLElement;
+      const currentDistance = Math.abs(slide.offsetLeft - scroller.scrollLeft);
+      const nearestSlide = scroller.children[nearestIndex] as HTMLElement | undefined;
+      const nearestDistance = nearestSlide
+        ? Math.abs(nearestSlide.offsetLeft - scroller.scrollLeft)
+        : Number.POSITIVE_INFINITY;
+      return currentDistance < nearestDistance ? index : nearestIndex;
+    }, 0);
+  }
+
   useLayoutEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller) {
       return;
     }
-    const targetLeft = activeIndex * scroller.clientWidth;
+    const targetLeft = getSlideLeft(scroller, activeIndex);
     if (Math.abs(scroller.scrollLeft - targetLeft) > 2) {
       scroller.scrollTo({ left: targetLeft, behavior: "auto" });
     }
@@ -90,7 +109,7 @@ export function MobileWalletPager({
       window.clearTimeout(scrollEndRef.current);
     }
     scrollEndRef.current = window.setTimeout(() => {
-      const nextIndex = Math.round(scroller.scrollLeft / scroller.clientWidth);
+      const nextIndex = getNearestSlideIndex(scroller);
       const nextOption = options[Math.max(0, Math.min(options.length - 1, nextIndex))];
       if (nextOption && nextOption.value !== activeWalletId) {
         onChange(nextOption.value);
@@ -136,7 +155,8 @@ export function MobileWalletPager({
 
       <div
         ref={scrollerRef}
-        className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="relative flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        style={{ columnGap: PAGE_GAP_PX }}
         onScroll={handleScroll}
       >
         {options.map((option) => (
