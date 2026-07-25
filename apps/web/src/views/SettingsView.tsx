@@ -208,7 +208,7 @@ export function SettingsView({
               role="dialog"
               aria-modal="true"
               aria-label={t.settings.section}
-              className="app-surface relative grid h-full w-[min(82vw,304px)] content-start gap-4 rounded-r-[8px] px-4 pb-6 pt-[calc(env(safe-area-inset-top)+16px)]"
+              className="app-surface relative grid h-full w-[min(82vw,304px)] content-start gap-4 rounded-r-[8px] px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+16px)]"
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}

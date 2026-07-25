@@ -244,6 +244,7 @@
 
 html {
   min-height: 100%;
+  min-height: 100dvh;
   background: rgb(var(--color-background));
   font-family:
     ui-sans-serif,
@@ -256,6 +257,7 @@ html {
 
 body {
   min-height: 100%;
+  min-height: 100dvh;
   margin: 0;
   background:
     linear-gradient(180deg, rgb(var(--color-accent-soft) / 0.34), rgb(var(--color-background) / 0) 340px),
@@ -264,6 +266,11 @@ body {
   transition:
     background-color 180ms ease,
     color 180ms ease;
+}
+
+#root {
+  min-height: 100%;
+  min-height: 100dvh;
 }
 
 .dark body {

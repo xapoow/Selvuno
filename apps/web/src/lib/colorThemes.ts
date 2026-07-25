@@ -28,4 +28,10 @@ export function applyRootVisualTheme(theme: ThemePreference, colorTheme: ColorTh
   root.classList.remove(...colorThemeClassNames);
   root.classList.add(`theme-${colorTheme || defaultColorTheme}`);
   root.style.colorScheme = shouldUseDark ? "dark" : "light";
+
+  const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  const backgroundColor = getComputedStyle(root).getPropertyValue("--color-background").trim();
+  if (themeColor && backgroundColor) {
+    themeColor.content = `rgb(${backgroundColor})`;
+  }
 }

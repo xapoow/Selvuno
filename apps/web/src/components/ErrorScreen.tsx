@@ -202,7 +202,9 @@ export function ErrorScreen({
     <div
       className={cn(
         "app-page-bg grid place-items-center px-4 text-foreground",
-        compact ? "min-h-[420px] py-4" : "min-h-screen py-10"
+        compact
+          ? "min-h-[420px] py-4"
+          : "min-h-dvh pb-[calc(env(safe-area-inset-bottom)+2.5rem)] pt-[calc(env(safe-area-inset-top)+2.5rem)]"
       )}
     >
       <section className="app-surface w-full max-w-xl rounded-app p-5">

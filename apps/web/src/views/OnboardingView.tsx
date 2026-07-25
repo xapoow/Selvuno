@@ -79,8 +79,8 @@ export function OnboardingView({
   }
 
   return (
-    <main className="app-page-bg min-h-screen px-4 py-[calc(env(safe-area-inset-top)+20px)] text-foreground">
-      <section className="mx-auto flex min-h-[calc(100vh-40px)] max-w-xl flex-col justify-center gap-6">
+    <main className="app-page-bg min-h-dvh px-4 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-[calc(env(safe-area-inset-top)+20px)] text-foreground">
+      <section className="mx-auto flex min-h-[calc(100dvh-40px)] max-w-xl flex-col justify-center gap-6">
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold uppercase text-muted">MyFinances</p>
           <div className="flex gap-1">
