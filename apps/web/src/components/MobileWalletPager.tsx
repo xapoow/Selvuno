@@ -122,26 +122,26 @@ export function MobileWalletPager({
   }
 
   return (
-    <div className="grid gap-5">
-      <div className="grid justify-items-center gap-2 text-center" aria-live="polite">
-        <span className="app-control grid h-9 w-9 place-items-center rounded-app text-accent">
-          <ActiveIcon className="h-4 w-4" />
+    <div className="grid gap-4">
+      <div className="flex min-h-11 items-center gap-3" aria-live="polite">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-app bg-accent-soft text-accent">
+          <ActiveIcon className="h-[18px] w-[18px]" />
         </span>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={activeOption.value}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
+            initial={{ opacity: 0, x: 8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -8 }}
             transition={{ duration: 0.16, ease: "easeOut" }}
-            className="grid gap-0.5"
+            className="min-w-0 flex-1"
           >
             {eyebrow ? <p className="text-xs font-semibold uppercase text-muted">{eyebrow}</p> : null}
-            <h2 className="text-xl font-semibold leading-tight text-foreground">{activeOption.name}</h2>
-            <p className="text-xs font-medium text-muted">{getCurrencyLabel(activeOption.currency)}</p>
+            <h2 className="truncate text-lg font-semibold leading-tight text-foreground">{activeOption.name}</h2>
+            <p className="mt-0.5 text-xs font-medium text-muted">{getCurrencyLabel(activeOption.currency)}</p>
           </motion.div>
         </AnimatePresence>
-        <div className="flex justify-center gap-1.5" aria-hidden>
+        <div className="flex shrink-0 items-center justify-end gap-1.5 px-1" aria-hidden>
           {options.map((option) => (
             <span
               key={option.value}
