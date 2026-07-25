@@ -36,7 +36,7 @@ export function ColorThemePicker({ value, labels, onChange }: ColorThemePickerPr
               />
               <span
                 className="h-3 w-3 rounded-full"
-                style={{ backgroundColor: option.marker }}
+                style={{ backgroundColor: option.accent }}
               />
             </span>
             <span className="flex items-center justify-between gap-2 text-xs font-semibold">
