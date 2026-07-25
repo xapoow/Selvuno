@@ -1,5 +1,6 @@
 import type { Wallet, WalletView } from "@myfinances/types";
-import { AnimatePresence, LayoutGroup, motion, type PanInfo } from "framer-motion";
+import { useState } from "react";
+import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import { ChevronLeft, ChevronRight, Layers3, WalletCards } from "lucide-react";
 import { cn } from "../lib/cn";
 
@@ -11,7 +12,7 @@ interface WalletSwitcherProps {
   allCurrency: string;
   className?: string;
   includeAll?: boolean;
-  onChange: (value: WalletView) => void;
+  onChange: (value: WalletView, direction?: number) => void;
 }
 
 interface WalletOption {
@@ -40,6 +41,7 @@ export function WalletSwitcher({
   const options: WalletOption[] = includeAll
     ? [{ value: "all", name: allLabel, currency: allCurrency, kind: "all" }, ...walletOptions]
     : walletOptions;
+  const [transitionDirection, setTransitionDirection] = useState(0);
   const resolvedActiveIndex = options.findIndex((option) => option.value === value);
   const activeIndex = resolvedActiveIndex >= 0 ? resolvedActiveIndex : 0;
   const activeOption = options[activeIndex] ?? options[0];
@@ -54,7 +56,17 @@ export function WalletSwitcher({
       return;
     }
     const nextIndex = (activeIndex + offset + options.length) % options.length;
-    onChange(options[nextIndex].value);
+    setTransitionDirection(offset);
+    onChange(options[nextIndex].value, offset);
+  }
+
+  function selectOption(index: number) {
+    if (index === activeIndex) {
+      return;
+    }
+    const direction = index > activeIndex ? 1 : -1;
+    setTransitionDirection(direction);
+    onChange(options[index].value, direction);
   }
 
   function handleDragEnd(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) {
@@ -127,37 +139,72 @@ export function WalletSwitcher({
         </div>
       </div>
 
-      <LayoutGroup>
-        <nav className="hidden justify-center md:flex" aria-label={label}>
-          <div className="app-surface max-w-full overflow-x-auto rounded-app px-5 py-2">
-            <div className="flex min-w-max items-center justify-center gap-8">
-              {options.map((option) => {
-                const isActive = option.value === activeOption.value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => onChange(option.value)}
-                    className={cn(
-                      "app-focus relative h-9 px-0 pb-2 pt-1 text-sm font-medium text-muted hover:text-foreground focus-visible:outline-none active:scale-[0.98]",
-                      isActive && "text-foreground"
-                    )}
-                  >
-                    <span className="whitespace-nowrap">{option.name}</span>
-                    {isActive ? (
-                      <motion.span
-                        layoutId="wallet-switcher-underline"
-                        className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-accent"
-                        transition={{ type: "spring", stiffness: 500, damping: 38 }}
-                      />
-                    ) : null}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </nav>
-      </LayoutGroup>
+      <div className="hidden md:grid md:justify-items-center md:gap-2">
+        <motion.div
+          role="group"
+          tabIndex={0}
+          aria-label={`${label}: ${activeOption.name}`}
+          drag={canSwitch ? "x" : false}
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.12}
+          dragSnapToOrigin
+          onDragEnd={handleDragEnd}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowLeft") {
+              event.preventDefault();
+              selectByOffset(-1);
+            }
+            if (event.key === "ArrowRight") {
+              event.preventDefault();
+              selectByOffset(1);
+            }
+          }}
+          className="app-surface app-focus grid h-[72px] w-full max-w-[430px] cursor-grab touch-pan-y select-none grid-cols-[32px_1fr_32px] items-center rounded-app px-3 outline-none active:cursor-grabbing"
+          whileDrag={{ scale: 0.985 }}
+        >
+          <ChevronLeft className={cn("h-4 w-4 justify-self-center text-muted", !canSwitch && "opacity-30")} />
+          <AnimatePresence initial={false} mode="wait" custom={transitionDirection}>
+            <motion.div
+              key={activeOption.value}
+              custom={transitionDirection}
+              initial={{ opacity: 0, x: transitionDirection * 28, scale: 0.97 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: transitionDirection * -28, scale: 0.97 }}
+              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+              className="flex min-w-0 items-center justify-center gap-3"
+              aria-live="polite"
+            >
+              <span className="app-control grid h-10 w-10 shrink-0 place-items-center rounded-app text-accent">
+                <ActiveIcon className="h-5 w-5" />
+              </span>
+              <span className="grid min-w-0">
+                <span className="truncate text-base font-semibold text-foreground">{activeOption.name}</span>
+                <span className="text-xs font-medium uppercase text-muted">{activeOption.currency}</span>
+              </span>
+            </motion.div>
+          </AnimatePresence>
+          <ChevronRight className={cn("h-4 w-4 justify-self-center text-muted", !canSwitch && "opacity-30")} />
+        </motion.div>
+        <div className="flex items-center justify-center gap-1" aria-label={label}>
+          {options.map((option, index) => (
+            <button
+              key={option.value}
+              type="button"
+              aria-label={option.name}
+              aria-current={index === activeIndex ? "true" : undefined}
+              onClick={() => selectOption(index)}
+              className="grid h-5 place-items-center px-1"
+            >
+              <span
+                className={cn(
+                  "block h-1.5 rounded-full bg-muted/25 transition-all duration-200",
+                  index === activeIndex ? "w-6 bg-accent" : "w-1.5"
+                )}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

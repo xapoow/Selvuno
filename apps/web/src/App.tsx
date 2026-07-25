@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import type { WalletView } from "@myfinances/types";
 import { BottomNavigation } from "./components/BottomNavigation";
@@ -24,6 +24,7 @@ import { WalletsView } from "./views/WalletsView";
 export function App() {
   const activeView = useAppStore((state) => state.activeView);
   const setActiveView = useAppStore((state) => state.setActiveView);
+  const [walletTransitionDirection, setWalletTransitionDirection] = useState(1);
   const data = useFinanceData();
   const mutations = useFinanceMutations();
 
@@ -70,10 +71,12 @@ export function App() {
       )
   );
   const exchangeRates = useExchangeRates(displayCurrency, conversionNeeded);
-  const handleWalletChange = (nextWalletId: WalletView) => {
+  const handleWalletChange = (nextWalletId: WalletView, direction = 1) => {
+    setWalletTransitionDirection(direction);
     void mutations.updateSettings.mutateAsync({ activeWalletId: nextWalletId });
   };
   const addWalletId: WalletView = activeWalletId === "all" ? wallets[0]?.id ?? "all" : activeWalletId;
+  const showsWalletContext = activeView === "dashboard" || activeView === "history" || activeView === "add";
 
   if (isError) {
     return (
@@ -125,28 +128,32 @@ export function App() {
           <h1 className="mt-1 text-2xl font-semibold text-foreground">{t.appName}</h1>
         </div>
         <HeaderNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
-        <div className="mt-auto rounded-app border border-line/60 bg-elevated/70 p-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t.common.wallet}</p>
-          <p className="mt-1 truncate text-sm font-semibold text-foreground">
-            {activeWallet?.name ?? t.wallets.allWallets}
-          </p>
-          <p className="mt-0.5 text-xs text-muted">{displayCurrency}</p>
-        </div>
+        {showsWalletContext ? (
+          <div className="mt-auto rounded-app border border-line/60 bg-elevated/70 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t.common.wallet}</p>
+            <p className="mt-1 truncate text-sm font-semibold text-foreground">
+              {activeWallet?.name ?? t.wallets.allWallets}
+            </p>
+            <p className="mt-0.5 text-xs text-muted">{displayCurrency}</p>
+          </div>
+        ) : null}
       </aside>
 
       <main className="mx-auto w-full max-w-[1180px] px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:px-8 md:pb-10 md:pt-7 lg:px-10">
-        <div className={activeView === "add" ? "mb-5" : "mb-5 hidden md:block"}>
-          <WalletSwitcher
-            wallets={wallets}
-            value={activeView === "add" ? addWalletId : activeWalletId}
-            label={t.common.wallet}
-            allLabel={t.wallets.allWallets}
-            allCurrency={settings.currency}
-            className="w-full"
-            includeAll={activeView !== "add"}
-            onChange={handleWalletChange}
-          />
-        </div>
+        {showsWalletContext ? (
+          <div className={activeView === "add" ? "mb-6" : "mb-6 hidden md:block"}>
+            <WalletSwitcher
+              wallets={wallets}
+              value={activeView === "add" ? addWalletId : activeWalletId}
+              label={t.common.wallet}
+              allLabel={t.wallets.allWallets}
+              allCurrency={settings.currency}
+              className="w-full"
+              includeAll={activeView !== "add"}
+              onChange={handleWalletChange}
+            />
+          </div>
+        ) : null}
         <motion.div
           key={activeView}
           initial={{ opacity: 0, y: 8 }}
@@ -168,20 +175,27 @@ export function App() {
                   onAdd={() => setActiveView("add")}
                 />
               </div>
-              <div className="hidden md:block">
-                <DashboardView
-                  wallets={wallets}
-                  categories={categories}
-                  transactions={transactions}
-                  settings={settings}
-                  activeWalletId={activeWalletId}
-                  displayCurrency={displayCurrency}
-                  exchangeRates={exchangeRates.data}
-                  isUpdatingExchangeRates={exchangeRates.isFetching && conversionNeeded}
-                  hasExchangeRateError={exchangeRates.isError && conversionNeeded}
-                  t={t}
-                  onAdd={() => setActiveView("add")}
-                />
+              <div className="hidden overflow-hidden md:block">
+                <motion.div
+                  key={activeWalletId}
+                  initial={{ opacity: 0, x: walletTransitionDirection * 18 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <DashboardView
+                    wallets={wallets}
+                    categories={categories}
+                    transactions={transactions}
+                    settings={settings}
+                    activeWalletId={activeWalletId}
+                    displayCurrency={displayCurrency}
+                    exchangeRates={exchangeRates.data}
+                    isUpdatingExchangeRates={exchangeRates.isFetching && conversionNeeded}
+                    hasExchangeRateError={exchangeRates.isError && conversionNeeded}
+                    t={t}
+                    onAdd={() => setActiveView("add")}
+                  />
+                </motion.div>
               </div>
             </>
           ) : null}
@@ -214,21 +228,28 @@ export function App() {
                   onDelete={(id) => mutations.deleteTransaction.mutateAsync(id)}
                 />
               </div>
-              <div className="hidden md:block">
-                <HistoryView
-                  wallets={wallets}
-                  categories={categories}
-                  transactions={transactions}
-                  settings={settings}
-                  activeWalletId={activeWalletId}
-                  displayCurrency={displayCurrency}
-                  exchangeRates={exchangeRates.data}
-                  t={t}
-                  onUpdate={async (id, input) => {
-                    await mutations.updateTransaction.mutateAsync({ id, input });
-                  }}
-                  onDelete={(id) => mutations.deleteTransaction.mutateAsync(id)}
-                />
+              <div className="hidden overflow-hidden md:block">
+                <motion.div
+                  key={activeWalletId}
+                  initial={{ opacity: 0, x: walletTransitionDirection * 18 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <HistoryView
+                    wallets={wallets}
+                    categories={categories}
+                    transactions={transactions}
+                    settings={settings}
+                    activeWalletId={activeWalletId}
+                    displayCurrency={displayCurrency}
+                    exchangeRates={exchangeRates.data}
+                    t={t}
+                    onUpdate={async (id, input) => {
+                      await mutations.updateTransaction.mutateAsync({ id, input });
+                    }}
+                    onDelete={(id) => mutations.deleteTransaction.mutateAsync(id)}
+                  />
+                </motion.div>
               </div>
             </>
           ) : null}

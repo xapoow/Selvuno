@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Category, Settings, Transaction, Wallet, WalletView } from "@myfinances/types";
-import { ArrowUpRight, PlusCircle } from "lucide-react";
+import { BarChart3, PlusCircle } from "lucide-react";
 import { filterTransactionsByWallet, formatMoney } from "@myfinances/utils";
 import {
   AnalyticsView,
@@ -191,43 +191,36 @@ export function DashboardView({
       </section>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(330px,0.85fr)]">
-        <Section
-          title={t.dashboard.cashFlow}
-          action={
-            <button
-              type="button"
-              onClick={() => setAnalyticsOpen(true)}
-              className="app-focus inline-flex items-center gap-1 text-xs font-semibold text-accent"
-            >
-              {t.dashboard.openAnalytics}
-              <ArrowUpRight className="h-3.5 w-3.5" />
-            </button>
-          }
-        >
-          <div className="app-surface grid min-h-[330px] gap-4 rounded-app p-4 sm:grid-cols-[210px_1fr] sm:p-5">
-            <div className="grid content-start gap-4">
-              <div className="app-control grid grid-cols-2 rounded-app p-1">
-                {(["expense", "income"] as const).map((type) => (
+        <Section title={t.dashboard.cashFlow}>
+          <div className="app-surface grid min-h-[286px] gap-4 rounded-app p-4 sm:p-5">
+            <div className="app-control grid w-full max-w-sm grid-cols-2 justify-self-center rounded-app p-1">
+              {(["expense", "income"] as const).map((type) => {
+                const hasData = (type === "expense" ? expenseCategories : incomeCategories).length > 0;
+                return (
                   <button
                     key={type}
                     type="button"
+                    disabled={!hasData}
                     onClick={() => setChartType(type)}
                     className={cn(
-                      "app-focus h-9 rounded-[6px] text-xs font-semibold text-muted",
+                      "app-focus h-9 rounded-[6px] text-xs font-semibold text-muted outline-none disabled:cursor-not-allowed disabled:opacity-40",
                       chartType === type && "app-selected-control text-foreground"
                     )}
                   >
                     {type === "expense" ? t.common.expenses : t.common.income}
                   </button>
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={() => setAnalyticsOpen(true)}
-                className="app-focus relative h-48 rounded-full outline-none active:scale-[0.98]"
-                aria-label={t.dashboard.openAnalytics}
-              >
-                {categoryTotals.length ? (
+                );
+              })}
+            </div>
+
+            {categoryTotals.length ? (
+              <div className="grid items-center gap-4 sm:grid-cols-[210px_1fr]">
+                <button
+                  type="button"
+                  onClick={() => setAnalyticsOpen(true)}
+                  className="app-focus relative h-48 rounded-full outline-none active:scale-[0.98]"
+                  aria-label={t.dashboard.openAnalytics}
+                >
                   <span
                     className="absolute left-1/2 top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full shadow-[0_16px_34px_rgb(0_0_0/0.18)]"
                     style={{ background: donutGradient }}
@@ -242,35 +235,40 @@ export function DashboardView({
                       </span>
                     </span>
                   </span>
-                ) : (
-                  <span className="grid h-full place-items-center px-4 text-center text-sm text-muted">
-                    {t.dashboard.emptyChart}
+                </button>
+                <div className="grid content-center gap-3">
+                  {summaryCategories.map((item) => {
+                    const percentage = chartTotal ? Math.round((item.value / chartTotal) * 100) : 0;
+                    return (
+                      <div key={item.id} className="grid gap-1.5">
+                        <div className="flex items-center justify-between gap-3 text-sm">
+                          <span className="flex min-w-0 items-center gap-2 text-muted">
+                            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+                            <span className="truncate">{item.name}</span>
+                          </span>
+                          <span className="font-semibold text-foreground">{percentage}%</span>
+                        </div>
+                        <span className="h-1.5 overflow-hidden rounded-full bg-elevated">
+                          <span
+                            className="block h-full rounded-full"
+                            style={{ width: `${percentage}%`, backgroundColor: item.color }}
+                          />
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="grid min-h-[188px] place-items-center text-center">
+                <div className="grid justify-items-center gap-3">
+                  <span className="app-control grid h-10 w-10 place-items-center rounded-app text-muted">
+                    <BarChart3 className="h-5 w-5" />
                   </span>
-                )}
-              </button>
-            </div>
-            <div className="grid content-center gap-3">
-              {summaryCategories.map((item) => {
-                const percentage = chartTotal ? Math.round((item.value / chartTotal) * 100) : 0;
-                return (
-                  <div key={item.id} className="grid gap-1.5">
-                    <div className="flex items-center justify-between gap-3 text-sm">
-                      <span className="flex min-w-0 items-center gap-2 text-muted">
-                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                        <span className="truncate">{item.name}</span>
-                      </span>
-                      <span className="font-semibold text-foreground">{percentage}%</span>
-                    </div>
-                    <span className="h-1.5 overflow-hidden rounded-full bg-elevated">
-                      <span
-                        className="block h-full rounded-full"
-                        style={{ width: `${percentage}%`, backgroundColor: item.color }}
-                      />
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+                  <p className="max-w-56 text-sm font-medium text-muted">{t.dashboard.emptyChart}</p>
+                </div>
+              </div>
+            )}
           </div>
         </Section>
 
@@ -295,6 +293,7 @@ export function DashboardView({
             <EmptyState
               icon={PlusCircle}
               title={t.dashboard.emptyTransactions}
+              className="min-h-[286px]"
               action={
                 <button type="button" onClick={onAdd} className="text-sm font-semibold text-accent">
                   {t.dashboard.addTransaction}
