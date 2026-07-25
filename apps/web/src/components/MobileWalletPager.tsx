@@ -1,10 +1,11 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import type { Wallet, WalletView } from "@myfinances/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { Layers3, WalletCards } from "lucide-react";
 import { getCurrencyLabel } from "../lib/currencies";
 
-const PAGE_GAP_PX = 16;
+const SWIPE_DISTANCE_PX = 64;
+const SWIPE_VELOCITY_PX = 520;
 
 export interface MobileWalletPageOption {
   value: WalletView;
@@ -52,8 +53,7 @@ export function MobileWalletPager({
   onChange,
   children
 }: MobileWalletPagerProps) {
-  const scrollerRef = useRef<HTMLDivElement | null>(null);
-  const scrollEndRef = useRef<number | null>(null);
+  const [transitionDirection, setTransitionDirection] = useState<1 | -1>(1);
   const options = useMemo(
     () => getMobileWalletOptions(wallets, allLabel, allCurrency, includeAll),
     [allCurrency, allLabel, includeAll, wallets]
@@ -62,59 +62,28 @@ export function MobileWalletPager({
   const activeIndex = resolvedActiveIndex >= 0 ? resolvedActiveIndex : 0;
   const activeOption = options[activeIndex] ?? options[0];
   const ActiveIcon = activeOption?.kind === "all" ? Layers3 : WalletCards;
+  const previousOption = options[activeIndex - 1];
+  const nextOption = options[activeIndex + 1];
 
-  function getSlideLeft(scroller: HTMLDivElement, index: number) {
-    const slide = scroller.children[index] as HTMLElement | undefined;
-    return slide?.offsetLeft ?? index * (scroller.clientWidth + PAGE_GAP_PX);
-  }
-
-  function getNearestSlideIndex(scroller: HTMLDivElement) {
-    return Array.from(scroller.children).reduce((nearestIndex, child, index) => {
-      const slide = child as HTMLElement;
-      const currentDistance = Math.abs(slide.offsetLeft - scroller.scrollLeft);
-      const nearestSlide = scroller.children[nearestIndex] as HTMLElement | undefined;
-      const nearestDistance = nearestSlide
-        ? Math.abs(nearestSlide.offsetLeft - scroller.scrollLeft)
-        : Number.POSITIVE_INFINITY;
-      return currentDistance < nearestDistance ? index : nearestIndex;
-    }, 0);
-  }
-
-  useLayoutEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) {
+  function selectWallet(index: number) {
+    const nextIndex = Math.max(0, Math.min(options.length - 1, index));
+    const nextOption = options[nextIndex];
+    if (!nextOption || nextIndex === activeIndex) {
       return;
     }
-    const targetLeft = getSlideLeft(scroller, activeIndex);
-    if (Math.abs(scroller.scrollLeft - targetLeft) > 2) {
-      scroller.scrollTo({ left: targetLeft, behavior: "auto" });
-    }
-  }, [activeIndex]);
+    setTransitionDirection(nextIndex > activeIndex ? 1 : -1);
+    onChange(nextOption.value);
+  }
 
-  useEffect(
-    () => () => {
-      if (scrollEndRef.current) {
-        window.clearTimeout(scrollEndRef.current);
-      }
-    },
-    []
-  );
-
-  function handleScroll() {
-    const scroller = scrollerRef.current;
-    if (!scroller) {
+  function handleDragEnd(offsetX: number, velocityX: number) {
+    const intent = offsetX + velocityX * 0.16;
+    if (intent <= -SWIPE_DISTANCE_PX || velocityX <= -SWIPE_VELOCITY_PX) {
+      selectWallet(activeIndex + 1);
       return;
     }
-    if (scrollEndRef.current) {
-      window.clearTimeout(scrollEndRef.current);
+    if (intent >= SWIPE_DISTANCE_PX || velocityX >= SWIPE_VELOCITY_PX) {
+      selectWallet(activeIndex - 1);
     }
-    scrollEndRef.current = window.setTimeout(() => {
-      const nextIndex = getNearestSlideIndex(scroller);
-      const nextOption = options[Math.max(0, Math.min(options.length - 1, nextIndex))];
-      if (nextOption && nextOption.value !== activeWalletId) {
-        onChange(nextOption.value);
-      }
-    }, 120);
   }
 
   if (!activeOption) {
@@ -123,47 +92,82 @@ export function MobileWalletPager({
 
   return (
     <div className="grid gap-4">
-      <div className="flex min-h-11 items-center gap-3" aria-live="polite">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-app bg-accent-soft text-accent">
-          <ActiveIcon className="h-[18px] w-[18px]" />
-        </span>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={activeOption.value}
-            initial={{ opacity: 0, x: 8 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -8 }}
-            transition={{ duration: 0.16, ease: "easeOut" }}
-            className="min-w-0 flex-1"
-          >
-            {eyebrow ? <p className="text-xs font-semibold uppercase text-muted">{eyebrow}</p> : null}
-            <h2 className="truncate text-lg font-semibold leading-tight text-foreground">{activeOption.name}</h2>
-            <p className="mt-0.5 text-xs font-medium text-muted">{getCurrencyLabel(activeOption.currency)}</p>
-          </motion.div>
-        </AnimatePresence>
-        <div className="flex shrink-0 items-center justify-end gap-1.5 px-1" aria-hidden>
-          {options.map((option) => (
-            <span
-              key={option.value}
-              className={`h-1.5 rounded-full transition-all duration-200 ${
-                option.value === activeOption.value ? "w-5 bg-accent" : "w-1.5 bg-muted/25"
-              }`}
-            />
-          ))}
-        </div>
+      <div className="relative h-[88px] overflow-hidden [perspective:900px]">
+        <div className="absolute inset-x-3 bottom-0 h-[76px] rounded-app bg-accent/10" aria-hidden />
+        <div className="absolute inset-x-1 bottom-1 h-[78px] rounded-app bg-accent/15" aria-hidden />
+        <motion.div
+          className="app-surface relative flex h-[76px] touch-pan-y items-center overflow-hidden rounded-app px-4 py-3 shadow-[0_14px_30px_rgb(var(--color-accent)/0.12)]"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.16}
+          dragSnapToOrigin
+          onDragEnd={(_, info) => handleDragEnd(info.offset.x, info.velocity.x)}
+        >
+          {previousOption ? (
+            <span className="absolute -left-5 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted/40" aria-hidden>
+              {previousOption.name}
+            </span>
+          ) : null}
+          {nextOption ? (
+            <span className="absolute -right-5 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted/40" aria-hidden>
+              {nextOption.name}
+            </span>
+          ) : null}
+          <AnimatePresence initial={false} mode="wait" custom={transitionDirection}>
+            <motion.div
+              key={activeOption.value}
+              initial={{ opacity: 0, x: transitionDirection * 32, rotateY: transitionDirection * 7, scale: 0.96 }}
+              animate={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
+              exit={{ opacity: 0, x: transitionDirection * -32, rotateY: transitionDirection * -7, scale: 0.96 }}
+              transition={{ type: "spring", stiffness: 420, damping: 34, mass: 0.72 }}
+              className="flex min-w-0 flex-1 items-center gap-3"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-app bg-accent-soft text-accent">
+                <ActiveIcon className="h-[18px] w-[18px]" />
+              </span>
+              <span className="min-w-0 flex-1">
+                {eyebrow ? <span className="block text-xs font-semibold uppercase text-muted">{eyebrow}</span> : null}
+                <span className="block truncate text-lg font-semibold leading-tight text-foreground">{activeOption.name}</span>
+                <span className="mt-0.5 block text-xs font-medium text-muted">{getCurrencyLabel(activeOption.currency)}</span>
+              </span>
+            </motion.div>
+          </AnimatePresence>
+          <div className="flex shrink-0 items-center gap-1.5" role="tablist" aria-label={allLabel}>
+            {options.map((option, index) => (
+              <button
+                key={option.value}
+                type="button"
+                role="tab"
+                aria-label={option.name}
+                aria-selected={option.value === activeOption.value}
+                className={`h-6 rounded-full px-1 transition-all duration-200 ${
+                  option.value === activeOption.value ? "w-7" : "w-3"
+                }`}
+                onClick={() => selectWallet(index)}
+              >
+                <span
+                  className={`block h-1.5 rounded-full transition-colors ${
+                    option.value === activeOption.value ? "bg-accent" : "bg-muted/25"
+                  }`}
+                />
+              </button>
+            ))}
+          </div>
+        </motion.div>
       </div>
 
-      <div
-        ref={scrollerRef}
-        className="relative flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        style={{ columnGap: PAGE_GAP_PX }}
-        onScroll={handleScroll}
-      >
-        {options.map((option) => (
-          <section key={option.value} className="w-full shrink-0 snap-center">
-            {children(option)}
-          </section>
-        ))}
+      <div className="overflow-hidden">
+        <AnimatePresence initial={false} mode="wait" custom={transitionDirection}>
+          <motion.section
+            key={activeOption.value}
+            initial={{ opacity: 0, x: transitionDirection * 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: transitionDirection * -24 }}
+            transition={{ type: "spring", stiffness: 380, damping: 36, mass: 0.75 }}
+          >
+            {children(activeOption)}
+          </motion.section>
+        </AnimatePresence>
       </div>
     </div>
   );
