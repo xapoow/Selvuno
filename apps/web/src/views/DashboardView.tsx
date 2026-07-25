@@ -126,7 +126,7 @@ export function DashboardView({
 
       <Section title={t.dashboard.spending}>
         {categoryTotals.length ? (
-          <div className="grid gap-4 rounded-app border border-line bg-surface p-4 sm:grid-cols-[180px_1fr]">
+          <div className="app-surface grid gap-4 rounded-app p-4 sm:grid-cols-[180px_1fr]">
             <div className="h-44">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -144,7 +144,12 @@ export function DashboardView({
                   </Pie>
                   <Tooltip
                     formatter={(value) => formatMoney(Number(value), displayCurrency, settings.locale)}
-                    contentStyle={{ borderRadius: 8, border: "1px solid rgb(var(--color-line))" }}
+                    contentStyle={{
+                      borderRadius: 8,
+                      border: 0,
+                      background: "rgb(var(--color-surface) / 0.94)",
+                      boxShadow: "0 12px 30px rgb(0 0 0 / 0.12)"
+                    }}
                   />
                 </PieChart>
               </ResponsiveContainer>

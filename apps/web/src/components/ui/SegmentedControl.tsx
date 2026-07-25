@@ -17,15 +17,15 @@ export function SegmentedControl<T extends string>({
   onChange
 }: SegmentedControlProps<T>) {
   return (
-    <div className="grid grid-flow-col rounded-app bg-elevated p-1 ring-1 ring-line">
+    <div className="app-control grid grid-flow-col rounded-app p-1">
       {options.map((option) => (
         <button
           key={option.value}
           type="button"
           onClick={() => onChange(option.value)}
           className={cn(
-            "h-9 rounded-[6px] px-3 text-sm font-medium text-muted transition duration-200 active:scale-[0.98]",
-            value === option.value && "bg-accent text-white shadow-sm"
+            "app-focus h-9 rounded-[6px] px-3 text-sm font-medium text-muted active:scale-[0.98]",
+            value === option.value && "app-selected-control text-foreground"
           )}
         >
           {option.label}

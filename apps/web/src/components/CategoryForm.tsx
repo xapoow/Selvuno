@@ -63,7 +63,7 @@ export function CategoryForm({ initial, t, submitLabel, onSubmit }: CategoryForm
               type="button"
               aria-label={swatch}
               onClick={() => setColor(swatch)}
-              className="h-10 rounded-app border border-line transition active:scale-[0.98]"
+              className="app-swatch h-10 rounded-app transition active:scale-[0.98]"
               style={{
                 backgroundColor: swatch,
                 outline: color === swatch ? "2px solid rgb(var(--color-foreground))" : "none"

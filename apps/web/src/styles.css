@@ -257,11 +257,19 @@ html {
 body {
   min-height: 100%;
   margin: 0;
-  background: rgb(var(--color-background));
+  background:
+    linear-gradient(180deg, rgb(var(--color-accent-soft) / 0.34), rgb(var(--color-background) / 0) 340px),
+    rgb(var(--color-background));
   color: rgb(var(--color-foreground));
   transition:
     background-color 180ms ease,
     color 180ms ease;
+}
+
+.dark body {
+  background:
+    linear-gradient(180deg, rgb(var(--color-accent-soft) / 0.18), rgb(var(--color-background) / 0) 360px),
+    rgb(var(--color-background));
 }
 
 button,
@@ -276,4 +284,116 @@ button {
 
 ::selection {
   background: rgb(var(--color-accent-soft));
+}
+
+@layer components {
+  .app-page-bg {
+    background:
+      linear-gradient(180deg, rgb(var(--color-accent-soft) / 0.32), rgb(var(--color-background) / 0) 340px),
+      rgb(var(--color-background));
+  }
+
+  .dark .app-page-bg {
+    background:
+      linear-gradient(180deg, rgb(var(--color-accent-soft) / 0.18), rgb(var(--color-background) / 0) 360px),
+      rgb(var(--color-background));
+  }
+
+  .app-chrome {
+    background: rgb(var(--color-surface) / 0.78);
+    box-shadow: 0 1px 0 rgb(var(--color-foreground) / 0.055);
+    backdrop-filter: blur(22px) saturate(1.35);
+  }
+
+  .dark .app-chrome {
+    background: rgb(var(--color-surface) / 0.74);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.055);
+  }
+
+  .app-surface {
+    background: rgb(var(--color-surface) / 0.82);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.52),
+      0 1px 2px rgb(0 0 0 / 0.035),
+      0 14px 34px rgb(var(--color-accent) / 0.055);
+  }
+
+  .dark .app-surface {
+    background: rgb(var(--color-surface) / 0.82);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.055),
+      0 14px 34px rgb(0 0 0 / 0.22);
+  }
+
+  .app-control {
+    background: rgb(var(--color-elevated) / 0.72);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.38),
+      inset 0 0 0 1px rgb(var(--color-foreground) / 0.035);
+  }
+
+  .dark .app-control {
+    background: rgb(var(--color-elevated) / 0.7);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.055),
+      inset 0 0 0 1px rgb(255 255 255 / 0.035);
+  }
+
+  .app-field {
+    background: rgb(var(--color-elevated) / 0.62);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.42),
+      inset 0 0 0 1px rgb(var(--color-foreground) / 0.045);
+  }
+
+  .dark .app-field {
+    background: rgb(var(--color-elevated) / 0.66);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.05),
+      inset 0 0 0 1px rgb(255 255 255 / 0.045);
+  }
+
+  .app-button-primary {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.24),
+      0 10px 22px rgb(var(--color-accent) / 0.22);
+  }
+
+  .app-button-danger {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.2),
+      0 10px 22px rgb(var(--color-expense) / 0.2);
+  }
+
+  .app-selected-control {
+    background: rgb(var(--color-surface) / 0.9);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.54),
+      0 1px 2px rgb(0 0 0 / 0.06);
+  }
+
+  .dark .app-selected-control {
+    background: rgb(var(--color-surface) / 0.88);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.065),
+      0 1px 2px rgb(0 0 0 / 0.24);
+  }
+
+  .app-swatch {
+    box-shadow: inset 0 0 0 1px rgb(var(--color-foreground) / 0.08);
+  }
+
+  .app-focus {
+    transition:
+      background-color 180ms ease,
+      color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
+  }
+
+  .app-focus:focus-visible {
+    box-shadow:
+      inset 0 0 0 1px rgb(var(--color-accent) / 0.28),
+      0 0 0 3px rgb(var(--color-accent) / 0.14);
+  }
 }

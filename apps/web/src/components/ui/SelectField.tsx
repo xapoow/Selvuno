@@ -12,7 +12,7 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
       <select
         ref={ref}
         className={cn(
-          "h-11 rounded-app border border-line bg-surface px-3 text-base text-foreground outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20",
+          "app-field app-focus h-11 rounded-app px-3 text-base text-foreground outline-none",
           className
         )}
         {...props}

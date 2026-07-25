@@ -161,14 +161,14 @@ export function SettingsView({
       </div>
 
       <div className="-mx-4 overflow-x-auto px-4 pb-1">
-        <div className="flex min-w-max gap-2 rounded-app bg-elevated p-1 ring-1 ring-line">
+        <div className="app-control flex min-w-max gap-2 rounded-app p-1">
           {settingsTabs.map((tab) => (
             <button
               key={tab.value}
               type="button"
               onClick={() => setActiveTab(tab.value)}
               className={`h-9 rounded-[6px] px-3 text-sm font-medium transition duration-200 active:scale-[0.98] ${
-                activeTab === tab.value ? "bg-accent text-white shadow-sm" : "text-muted"
+                activeTab === tab.value ? "app-selected-control text-foreground" : "text-muted hover:text-foreground"
               }`}
             >
               {t.settings.tabs[tab.value]}
@@ -179,7 +179,7 @@ export function SettingsView({
 
       {activeTab === "general" ? (
         <Section title={t.settings.general}>
-          <div className="grid gap-4 rounded-app border border-line bg-surface p-4 sm:grid-cols-2">
+          <div className="app-surface grid gap-4 rounded-app p-4 sm:grid-cols-2">
             <SelectField
               label={t.common.language}
               value={settings.locale}
@@ -230,7 +230,7 @@ export function SettingsView({
 
       {activeTab === "appearance" ? (
         <Section title={t.settings.appearance}>
-          <div className="grid gap-4 rounded-app border border-line bg-surface p-4">
+          <div className="app-surface grid gap-4 rounded-app p-4">
             <SegmentedControl
               value={visualTheme}
               onChange={handleThemeChange}
@@ -272,7 +272,7 @@ export function SettingsView({
                     {groupedCategories[type].map((category) => (
                       <article
                         key={category.id}
-                        className="grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-app border border-line bg-surface p-3"
+                        className="app-surface grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-app p-3"
                       >
                         <span
                           className="grid h-10 w-10 place-items-center rounded-app text-white"
@@ -319,7 +319,7 @@ export function SettingsView({
 
       {activeTab === "backup" ? (
         <Section title={t.settings.backup}>
-          <div className="grid gap-3 rounded-app border border-line bg-surface p-4 sm:grid-cols-2">
+          <div className="app-surface grid gap-3 rounded-app p-4 sm:grid-cols-2">
             <Button variant="secondary" onClick={() => void handleExport()}>
               <FileDown className="h-4 w-4" />
               {t.settings.exportJson}
@@ -342,7 +342,7 @@ export function SettingsView({
 
       {activeTab === "sync" ? (
         <Section title={t.settings.sync}>
-          <div className="rounded-app border border-line bg-surface p-5">
+          <div className="app-surface rounded-app p-5">
             <p className="text-sm font-semibold uppercase text-muted">{t.settings.comingSoon}</p>
             <h3 className="mt-2 text-xl font-semibold text-foreground">{t.settings.syncTitle}</h3>
             <p className="mt-2 text-sm leading-6 text-muted">
@@ -354,8 +354,8 @@ export function SettingsView({
 
       {activeTab === "debug" ? (
         <Section title={t.settings.debug}>
-          <div className="grid gap-3 rounded-app border border-line bg-surface p-4">
-            <div className="rounded-app bg-elevated px-3 py-2 text-sm text-muted">
+          <div className="app-surface grid gap-3 rounded-app p-4">
+            <div className="app-control rounded-app px-3 py-2 text-sm text-muted">
               {t.settings.version}: <span className="font-semibold text-foreground">{appVersion}</span>
             </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">

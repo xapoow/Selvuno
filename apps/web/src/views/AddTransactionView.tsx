@@ -21,7 +21,7 @@ export function AddTransactionView({ wallets, categories, settings, t, onSubmit 
         <h2 className="text-xl font-semibold text-foreground">{t.transaction.addTitle}</h2>
       </div>
       {activeWallet ? (
-        <div className="rounded-app border border-line bg-surface p-4">
+        <div className="app-surface rounded-app p-4">
           <TransactionForm
             wallets={wallets}
             categories={categories}

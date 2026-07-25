@@ -201,11 +201,11 @@ export function ErrorScreen({
   return (
     <div
       className={cn(
-        "grid place-items-center bg-background px-4 text-foreground",
+        "app-page-bg grid place-items-center px-4 text-foreground",
         compact ? "min-h-[420px] py-4" : "min-h-screen py-10"
       )}
     >
-      <section className="w-full max-w-xl rounded-app border border-line bg-surface p-5 shadow-soft dark:shadow-softDark">
+      <section className="app-surface w-full max-w-xl rounded-app p-5">
         <div className="flex items-start gap-4">
           <span
             className={cn(
@@ -240,7 +240,7 @@ export function ErrorScreen({
         </div>
 
         {details ? (
-          <details className="mt-5 rounded-app border border-line bg-elevated p-3">
+          <details className="app-control mt-5 rounded-app p-3">
             <summary className="cursor-pointer text-sm font-semibold text-foreground">
               {copy?.actions.debugDetails ?? "Debug details"}
             </summary>

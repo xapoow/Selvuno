@@ -151,7 +151,7 @@ export function HistoryView({
       <div>
         <h2 className="text-xl font-semibold text-foreground">{t.history.title}</h2>
       </div>
-      <div className="grid gap-3 rounded-app border border-line bg-surface p-3">
+      <div className="app-surface grid gap-3 rounded-app p-3">
         <SegmentedControl
           value={typeFilter}
           onChange={setTypeFilter}

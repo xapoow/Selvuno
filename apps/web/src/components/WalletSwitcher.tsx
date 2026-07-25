@@ -82,13 +82,13 @@ export function WalletSwitcher({
               selectByOffset(1);
             }
           }}
-          className="touch-pan-y select-none rounded-app border border-line bg-surface/90 px-3 py-3 shadow-sm outline-none transition duration-200 focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent/20 active:scale-[0.99]"
+          className="app-surface app-focus touch-pan-y select-none rounded-app px-3 py-3 outline-none active:scale-[0.99]"
           whileTap={canSwitch ? { scale: 0.99 } : undefined}
         >
           <div className="grid grid-cols-[24px_1fr_24px] items-center gap-2">
             <ChevronLeft className={cn("h-4 w-4 text-muted transition", !canSwitch && "opacity-35")} aria-hidden />
             <div className="grid justify-items-center gap-1 overflow-hidden text-center">
-              <span className="grid h-9 w-9 place-items-center rounded-app bg-accentSoft text-accent">
+              <span className="app-control grid h-9 w-9 place-items-center rounded-app text-accent">
                 <ActiveIcon className="h-4 w-4" />
               </span>
               <AnimatePresence mode="wait" initial={false}>
@@ -114,7 +114,7 @@ export function WalletSwitcher({
             <span
               key={option.value}
               className={cn(
-                "h-1.5 rounded-full bg-line transition-all duration-200",
+                "h-1.5 rounded-full bg-muted/25 transition-all duration-200",
                 option.value === activeOption.value ? "w-5 bg-accent" : "w-1.5"
               )}
             />
@@ -124,7 +124,7 @@ export function WalletSwitcher({
 
       <LayoutGroup>
         <nav className="hidden justify-center md:flex" aria-label={label}>
-          <div className="max-w-full overflow-x-auto rounded-app border border-line bg-surface/70 px-5 py-2 shadow-sm">
+          <div className="app-surface max-w-full overflow-x-auto rounded-app px-5 py-2">
             <div className="flex min-w-max items-center justify-center gap-8">
               {options.map((option) => {
                 const isActive = option.value === activeOption.value;
@@ -134,7 +134,7 @@ export function WalletSwitcher({
                     type="button"
                     onClick={() => onChange(option.value)}
                     className={cn(
-                      "relative h-9 px-0 pb-2 pt-1 text-sm font-medium text-muted transition duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/20 active:scale-[0.98]",
+                      "app-focus relative h-9 px-0 pb-2 pt-1 text-sm font-medium text-muted hover:text-foreground focus-visible:outline-none active:scale-[0.98]",
                       isActive && "text-foreground"
                     )}
                   >

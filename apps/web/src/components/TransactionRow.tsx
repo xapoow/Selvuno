@@ -36,7 +36,7 @@ export function TransactionRow({
   const currency = displayCurrency ?? transaction.currency;
 
   return (
-    <article className="grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-app border border-line bg-surface p-3">
+    <article className="app-surface grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-app p-3">
       <span
         className="grid h-11 w-11 place-items-center rounded-app text-white"
         style={{ backgroundColor: category?.color ?? "#676761" }}

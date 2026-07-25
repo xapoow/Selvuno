@@ -14,7 +14,7 @@ export function BottomSheet({ open, title, children, onClose }: BottomSheetProps
     <AnimatePresence>
       {open ? (
         <motion.div
-          className="fixed inset-0 z-50 grid items-end bg-black/30 px-3 pb-3 backdrop-blur-[2px] sm:items-center sm:px-6"
+          className="fixed inset-0 z-50 grid items-end bg-black/28 px-3 pb-3 backdrop-blur-[3px] sm:items-center sm:px-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -24,7 +24,7 @@ export function BottomSheet({ open, title, children, onClose }: BottomSheetProps
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            className="relative mx-auto w-full max-w-xl rounded-app border border-line bg-surface p-4 shadow-soft dark:shadow-softDark"
+            className="app-surface relative mx-auto w-full max-w-xl rounded-app p-4"
             initial={{ y: 36, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 24, opacity: 0 }}

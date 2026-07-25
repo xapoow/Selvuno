@@ -86,7 +86,7 @@ export function App() {
 
   if (isLoading || !settings) {
     return (
-      <div className="grid min-h-screen place-items-center bg-background px-6 text-foreground">
+      <div className="app-page-bg grid min-h-screen place-items-center px-6 text-foreground">
         <div className="h-10 w-10 animate-pulse rounded-app bg-accent" />
       </div>
     );
@@ -107,8 +107,8 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b border-line bg-background/88 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+14px)] backdrop-blur-xl">
+    <div className="app-page-bg min-h-screen text-foreground">
+      <header className="app-chrome sticky top-0 z-30 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+14px)]">
         <div className="mx-auto grid max-w-3xl gap-3">
           <div className="flex items-center justify-between gap-3">
             <div>

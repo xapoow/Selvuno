@@ -79,7 +79,7 @@ export function OnboardingView({
   }
 
   return (
-    <main className="min-h-screen bg-background px-4 py-[calc(env(safe-area-inset-top)+20px)] text-foreground">
+    <main className="app-page-bg min-h-screen px-4 py-[calc(env(safe-area-inset-top)+20px)] text-foreground">
       <section className="mx-auto flex min-h-[calc(100vh-40px)] max-w-xl flex-col justify-center gap-6">
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold uppercase text-muted">MyFinances</p>
@@ -87,7 +87,7 @@ export function OnboardingView({
             {[1, 2].map((item) => (
               <span
                 key={item}
-                className={`h-1.5 w-6 rounded-full transition ${item === step ? "bg-accent" : "bg-line"}`}
+                className={`h-1.5 w-6 rounded-full transition ${item === step ? "bg-accent" : "bg-muted/25"}`}
               />
             ))}
           </div>
@@ -95,7 +95,7 @@ export function OnboardingView({
 
         {step === 1 ? (
           <div className="grid gap-5">
-            <div className="grid h-12 w-12 place-items-center rounded-app bg-accentSoft text-accent">
+            <div className="app-control grid h-12 w-12 place-items-center rounded-app text-accent">
               <Languages className="h-6 w-6" />
             </div>
             <div>
@@ -116,7 +116,7 @@ export function OnboardingView({
           </div>
         ) : (
           <div className="grid gap-5">
-            <div className="grid h-12 w-12 place-items-center rounded-app bg-accentSoft text-accent">
+            <div className="app-control grid h-12 w-12 place-items-center rounded-app text-accent">
               <WalletCards className="h-6 w-6" />
             </div>
             <div>
@@ -124,7 +124,7 @@ export function OnboardingView({
               <h1 className="mt-2 text-3xl font-semibold leading-tight text-foreground">{t.onboarding.setupTitle}</h1>
               <p className="mt-3 text-sm leading-6 text-muted">{t.onboarding.setupBody}</p>
             </div>
-            <div className="grid gap-4 rounded-app border border-line bg-surface p-4">
+            <div className="app-surface grid gap-4 rounded-app p-4">
               <SelectField
                 label={t.onboarding.globalCurrency}
                 value={globalCurrency}

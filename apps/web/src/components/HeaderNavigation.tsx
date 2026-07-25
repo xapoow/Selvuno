@@ -10,7 +10,7 @@ interface HeaderNavigationProps {
 
 export function HeaderNavigation({ activeView, labels, onChange }: HeaderNavigationProps) {
   return (
-    <nav className="hidden md:grid md:grid-cols-5 md:gap-1 rounded-app bg-elevated p-1 ring-1 ring-line">
+    <nav className="app-control hidden rounded-app p-1 md:grid md:grid-cols-5 md:gap-1">
       {navigationItems.map((item) => {
         const Icon = item.icon;
         const isActive = activeView === item.view;
@@ -20,8 +20,8 @@ export function HeaderNavigation({ activeView, labels, onChange }: HeaderNavigat
             type="button"
             onClick={() => onChange(item.view)}
             className={cn(
-              "inline-flex h-10 items-center justify-center gap-2 rounded-[6px] px-3 text-sm font-medium text-muted transition duration-200 active:scale-[0.98]",
-              isActive && "bg-accent text-white shadow-sm"
+              "app-focus inline-flex h-10 items-center justify-center gap-2 rounded-[6px] px-3 text-sm font-medium text-muted active:scale-[0.98]",
+              isActive && "app-selected-control text-foreground"
             )}
             >
             <Icon className="h-4 w-4" />

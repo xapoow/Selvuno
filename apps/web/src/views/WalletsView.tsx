@@ -38,7 +38,7 @@ export function WalletsView({ wallets, transactions, settings, t, onCreate, onUp
           {wallets.map((wallet) => {
             const totals = calculateTransactionTotals(transactions, wallet.id);
             return (
-              <article key={wallet.id} className="grid gap-3 rounded-app border border-line bg-surface p-4">
+              <article key={wallet.id} className="app-surface grid gap-3 rounded-app p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="text-base font-semibold text-foreground">{wallet.name}</h3>

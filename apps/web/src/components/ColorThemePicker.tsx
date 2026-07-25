@@ -21,15 +21,15 @@ export function ColorThemePicker({ value, labels, onChange }: ColorThemePickerPr
             aria-pressed={selected}
             onClick={() => onChange(option.value)}
             className={cn(
-              "grid min-h-[76px] gap-2 rounded-app border bg-surface p-3 text-left transition duration-200 active:scale-[0.98]",
+              "app-focus grid min-h-[76px] gap-2 rounded-app p-3 text-left active:scale-[0.98]",
               selected
-                ? "border-accent bg-accentSoft/70 text-foreground ring-2 ring-accent/25"
-                : "border-line text-muted hover:border-accent/50 hover:text-foreground"
+                ? "app-selected-control text-foreground"
+                : "app-control text-muted hover:bg-surface/80 hover:text-foreground"
             )}
           >
             <span className="flex items-center justify-between gap-2">
               <span
-                className="h-7 w-7 rounded-full ring-1 ring-line"
+                className="app-swatch h-7 w-7 rounded-full"
                 style={{
                   background: `linear-gradient(135deg, ${option.background} 0 28%, ${option.soft} 28% 60%, ${option.accent} 60% 100%)`
                 }}
