@@ -160,7 +160,21 @@ export function SettingsView({
         <h2 className="text-xl font-semibold text-foreground">{t.settings.title}</h2>
       </div>
 
-      <div className="-mx-4 overflow-x-auto px-4 pb-1">
+      <div className="md:hidden">
+        <SelectField
+          label={t.settings.section}
+          value={activeTab}
+          onChange={(event) => setActiveTab(event.target.value as SettingsTab)}
+        >
+          {settingsTabs.map((tab) => (
+            <option key={tab.value} value={tab.value}>
+              {t.settings.tabs[tab.value]}
+            </option>
+          ))}
+        </SelectField>
+      </div>
+
+      <div className="hidden md:block">
         <div className="app-control flex min-w-max gap-2 rounded-app p-1">
           {settingsTabs.map((tab) => (
             <button

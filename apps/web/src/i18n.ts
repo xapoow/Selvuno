@@ -165,6 +165,7 @@ export interface Dictionary {
   };
   settings: {
     title: string;
+    section: string;
     tabs: Record<SettingsTab, string>;
     general: string;
     appearance: string;
@@ -350,6 +351,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     },
     settings: {
       title: "Settings",
+      section: "Section",
       tabs: {
         general: "General",
         appearance: "Appearance",
@@ -601,6 +603,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     },
     settings: {
       title: "Настройки",
+      section: "Раздел",
       tabs: {
         general: "Общее",
         appearance: "Вид",
