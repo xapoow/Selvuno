@@ -2,10 +2,8 @@ import type { ColorThemePreference } from "@myfinances/types";
 import type { AppView } from "./state/appStore";
 
 export type Language = "en" | "ru";
-export type SettingsTab = "general" | "appearance" | "categories" | "backup" | "sync" | "debug";
+export type SettingsTab = "general" | "appearance" | "categories" | "backup" | "sync";
 export type DateFormatLabel = "short" | "medium" | "long";
-
-export const appVersion = "0.1.0";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -188,13 +186,6 @@ export interface Dictionary {
     comingSoon: string;
     syncTitle: string;
     syncBody: string;
-    debug: string;
-    version: string;
-    triggerRuntimeError: string;
-    resetLocalData: string;
-    resetLocalDataConfirm: string;
-    errorPreview: string;
-    closePreview: string;
   };
   errors: ErrorCopy;
 }
@@ -361,8 +352,7 @@ export const dictionaries: Record<Language, Dictionary> = {
         appearance: "Appearance",
         categories: "Categories",
         backup: "Backup",
-        sync: "Sync",
-        debug: "Debug"
+        sync: "Sync"
       },
       general: "General",
       appearance: "Appearance",
@@ -395,14 +385,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       sync: "Sync",
       comingSoon: "Coming soon",
       syncTitle: "Cloud sync is planned",
-      syncBody: "Accounts, cloud backup, restore, and multi-device synchronization will live here.",
-      debug: "Debug",
-      version: "Version",
-      triggerRuntimeError: "Trigger runtime error",
-      resetLocalData: "Reset local data",
-      resetLocalDataConfirm: "Clear local data, cookies, and restart onboarding?",
-      errorPreview: "Error preview",
-      closePreview: "Close preview"
+      syncBody: "Accounts, cloud backup, restore, and multi-device synchronization will live here."
     },
     errors: {
       actions: {
@@ -615,8 +598,7 @@ export const dictionaries: Record<Language, Dictionary> = {
         appearance: "Вид",
         categories: "Категории",
         backup: "Бэкап",
-        sync: "Синхронизация",
-        debug: "Дебаг"
+        sync: "Синхронизация"
       },
       general: "Общее",
       appearance: "Внешний вид",
@@ -649,14 +631,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       sync: "Синхронизация",
       comingSoon: "Скоро",
       syncTitle: "Облачная синхронизация запланирована",
-      syncBody: "Аккаунты, облачный бэкап, восстановление и синхронизация между устройствами будут здесь.",
-      debug: "Дебаг",
-      version: "Версия",
-      triggerRuntimeError: "Вызвать runtime ошибку",
-      resetLocalData: "Сбросить локальные данные",
-      resetLocalDataConfirm: "Очистить локальные данные, cookies и запустить onboarding заново?",
-      errorPreview: "Превью ошибки",
-      closePreview: "Закрыть превью"
+      syncBody: "Аккаунты, облачный бэкап, восстановление и синхронизация между устройствами будут здесь."
     },
     errors: {
       actions: {
