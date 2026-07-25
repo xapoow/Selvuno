@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
 import type { Wallet, WalletView } from "@myfinances/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { Layers3, WalletCards } from "lucide-react";
@@ -61,14 +61,14 @@ export function MobileWalletPager({
   const activeOption = options[activeIndex] ?? options[0];
   const ActiveIcon = activeOption?.kind === "all" ? Layers3 : WalletCards;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller) {
       return;
     }
     const targetLeft = activeIndex * scroller.clientWidth;
     if (Math.abs(scroller.scrollLeft - targetLeft) > 2) {
-      scroller.scrollTo({ left: targetLeft, behavior: "smooth" });
+      scroller.scrollTo({ left: targetLeft, behavior: "auto" });
     }
   }, [activeIndex]);
 
@@ -136,7 +136,7 @@ export function MobileWalletPager({
 
       <div
         ref={scrollerRef}
-        className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         onScroll={handleScroll}
       >
         {options.map((option) => (
