@@ -62,8 +62,6 @@ export function MobileWalletPager({
   const activeIndex = resolvedActiveIndex >= 0 ? resolvedActiveIndex : 0;
   const activeOption = options[activeIndex] ?? options[0];
   const ActiveIcon = activeOption?.kind === "all" ? Layers3 : WalletCards;
-  const previousOption = options[activeIndex - 1];
-  const nextOption = options[activeIndex + 1];
 
   function selectWallet(index: number) {
     const nextIndex = Math.max(0, Math.min(options.length - 1, index));
@@ -92,9 +90,7 @@ export function MobileWalletPager({
 
   return (
     <div className="grid gap-4">
-      <div className="relative h-[88px] overflow-hidden [perspective:900px]">
-        <div className="absolute inset-x-3 bottom-0 h-[76px] rounded-app bg-accent/10" aria-hidden />
-        <div className="absolute inset-x-1 bottom-1 h-[78px] rounded-app bg-accent/15" aria-hidden />
+      <div className="[perspective:900px]">
         <motion.div
           className="app-surface relative flex h-[76px] touch-pan-y items-center overflow-hidden rounded-app px-4 py-3 shadow-[0_14px_30px_rgb(var(--color-accent)/0.12)]"
           drag="x"
@@ -103,16 +99,6 @@ export function MobileWalletPager({
           dragSnapToOrigin
           onDragEnd={(_, info) => handleDragEnd(info.offset.x, info.velocity.x)}
         >
-          {previousOption ? (
-            <span className="absolute -left-5 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted/40" aria-hidden>
-              {previousOption.name}
-            </span>
-          ) : null}
-          {nextOption ? (
-            <span className="absolute -right-5 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted/40" aria-hidden>
-              {nextOption.name}
-            </span>
-          ) : null}
           <AnimatePresence initial={false} mode="wait" custom={transitionDirection}>
             <motion.div
               key={activeOption.value}

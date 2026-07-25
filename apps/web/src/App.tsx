@@ -232,10 +232,7 @@ export function App() {
                   wallets={wallets}
                   transactions={transactions}
                   settings={settings}
-                  activeWalletId={activeWalletId}
-                  allLabel={t.wallets.allWallets}
                   t={t}
-                  onChange={handleWalletChange}
                   onCreate={async (input) => {
                     await mutations.createWallet.mutateAsync(input);
                   }}
