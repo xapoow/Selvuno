@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import type {
   Category,
   CategoryInput,
@@ -8,7 +9,7 @@ import type {
   SettingsUpdate,
   ThemePreference
 } from "@myfinances/types";
-import { Edit3, FileDown, FileUp, Tags, Trash2 } from "lucide-react";
+import { Edit3, FileDown, FileUp, Menu, Tags, Trash2, X } from "lucide-react";
 import { CategoryIcon } from "../lib/icons";
 import { currencyOptions, getCurrencyLabel } from "../lib/currencies";
 import { applyRootVisualTheme } from "../lib/colorThemes";
@@ -72,6 +73,7 @@ export function SettingsView({
   const [debugError, setDebugError] = useState<ErrorScreenKind | null>(null);
   const [shouldCrash, setShouldCrash] = useState(false);
   const [activeTab, setActiveTab] = useState<SettingsTab>("general");
+  const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const [visualTheme, setVisualTheme] = useState<ThemePreference>(settings.theme);
   const [visualColorTheme, setVisualColorTheme] = useState<ColorThemePreference>(settings.colorTheme);
   const [importError, setImportError] = useState("");
@@ -92,6 +94,24 @@ export function SettingsView({
     setVisualTheme(settings.theme);
     setVisualColorTheme(settings.colorTheme);
   }, [settings.theme, settings.colorTheme]);
+
+  useEffect(() => {
+    if (!settingsMenuOpen) {
+      return;
+    }
+    const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSettingsMenuOpen(false);
+      }
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [settingsMenuOpen]);
 
   function handleThemeChange(theme: ThemePreference) {
     setVisualTheme(theme);
@@ -156,23 +176,78 @@ export function SettingsView({
 
   return (
     <div className="grid gap-6">
-      <div>
+      <div className="flex items-center justify-between gap-3">
         <h2 className="text-xl font-semibold text-foreground">{t.settings.title}</h2>
+        <Button
+          variant="secondary"
+          size="icon"
+          className="md:hidden"
+          onClick={() => setSettingsMenuOpen(true)}
+          aria-label={t.settings.section}
+          aria-expanded={settingsMenuOpen}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
       </div>
 
-      <div className="md:hidden">
-        <SelectField
-          label={t.settings.section}
-          value={activeTab}
-          onChange={(event) => setActiveTab(event.target.value as SettingsTab)}
-        >
-          {settingsTabs.map((tab) => (
-            <option key={tab.value} value={tab.value}>
-              {t.settings.tabs[tab.value]}
-            </option>
-          ))}
-        </SelectField>
-      </div>
+      <AnimatePresence>
+        {settingsMenuOpen ? (
+          <motion.div
+            className="fixed inset-0 z-50 bg-black/28 backdrop-blur-[3px] md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <button
+              type="button"
+              className="absolute inset-0 cursor-default"
+              onClick={() => setSettingsMenuOpen(false)}
+              aria-label={t.common.close}
+            />
+            <motion.aside
+              role="dialog"
+              aria-modal="true"
+              aria-label={t.settings.section}
+              className="app-surface relative grid h-full w-[min(82vw,304px)] content-start gap-4 rounded-r-[8px] px-4 pb-6 pt-[calc(env(safe-area-inset-top)+16px)]"
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", stiffness: 360, damping: 34 }}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase text-muted">{t.settings.section}</p>
+                  <h3 className="text-lg font-semibold text-foreground">{t.settings.title}</h3>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setSettingsMenuOpen(false)} aria-label={t.common.close}>
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+              <nav className="grid gap-2" aria-label={t.settings.section}>
+                {settingsTabs.map((tab) => {
+                  const isActive = activeTab === tab.value;
+                  return (
+                    <button
+                      key={tab.value}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab(tab.value);
+                        setSettingsMenuOpen(false);
+                      }}
+                      className={`app-focus flex h-11 items-center justify-between rounded-app px-3 text-left text-sm font-medium active:scale-[0.98] ${
+                        isActive ? "app-selected-control text-foreground" : "text-muted hover:bg-elevated/70 hover:text-foreground"
+                      }`}
+                    >
+                      <span>{t.settings.tabs[tab.value]}</span>
+                      {isActive ? <span className="h-1.5 w-1.5 rounded-full bg-accent" /> : null}
+                    </button>
+                  );
+                })}
+              </nav>
+            </motion.aside>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       <div className="hidden md:block">
         <div className="app-control flex min-w-max gap-2 rounded-app p-1">
