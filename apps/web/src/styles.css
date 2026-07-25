@@ -380,11 +380,18 @@ button {
   }
 
   .app-navigation-active {
-    background: rgb(var(--color-accent));
-    color: white;
+    background: rgb(var(--color-foreground) / 0.11);
+    color: rgb(var(--color-foreground));
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.24),
-      0 8px 18px rgb(var(--color-accent) / 0.32);
+      inset 0 0 0 1px rgb(var(--color-foreground) / 0.08),
+      0 6px 16px rgb(0 0 0 / 0.08);
+  }
+
+  .dark .app-navigation-active {
+    background: rgb(var(--color-foreground) / 0.13);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.08),
+      0 8px 20px rgb(0 0 0 / 0.22);
   }
 
   .dark .app-selected-control {
@@ -415,5 +422,11 @@ button {
     box-shadow:
       inset 0 0 0 1px rgb(var(--color-accent) / 0.28),
       0 0 0 3px rgb(var(--color-accent) / 0.14);
+  }
+
+  .app-focus.app-navigation-active:focus-visible {
+    box-shadow:
+      inset 0 0 0 1px rgb(var(--color-foreground) / 0.1),
+      0 6px 16px rgb(0 0 0 / 0.1);
   }
 }
