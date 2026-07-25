@@ -111,6 +111,18 @@ export interface Dictionary {
     convertedTo: string;
     exchangeRatesLoading: string;
     exchangeRatesUnavailable: string;
+    cashFlow: string;
+    openAnalytics: string;
+    analyticsEyebrow: string;
+    analyticsTitle: string;
+    backToOverview: string;
+    averageTransaction: string;
+    topCategory: string;
+    trend: string;
+    lastSevenDays: string;
+    operations: string;
+    categoriesBreakdown: string;
+    categoryComparison: string;
   };
   transaction: {
     addTitle: string;
@@ -301,7 +313,19 @@ export const dictionaries: Record<Language, Dictionary> = {
       addTransaction: "Add transaction",
       convertedTo: "Converted to",
       exchangeRatesLoading: "Updating exchange rates",
-      exchangeRatesUnavailable: "Some exchange rates are unavailable"
+      exchangeRatesUnavailable: "Some exchange rates are unavailable",
+      cashFlow: "Cash flow",
+      openAnalytics: "Detailed analytics",
+      analyticsEyebrow: "Insights",
+      analyticsTitle: "Financial analytics",
+      backToOverview: "Back to overview",
+      averageTransaction: "Average transaction",
+      topCategory: "Top category",
+      trend: "Daily trend",
+      lastSevenDays: "Last 7 days",
+      operations: "operations",
+      categoriesBreakdown: "Category breakdown",
+      categoryComparison: "Your largest categories"
     },
     transaction: {
       addTitle: "Add transaction",
@@ -557,7 +581,19 @@ export const dictionaries: Record<Language, Dictionary> = {
       addTransaction: "Добавить операцию",
       convertedTo: "Конвертировано в",
       exchangeRatesLoading: "Обновляем курсы валют",
-      exchangeRatesUnavailable: "Некоторые курсы валют недоступны"
+      exchangeRatesUnavailable: "Некоторые курсы валют недоступны",
+      cashFlow: "Движение денег",
+      openAnalytics: "Подробнее",
+      analyticsEyebrow: "Аналитика",
+      analyticsTitle: "Финансовая аналитика",
+      backToOverview: "Назад к обзору",
+      averageTransaction: "Средняя операция",
+      topCategory: "Главная категория",
+      trend: "Динамика по дням",
+      lastSevenDays: "Последние 7 дней",
+      operations: "операций",
+      categoriesBreakdown: "По категориям",
+      categoryComparison: "Самые крупные категории"
     },
     transaction: {
       addTitle: "Добавить операцию",

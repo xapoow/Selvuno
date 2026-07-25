@@ -22,7 +22,7 @@ export function BottomNavigation({ activeView, labels, onChange }: BottomNavigat
               onClick={() => onChange(item.view)}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "app-focus grid h-12 place-items-center rounded-app text-[11px] font-medium text-muted active:scale-[0.98]",
+                "app-focus grid h-12 place-items-center rounded-app text-[11px] font-medium text-muted outline-none active:scale-[0.98]",
                 isActive && "app-navigation-active"
               )}
             >

@@ -118,20 +118,23 @@ export function App() {
   }
 
   return (
-    <div className="app-page-bg min-h-dvh text-foreground">
-      <header className="app-chrome sticky top-0 z-30 hidden px-4 pb-3 pt-[calc(env(safe-area-inset-top)+14px)] md:block">
-        <div className="mx-auto grid max-w-3xl gap-3">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase text-muted">MyFinances</p>
-              <h1 className="text-2xl font-semibold text-foreground">{t.appName}</h1>
-            </div>
-          </div>
-          <HeaderNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
+    <div className="app-page-bg min-h-dvh text-foreground md:grid md:grid-cols-[236px_minmax(0,1fr)]">
+      <aside className="app-chrome sticky top-0 hidden h-dvh border-r border-line/60 p-4 md:flex md:flex-col">
+        <div className="mb-7 px-2 pt-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">MyFinances</p>
+          <h1 className="mt-1 text-2xl font-semibold text-foreground">{t.appName}</h1>
         </div>
-      </header>
+        <HeaderNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
+        <div className="mt-auto rounded-app border border-line/60 bg-elevated/70 p-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t.common.wallet}</p>
+          <p className="mt-1 truncate text-sm font-semibold text-foreground">
+            {activeWallet?.name ?? t.wallets.allWallets}
+          </p>
+          <p className="mt-0.5 text-xs text-muted">{displayCurrency}</p>
+        </div>
+      </aside>
 
-      <main className="mx-auto max-w-3xl px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:pt-5">
+      <main className="mx-auto w-full max-w-[1180px] px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:px-8 md:pb-10 md:pt-7 lg:px-10">
         <div className={activeView === "add" ? "mb-5" : "mb-5 hidden md:block"}>
           <WalletSwitcher
             wallets={wallets}
