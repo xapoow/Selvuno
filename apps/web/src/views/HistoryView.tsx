@@ -27,6 +27,7 @@ interface HistoryViewProps {
   displayCurrency: string;
   exchangeRates?: ExchangeRateTable;
   t: Dictionary;
+  showTitle?: boolean;
   onUpdate: (id: string, input: Partial<TransactionInput>) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 }
@@ -51,6 +52,7 @@ export function HistoryView({
   displayCurrency,
   exchangeRates,
   t,
+  showTitle = true,
   onUpdate,
   onDelete
 }: HistoryViewProps) {
@@ -148,9 +150,11 @@ export function HistoryView({
 
   return (
     <div className="grid gap-5">
-      <div>
-        <h2 className="text-xl font-semibold text-foreground">{t.history.title}</h2>
-      </div>
+      {showTitle ? (
+        <div>
+          <h2 className="text-xl font-semibold text-foreground">{t.history.title}</h2>
+        </div>
+      ) : null}
       <div className="app-surface grid gap-3 rounded-app p-3">
         <SegmentedControl
           value={typeFilter}

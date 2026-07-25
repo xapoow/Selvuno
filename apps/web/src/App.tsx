@@ -4,6 +4,8 @@ import type { WalletView } from "@myfinances/types";
 import { BottomNavigation } from "./components/BottomNavigation";
 import { HeaderNavigation } from "./components/HeaderNavigation";
 import { MobileWalletDashboardPager } from "./components/MobileWalletDashboardPager";
+import { MobileWalletHistoryPager } from "./components/MobileWalletHistoryPager";
+import { MobileWalletsPager } from "./components/MobileWalletsPager";
 import { WalletSwitcher } from "./components/WalletSwitcher";
 import { ErrorScreen } from "./components/ErrorScreen";
 import { getDictionary } from "./i18n";
@@ -70,6 +72,7 @@ export function App() {
   const handleWalletChange = (nextWalletId: WalletView) => {
     void mutations.updateSettings.mutateAsync({ activeWalletId: nextWalletId });
   };
+  const addWalletId: WalletView = activeWalletId === "all" ? wallets[0]?.id ?? "all" : activeWalletId;
 
   if (isError) {
     return (
@@ -112,7 +115,7 @@ export function App() {
 
   return (
     <div className="app-page-bg min-h-screen text-foreground">
-      <header className="app-chrome sticky top-0 z-30 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+14px)]">
+      <header className="app-chrome sticky top-0 z-30 hidden px-4 pb-3 pt-[calc(env(safe-area-inset-top)+14px)] md:block">
         <div className="mx-auto grid max-w-3xl gap-3">
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -124,15 +127,16 @@ export function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-4 pb-28 pt-5">
-        <div className={activeView === "dashboard" || activeView === "settings" ? "mb-5 hidden md:block" : "mb-5"}>
+      <main className="mx-auto max-w-3xl px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:pt-5">
+        <div className={activeView === "add" ? "mb-5" : "mb-5 hidden md:block"}>
           <WalletSwitcher
             wallets={wallets}
-            value={activeWalletId}
+            value={activeView === "add" ? addWalletId : activeWalletId}
             label={t.common.wallet}
             allLabel={t.wallets.allWallets}
             allCurrency={settings.currency}
             className="w-full"
+            includeAll={activeView !== "add"}
             onChange={handleWalletChange}
           />
         </div>
@@ -178,7 +182,7 @@ export function App() {
             <AddTransactionView
               wallets={wallets}
               categories={categories}
-              settings={{ ...settings, activeWalletId }}
+              settings={{ ...settings, activeWalletId: addWalletId }}
               t={t}
               onSubmit={async (input) => {
                 await mutations.addTransaction.mutateAsync(input);
@@ -186,35 +190,77 @@ export function App() {
             />
           ) : null}
           {activeView === "history" ? (
-            <HistoryView
-              wallets={wallets}
-              categories={categories}
-              transactions={transactions}
-              settings={settings}
-              activeWalletId={activeWalletId}
-              displayCurrency={displayCurrency}
-              exchangeRates={exchangeRates.data}
-              t={t}
-              onUpdate={async (id, input) => {
-                await mutations.updateTransaction.mutateAsync({ id, input });
-              }}
-              onDelete={(id) => mutations.deleteTransaction.mutateAsync(id)}
-            />
+            <>
+              <div className="md:hidden">
+                <MobileWalletHistoryPager
+                  wallets={wallets}
+                  categories={categories}
+                  transactions={transactions}
+                  settings={settings}
+                  activeWalletId={activeWalletId}
+                  allLabel={t.wallets.allWallets}
+                  t={t}
+                  onChange={handleWalletChange}
+                  onUpdate={async (id, input) => {
+                    await mutations.updateTransaction.mutateAsync({ id, input });
+                  }}
+                  onDelete={(id) => mutations.deleteTransaction.mutateAsync(id)}
+                />
+              </div>
+              <div className="hidden md:block">
+                <HistoryView
+                  wallets={wallets}
+                  categories={categories}
+                  transactions={transactions}
+                  settings={settings}
+                  activeWalletId={activeWalletId}
+                  displayCurrency={displayCurrency}
+                  exchangeRates={exchangeRates.data}
+                  t={t}
+                  onUpdate={async (id, input) => {
+                    await mutations.updateTransaction.mutateAsync({ id, input });
+                  }}
+                  onDelete={(id) => mutations.deleteTransaction.mutateAsync(id)}
+                />
+              </div>
+            </>
           ) : null}
           {activeView === "wallets" ? (
-            <WalletsView
-              wallets={wallets}
-              transactions={transactions}
-              settings={settings}
-              t={t}
-              onCreate={async (input) => {
-                await mutations.createWallet.mutateAsync(input);
-              }}
-              onUpdate={async (id, input) => {
-                await mutations.updateWallet.mutateAsync({ id, input });
-              }}
-              onArchive={(id) => mutations.archiveWallet.mutateAsync(id)}
-            />
+            <>
+              <div className="md:hidden">
+                <MobileWalletsPager
+                  wallets={wallets}
+                  transactions={transactions}
+                  settings={settings}
+                  activeWalletId={activeWalletId}
+                  allLabel={t.wallets.allWallets}
+                  t={t}
+                  onChange={handleWalletChange}
+                  onCreate={async (input) => {
+                    await mutations.createWallet.mutateAsync(input);
+                  }}
+                  onUpdate={async (id, input) => {
+                    await mutations.updateWallet.mutateAsync({ id, input });
+                  }}
+                  onArchive={(id) => mutations.archiveWallet.mutateAsync(id)}
+                />
+              </div>
+              <div className="hidden md:block">
+                <WalletsView
+                  wallets={wallets}
+                  transactions={transactions}
+                  settings={settings}
+                  t={t}
+                  onCreate={async (input) => {
+                    await mutations.createWallet.mutateAsync(input);
+                  }}
+                  onUpdate={async (id, input) => {
+                    await mutations.updateWallet.mutateAsync({ id, input });
+                  }}
+                  onArchive={(id) => mutations.archiveWallet.mutateAsync(id)}
+                />
+              </div>
+            </>
           ) : null}
           {activeView === "settings" ? (
             <SettingsView

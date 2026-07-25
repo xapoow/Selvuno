@@ -10,6 +10,7 @@ interface WalletSwitcherProps {
   allLabel: string;
   allCurrency: string;
   className?: string;
+  includeAll?: boolean;
   onChange: (value: WalletView) => void;
 }
 
@@ -27,20 +28,24 @@ export function WalletSwitcher({
   allLabel,
   allCurrency,
   className,
+  includeAll = true,
   onChange
 }: WalletSwitcherProps) {
-  const options: WalletOption[] = [
-    { value: "all", name: allLabel, currency: allCurrency, kind: "all" },
-    ...wallets.map((wallet) => ({
+  const walletOptions: WalletOption[] = wallets.map((wallet) => ({
       value: wallet.id,
       name: wallet.name,
       currency: wallet.currency,
       kind: "wallet" as const
-    }))
-  ];
+    }));
+  const options: WalletOption[] = includeAll
+    ? [{ value: "all", name: allLabel, currency: allCurrency, kind: "all" }, ...walletOptions]
+    : walletOptions;
   const resolvedActiveIndex = options.findIndex((option) => option.value === value);
   const activeIndex = resolvedActiveIndex >= 0 ? resolvedActiveIndex : 0;
   const activeOption = options[activeIndex] ?? options[0];
+  if (!activeOption) {
+    return null;
+  }
   const ActiveIcon = activeOption.kind === "all" ? Layers3 : WalletCards;
   const canSwitch = options.length > 1;
 

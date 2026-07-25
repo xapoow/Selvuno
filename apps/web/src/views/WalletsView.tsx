@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Settings, Transaction, Wallet, WalletInput } from "@myfinances/types";
+import type { Settings, Transaction, Wallet, WalletInput, WalletView } from "@myfinances/types";
 import { Edit3, Plus, WalletCards } from "lucide-react";
 import { calculateTransactionTotals, formatMoney } from "@myfinances/utils";
 import { WalletForm } from "../components/WalletForm";
@@ -13,29 +13,47 @@ interface WalletsViewProps {
   transactions: Transaction[];
   settings: Settings;
   t: Dictionary;
+  activeWalletId?: WalletView;
+  showTitle?: boolean;
   onCreate: (input: WalletInput) => Promise<void>;
   onUpdate: (id: string, input: Partial<WalletInput>) => Promise<void>;
   onArchive: (id: string) => Promise<void>;
 }
 
-export function WalletsView({ wallets, transactions, settings, t, onCreate, onUpdate, onArchive }: WalletsViewProps) {
+export function WalletsView({
+  wallets,
+  transactions,
+  settings,
+  t,
+  activeWalletId = "all",
+  showTitle = true,
+  onCreate,
+  onUpdate,
+  onArchive
+}: WalletsViewProps) {
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Wallet | null>(null);
+  const visibleWallets =
+    activeWalletId === "all" ? wallets : wallets.filter((wallet) => wallet.id === activeWalletId);
 
   return (
     <div className="grid gap-5">
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-semibold text-foreground">{t.wallets.title}</h2>
-        </div>
+        {showTitle ? (
+          <div>
+            <h2 className="text-xl font-semibold text-foreground">{t.wallets.title}</h2>
+          </div>
+        ) : (
+          <span />
+        )}
         <Button size="icon" onClick={() => setCreating(true)} aria-label={t.wallets.add}>
           <Plus className="h-5 w-5" />
         </Button>
       </div>
 
-      {wallets.length ? (
+      {visibleWallets.length ? (
         <div className="grid gap-2">
-          {wallets.map((wallet) => {
+          {visibleWallets.map((wallet) => {
             const totals = calculateTransactionTotals(transactions, wallet.id);
             return (
               <article key={wallet.id} className="app-surface grid gap-3 rounded-app p-4">
