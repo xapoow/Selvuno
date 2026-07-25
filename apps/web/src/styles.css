@@ -383,6 +383,11 @@ button {
     box-shadow: inset 0 0 0 1px rgb(var(--color-foreground) / 0.08);
   }
 
+  .app-select-option {
+    min-height: 40px;
+    padding-block: 0.5rem;
+  }
+
   .app-focus {
     transition:
       background-color 180ms ease,
