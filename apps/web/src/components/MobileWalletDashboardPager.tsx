@@ -71,6 +71,7 @@ export function MobileWalletDashboardPager({
       activeWalletId={activeWalletId}
       allLabel={allLabel}
       allCurrency={settings.currency}
+      swipeHint={t.wallets.swipeHint}
       onChange={onChange}
     >
       {(option) => (

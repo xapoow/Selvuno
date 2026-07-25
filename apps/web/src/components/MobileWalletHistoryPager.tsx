@@ -74,6 +74,7 @@ export function MobileWalletHistoryPager({
       activeWalletId={activeWalletId}
       allLabel={allLabel}
       allCurrency={settings.currency}
+      swipeHint={t.wallets.swipeHint}
       eyebrow={t.history.title}
       onChange={onChange}
     >

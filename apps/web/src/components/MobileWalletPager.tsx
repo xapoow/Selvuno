@@ -1,11 +1,12 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Wallet, WalletView } from "@myfinances/types";
 import { AnimatePresence, motion } from "framer-motion";
-import { Layers3, WalletCards } from "lucide-react";
+import { ArrowLeftRight, Layers3, WalletCards } from "lucide-react";
 import { getCurrencyLabel } from "../lib/currencies";
 
 const SWIPE_DISTANCE_PX = 64;
 const SWIPE_VELOCITY_PX = 520;
+const SWIPE_HINT_KEY = "myfinances-wallet-swipe-hint-v1";
 
 export interface MobileWalletPageOption {
   value: WalletView;
@@ -19,6 +20,7 @@ interface MobileWalletPagerProps {
   activeWalletId: WalletView;
   allLabel: string;
   allCurrency: string;
+  swipeHint: string;
   eyebrow?: string;
   includeAll?: boolean;
   onChange: (value: WalletView) => void;
@@ -48,12 +50,14 @@ export function MobileWalletPager({
   activeWalletId,
   allLabel,
   allCurrency,
+  swipeHint,
   eyebrow,
   includeAll = true,
   onChange,
   children
 }: MobileWalletPagerProps) {
   const [transitionDirection, setTransitionDirection] = useState<1 | -1>(1);
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
   const options = useMemo(
     () => getMobileWalletOptions(wallets, allLabel, allCurrency, includeAll),
     [allCurrency, allLabel, includeAll, wallets]
@@ -62,6 +66,22 @@ export function MobileWalletPager({
   const activeIndex = resolvedActiveIndex >= 0 ? resolvedActiveIndex : 0;
   const activeOption = options[activeIndex] ?? options[0];
   const ActiveIcon = activeOption?.kind === "all" ? Layers3 : WalletCards;
+
+  useEffect(() => {
+    try {
+      setShowSwipeHint(options.length > 1 && !window.localStorage.getItem(SWIPE_HINT_KEY));
+    } catch {
+      setShowSwipeHint(false);
+    }
+  }, [options.length]);
+
+  function dismissSwipeHint() {
+    try {
+      window.localStorage.setItem(SWIPE_HINT_KEY, "acknowledged");
+    } finally {
+      setShowSwipeHint(false);
+    }
+  }
 
   function selectWallet(index: number) {
     const nextIndex = Math.max(0, Math.min(options.length - 1, index));
@@ -97,6 +117,7 @@ export function MobileWalletPager({
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.16}
           dragSnapToOrigin
+          onDragStart={dismissSwipeHint}
           onDragEnd={(_, info) => handleDragEnd(info.offset.x, info.velocity.x)}
         >
           <AnimatePresence initial={false} mode="wait" custom={transitionDirection}>
@@ -141,6 +162,22 @@ export function MobileWalletPager({
           </div>
         </motion.div>
       </div>
+
+      <AnimatePresence>
+        {showSwipeHint ? (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            className="app-control -mt-2 flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium text-muted"
+            onClick={dismissSwipeHint}
+          >
+            <ArrowLeftRight className="h-3.5 w-3.5 text-accent" />
+            {swipeHint}
+          </motion.button>
+        ) : null}
+      </AnimatePresence>
 
       <div className="overflow-hidden">
         <AnimatePresence initial={false} mode="wait" custom={transitionDirection}>

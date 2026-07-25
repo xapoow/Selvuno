@@ -464,6 +464,10 @@ export function SettingsView({
         </Section>
       ) : null}
 
+      <p className="text-center text-xs font-medium text-muted">
+        {t.settings.version} {appVersion}
+      </p>
+
       <BottomSheet open={creatingCategory} title={t.categories.newTitle} onClose={() => setCreatingCategory(false)}>
         <CategoryForm
           t={t}

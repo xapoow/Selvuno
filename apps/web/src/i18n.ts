@@ -66,10 +66,13 @@ export interface Dictionary {
     income: string;
     language: string;
     name: string;
+    nextMonth: string;
     note: string;
+    previousMonth: string;
     reload: string;
     saved: string;
     timeZone: string;
+    today: string;
     uncategorized: string;
     wallet: string;
   };
@@ -122,6 +125,11 @@ export interface Dictionary {
     update: string;
     saveError: string;
   };
+  cookieNotice: {
+    title: string;
+    body: string;
+    accept: string;
+  };
   history: {
     title: string;
     search: string;
@@ -153,6 +161,7 @@ export interface Dictionary {
     create: string;
     update: string;
     saveError: string;
+    swipeHint: string;
   };
   categories: {
     title: string;
@@ -245,10 +254,13 @@ export const dictionaries: Record<Language, Dictionary> = {
       income: "Income",
       language: "Language",
       name: "Name",
+      nextMonth: "Next month",
       note: "Note",
+      previousMonth: "Previous month",
       reload: "Reload",
       saved: "Saved",
       timeZone: "Time zone",
+      today: "Today",
       uncategorized: "Uncategorized",
       wallet: "Wallet"
     },
@@ -340,7 +352,13 @@ export const dictionaries: Record<Language, Dictionary> = {
       editTitle: "Edit wallet",
       create: "Create wallet",
       update: "Update wallet",
-      saveError: "Unable to save wallet."
+      saveError: "Unable to save wallet.",
+      swipeHint: "Swipe this card to switch wallets"
+    },
+    cookieNotice: {
+      title: "Your privacy",
+      body: "MyFinances stores your settings and finance data only on this device. We do not use advertising cookies.",
+      accept: "Got it"
     },
     categories: {
       title: "Categories",
@@ -499,10 +517,13 @@ export const dictionaries: Record<Language, Dictionary> = {
       income: "Доход",
       language: "Язык",
       name: "Название",
+      nextMonth: "Следующий месяц",
       note: "Заметка",
+      previousMonth: "Предыдущий месяц",
       reload: "Перезагрузить",
       saved: "Сохранено",
       timeZone: "Часовой пояс",
+      today: "Сегодня",
       uncategorized: "Без категории",
       wallet: "Кошелек"
     },
@@ -594,7 +615,13 @@ export const dictionaries: Record<Language, Dictionary> = {
       editTitle: "Редактировать кошелек",
       create: "Создать кошелек",
       update: "Обновить кошелек",
-      saveError: "Не удалось сохранить кошелек."
+      saveError: "Не удалось сохранить кошелек.",
+      swipeHint: "Свайпни карточку, чтобы сменить кошелек"
+    },
+    cookieNotice: {
+      title: "О приватности",
+      body: "MyFinances хранит настройки и финансовые данные только на этом устройстве. Рекламные cookies не используются.",
+      accept: "Понятно"
     },
     categories: {
       title: "Категории",

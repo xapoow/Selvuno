@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import type { WalletView } from "@myfinances/types";
 import { BottomNavigation } from "./components/BottomNavigation";
+import { CookieNotice } from "./components/CookieNotice";
 import { HeaderNavigation } from "./components/HeaderNavigation";
 import { MobileWalletDashboardPager } from "./components/MobileWalletDashboardPager";
 import { MobileWalletHistoryPager } from "./components/MobileWalletHistoryPager";
@@ -103,13 +104,16 @@ export function App() {
 
   if (!settings.onboardingCompleted) {
     return (
-      <OnboardingView
-        settings={settings}
-        wallets={wallets}
-        onUpdateSettings={async (input) => mutations.updateSettings.mutateAsync(input)}
-        onCreateWallet={(input) => mutations.createWallet.mutateAsync(input)}
-        onUpdateWallet={(id, input) => mutations.updateWallet.mutateAsync({ id, input })}
-      />
+      <>
+        <OnboardingView
+          settings={settings}
+          wallets={wallets}
+          onUpdateSettings={async (input) => mutations.updateSettings.mutateAsync(input)}
+          onCreateWallet={(input) => mutations.createWallet.mutateAsync(input)}
+          onUpdateWallet={(id, input) => mutations.updateWallet.mutateAsync({ id, input })}
+        />
+        <CookieNotice />
+      </>
     );
   }
 
@@ -284,6 +288,7 @@ export function App() {
       </main>
 
       <BottomNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
+      <CookieNotice />
     </div>
   );
 }
