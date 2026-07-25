@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import type { WalletView } from "@myfinances/types";
 import { BottomNavigation } from "./components/BottomNavigation";
 import { HeaderNavigation } from "./components/HeaderNavigation";
+import { MobileWalletDashboardPager } from "./components/MobileWalletDashboardPager";
 import { WalletSwitcher } from "./components/WalletSwitcher";
 import { ErrorScreen } from "./components/ErrorScreen";
 import { getDictionary } from "./i18n";
@@ -66,6 +67,9 @@ export function App() {
       )
   );
   const exchangeRates = useExchangeRates(displayCurrency, conversionNeeded);
+  const handleWalletChange = (nextWalletId: WalletView) => {
+    void mutations.updateSettings.mutateAsync({ activeWalletId: nextWalletId });
+  };
 
   if (isError) {
     return (
@@ -121,7 +125,7 @@ export function App() {
       </header>
 
       <main className="mx-auto max-w-3xl px-4 pb-28 pt-5">
-        <div className="mb-5">
+        <div className={activeView === "dashboard" ? "mb-5 hidden md:block" : "mb-5"}>
           <WalletSwitcher
             wallets={wallets}
             value={activeWalletId}
@@ -129,7 +133,7 @@ export function App() {
             allLabel={t.wallets.allWallets}
             allCurrency={settings.currency}
             className="w-full"
-            onChange={(activeWallet) => void mutations.updateSettings.mutateAsync({ activeWalletId: activeWallet })}
+            onChange={handleWalletChange}
           />
         </div>
         <motion.div
@@ -139,19 +143,36 @@ export function App() {
           transition={{ duration: 0.18, ease: "easeOut" }}
         >
           {activeView === "dashboard" ? (
-            <DashboardView
-              wallets={wallets}
-              categories={categories}
-              transactions={transactions}
-              settings={settings}
-              activeWalletId={activeWalletId}
-              displayCurrency={displayCurrency}
-              exchangeRates={exchangeRates.data}
-              isUpdatingExchangeRates={exchangeRates.isFetching && conversionNeeded}
-              hasExchangeRateError={exchangeRates.isError && conversionNeeded}
-              t={t}
-              onAdd={() => setActiveView("add")}
-            />
+            <>
+              <div className="md:hidden">
+                <MobileWalletDashboardPager
+                  wallets={wallets}
+                  categories={categories}
+                  transactions={transactions}
+                  settings={settings}
+                  activeWalletId={activeWalletId}
+                  allLabel={t.wallets.allWallets}
+                  t={t}
+                  onChange={handleWalletChange}
+                  onAdd={() => setActiveView("add")}
+                />
+              </div>
+              <div className="hidden md:block">
+                <DashboardView
+                  wallets={wallets}
+                  categories={categories}
+                  transactions={transactions}
+                  settings={settings}
+                  activeWalletId={activeWalletId}
+                  displayCurrency={displayCurrency}
+                  exchangeRates={exchangeRates.data}
+                  isUpdatingExchangeRates={exchangeRates.isFetching && conversionNeeded}
+                  hasExchangeRateError={exchangeRates.isError && conversionNeeded}
+                  t={t}
+                  onAdd={() => setActiveView("add")}
+                />
+              </div>
+            </>
           ) : null}
           {activeView === "add" ? (
             <AddTransactionView
