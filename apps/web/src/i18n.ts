@@ -124,6 +124,27 @@ export interface Dictionary {
     categoriesBreakdown: string;
     categoryComparison: string;
   };
+  analytics: {
+    period: string;
+    week: string;
+    month: string;
+    year: string;
+    custom: string;
+    dateFrom: string;
+    dateTo: string;
+    currentPeriod: string;
+    previousPeriod: string;
+    change: string;
+    comparedWithPrevious: string;
+    allCategories: string;
+    missingRates: string;
+    noComparison: string;
+    unchanged: string;
+    expenseIncreased: string;
+    expenseDecreased: string;
+    incomeIncreased: string;
+    incomeDecreased: string;
+  };
   budget: {
     title: string;
     monthPlan: string;
@@ -450,6 +471,27 @@ export const dictionaries: Record<Language, Dictionary> = {
       operations: "operations",
       categoriesBreakdown: "Category breakdown",
       categoryComparison: "Your largest categories"
+    },
+    analytics: {
+      period: "Period",
+      week: "Week",
+      month: "Month",
+      year: "Year",
+      custom: "Custom",
+      dateFrom: "From",
+      dateTo: "To",
+      currentPeriod: "Current period",
+      previousPeriod: "Previous period",
+      change: "Change",
+      comparedWithPrevious: "Compared with the previous period",
+      allCategories: "All categories",
+      missingRates: "Some foreign-currency operations are not included.",
+      noComparison: "There is not enough previous-period data for a percentage comparison.",
+      unchanged: "The value stayed unchanged compared with the previous period.",
+      expenseIncreased: "Expenses increased by {percentage}% compared with the previous period.",
+      expenseDecreased: "Expenses decreased by {percentage}% compared with the previous period.",
+      incomeIncreased: "Income increased by {percentage}% compared with the previous period.",
+      incomeDecreased: "Income decreased by {percentage}% compared with the previous period."
     },
     budget: {
       title: "Budget",
@@ -847,6 +889,27 @@ export const dictionaries: Record<Language, Dictionary> = {
       operations: "операций",
       categoriesBreakdown: "По категориям",
       categoryComparison: "Самые крупные категории"
+    },
+    analytics: {
+      period: "Период",
+      week: "Неделя",
+      month: "Месяц",
+      year: "Год",
+      custom: "Свой",
+      dateFrom: "С",
+      dateTo: "По",
+      currentPeriod: "Текущий период",
+      previousPeriod: "Предыдущий период",
+      change: "Изменение",
+      comparedWithPrevious: "Относительно предыдущего периода",
+      allCategories: "Все категории",
+      missingRates: "Некоторые операции в другой валюте не учтены.",
+      noComparison: "В предыдущем периоде недостаточно данных для сравнения в процентах.",
+      unchanged: "Значение не изменилось относительно предыдущего периода.",
+      expenseIncreased: "Расходы выросли на {percentage}% относительно предыдущего периода.",
+      expenseDecreased: "Расходы снизились на {percentage}% относительно предыдущего периода.",
+      incomeIncreased: "Доходы выросли на {percentage}% относительно предыдущего периода.",
+      incomeDecreased: "Доходы снизились на {percentage}% относительно предыдущего периода."
     },
     budget: {
       title: "Бюджет",

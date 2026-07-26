@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type {
   Category,
   MonthlyBudget,
@@ -12,8 +12,7 @@ import { BarChart3, PlusCircle } from "lucide-react";
 import { filterTransactionsByWallet, formatMoney } from "@myfinances/utils";
 import {
   AnalyticsView,
-  type AnalyticsCategoryItem,
-  type AnalyticsTrendItem
+  type AnalyticsCategoryItem
 } from "../components/AnalyticsView";
 import { BudgetOverviewCard } from "../components/BudgetOverviewCard";
 import { BudgetPlanView } from "../components/BudgetPlanView";
@@ -61,6 +60,11 @@ export function DashboardView({
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [chartType, setChartType] = useState<"expense" | "income">("expense");
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [analyticsOpen, budgetOpen]);
+
   const budgetConversionNeeded =
     transactions.some(
       (transaction) =>
@@ -151,27 +155,6 @@ export function DashboardView({
         })
         .join(", ")})`
     : "rgb(var(--color-elevated))";
-  const trendData: AnalyticsTrendItem[] = Array.from({ length: 7 }, (_, index) => {
-    const date = new Date();
-    date.setHours(0, 0, 0, 0);
-    date.setDate(date.getDate() - (6 - index));
-    const nextDate = new Date(date);
-    nextDate.setDate(nextDate.getDate() + 1);
-    const values = displayTransactions.filter((item) => {
-      const transactionDate = new Date(item.transaction.transactionDate);
-      return !item.conversionMissing && transactionDate >= date && transactionDate < nextDate;
-    });
-    return {
-      label: new Intl.DateTimeFormat(settings.locale, { weekday: "short" }).format(date),
-      expense: values
-        .filter((item) => item.transaction.type === "expense")
-        .reduce((sum, item) => sum + item.amountMinor, 0),
-      income: values
-        .filter((item) => item.transaction.type === "income")
-        .reduce((sum, item) => sum + item.amountMinor, 0)
-    };
-  });
-
   if (budgetOpen) {
     return (
       <BudgetPlanView
@@ -191,19 +174,11 @@ export function DashboardView({
   if (analyticsOpen) {
     return (
       <AnalyticsView
-        expenseCategories={expenseCategories}
-        incomeCategories={incomeCategories}
-        trendData={trendData}
-        transactionCounts={{
-          expense: displayTransactions.filter(
-            (item) => !item.conversionMissing && item.transaction.type === "expense"
-          ).length,
-          income: displayTransactions.filter(
-            (item) => !item.conversionMissing && item.transaction.type === "income"
-          ).length
-        }}
-        currency={displayCurrency}
-        locale={settings.locale}
+        wallets={wallets}
+        categories={categories}
+        transactions={transactions}
+        settings={settings}
+        initialWalletId={activeWalletId}
         t={t}
         onBack={() => setAnalyticsOpen(false)}
       />
