@@ -144,6 +144,42 @@ export const recurringTransactionInputSchema = z.object({
 });
 export type RecurringTransactionInput = z.infer<typeof recurringTransactionInputSchema>;
 
+export const savingsGoalSchema = baseEntitySchema.extend({
+  walletId: z.string().uuid(),
+  name: z.string().trim().min(1).max(64),
+  targetAmountMinor: z.number().int().positive(),
+  currency: z.string().length(3),
+  targetDate: calendarDateSchema.optional(),
+  color: z.string().min(4).max(32)
+});
+export type SavingsGoal = z.infer<typeof savingsGoalSchema>;
+
+export const savingsGoalInputSchema = z.object({
+  walletId: z.string().uuid(),
+  name: z.string().trim().min(1).max(64),
+  targetAmountMinor: z.number().int().positive(),
+  currency: z.string().length(3),
+  targetDate: calendarDateSchema.optional(),
+  color: z.string().min(4).max(32)
+});
+export type SavingsGoalInput = z.infer<typeof savingsGoalInputSchema>;
+
+export const savingsGoalContributionSchema = baseEntitySchema.extend({
+  goalId: z.string().uuid(),
+  amountMinor: z.number().int().positive(),
+  contributionDate: z.string().datetime(),
+  note: z.string().max(160).optional()
+});
+export type SavingsGoalContribution = z.infer<typeof savingsGoalContributionSchema>;
+
+export const savingsGoalContributionInputSchema = z.object({
+  goalId: z.string().uuid(),
+  amountMinor: z.number().int().positive(),
+  contributionDate: z.string().datetime(),
+  note: z.string().max(160).optional()
+});
+export type SavingsGoalContributionInput = z.infer<typeof savingsGoalContributionInputSchema>;
+
 export const transactionFilterSchema = z.object({
   walletId: walletViewSchema.default("all"),
   type: z.union([transactionTypeSchema, z.literal("all")]).default("all"),
@@ -194,7 +230,19 @@ const backupV3Schema = backupV2Schema.extend({
   recurringTransactions: z.array(recurringTransactionSchema)
 });
 
-export const backupSchema = z.discriminatedUnion("version", [backupV1Schema, backupV2Schema, backupV3Schema]);
+const backupV4Schema = backupV3Schema.extend({
+  version: z.literal(4),
+  savingsGoals: z.array(savingsGoalSchema),
+  savingsGoalContributions: z.array(savingsGoalContributionSchema)
+});
+
+export const backupSchema = z.discriminatedUnion("version", [
+  backupV1Schema,
+  backupV2Schema,
+  backupV3Schema,
+  backupV4Schema
+]);
 export type FinanceBackup = z.infer<typeof backupSchema>;
 export type FinanceBackupV2 = z.infer<typeof backupV2Schema>;
 export type FinanceBackupV3 = z.infer<typeof backupV3Schema>;
+export type FinanceBackupV4 = z.infer<typeof backupV4Schema>;

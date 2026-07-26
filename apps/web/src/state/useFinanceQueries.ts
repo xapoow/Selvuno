@@ -3,6 +3,8 @@ import type {
   CategoryInput,
   MonthlyBudgetInput,
   RecurringTransactionInput,
+  SavingsGoalContributionInput,
+  SavingsGoalInput,
   SettingsUpdate,
   TransactionInput,
   WalletInput
@@ -12,6 +14,7 @@ import { backupRepository } from "../repositories/backupRepository";
 import { budgetRepository } from "../repositories/budgetRepository";
 import { categoryRepository } from "../repositories/categoryRepository";
 import { recurringTransactionRepository } from "../repositories/recurringTransactionRepository";
+import { savingsGoalRepository } from "../repositories/savingsGoalRepository";
 import { settingsRepository } from "../repositories/settingsRepository";
 import { transactionRepository } from "../repositories/transactionRepository";
 import { walletRepository } from "../repositories/walletRepository";
@@ -58,8 +61,28 @@ export function useFinanceData() {
     queryFn: () => recurringTransactionRepository.listRecurringTransactions(),
     enabled
   });
+  const savingsGoals = useQuery({
+    queryKey: queryKeys.savingsGoals,
+    queryFn: () => savingsGoalRepository.listGoals(),
+    enabled
+  });
+  const savingsGoalContributions = useQuery({
+    queryKey: queryKeys.savingsGoalContributions,
+    queryFn: () => savingsGoalRepository.listContributions(),
+    enabled
+  });
 
-  return { bootstrap, settings, wallets, categories, transactions, budgets, recurringTransactions };
+  return {
+    bootstrap,
+    settings,
+    wallets,
+    categories,
+    transactions,
+    budgets,
+    recurringTransactions,
+    savingsGoals,
+    savingsGoalContributions
+  };
 }
 
 function invalidateFinance(queryClient: ReturnType<typeof useQueryClient>) {
@@ -69,7 +92,9 @@ function invalidateFinance(queryClient: ReturnType<typeof useQueryClient>) {
     queryClient.invalidateQueries({ queryKey: queryKeys.categories }),
     queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
     queryClient.invalidateQueries({ queryKey: queryKeys.budgets }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.recurringTransactions })
+    queryClient.invalidateQueries({ queryKey: queryKeys.recurringTransactions }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalContributions })
   ]);
 }
 
@@ -151,6 +176,28 @@ export function useFinanceMutations() {
     }),
     deleteRecurringTransaction: useMutation({
       mutationFn: (id: string) => recurringTransactionRepository.deleteRecurringTransaction(id),
+      onSuccess: invalidate
+    }),
+    createSavingsGoal: useMutation({
+      mutationFn: (input: SavingsGoalInput) => savingsGoalRepository.createGoal(input),
+      onSuccess: invalidate
+    }),
+    updateSavingsGoal: useMutation({
+      mutationFn: ({ id, input }: { id: string; input: Partial<SavingsGoalInput> }) =>
+        savingsGoalRepository.updateGoal(id, input),
+      onSuccess: invalidate
+    }),
+    deleteSavingsGoal: useMutation({
+      mutationFn: (id: string) => savingsGoalRepository.deleteGoal(id),
+      onSuccess: invalidate
+    }),
+    addSavingsGoalContribution: useMutation({
+      mutationFn: (input: SavingsGoalContributionInput) =>
+        savingsGoalRepository.addContribution(input),
+      onSuccess: invalidate
+    }),
+    deleteSavingsGoalContribution: useMutation({
+      mutationFn: (id: string) => savingsGoalRepository.deleteContribution(id),
       onSuccess: invalidate
     }),
     updateSettings: useMutation({

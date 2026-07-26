@@ -1,9 +1,9 @@
-import type { FinanceBackup, FinanceBackupV3 } from "@myfinances/types";
+import type { FinanceBackup, FinanceBackupV4 } from "@myfinances/types";
 import { backupSchema } from "@myfinances/types";
 import { financeDb, nowIso, seedLocalData } from "../db/database";
 
 export interface BackupRepository {
-  exportBackup(): Promise<FinanceBackupV3>;
+  exportBackup(): Promise<FinanceBackupV4>;
   importBackup(backup: unknown): Promise<FinanceBackup>;
 }
 
@@ -15,15 +15,17 @@ export const backupRepository: BackupRepository = {
       throw new Error("Settings not found.");
     }
     return backupSchema.parse({
-      version: 3,
+      version: 4,
       exportedAt: nowIso(),
       wallets: await financeDb.wallets.toArray(),
       categories: await financeDb.categories.toArray(),
       transactions: await financeDb.transactions.toArray(),
       budgets: await financeDb.budgets.toArray(),
       recurringTransactions: await financeDb.recurringTransactions.toArray(),
+      savingsGoals: await financeDb.savingsGoals.toArray(),
+      savingsGoalContributions: await financeDb.savingsGoalContributions.toArray(),
       settings
-    }) as FinanceBackupV3;
+    }) as FinanceBackupV4;
   },
 
   async importBackup(backup) {
@@ -36,7 +38,9 @@ export const backupRepository: BackupRepository = {
         financeDb.transactions,
         financeDb.settings,
         financeDb.budgets,
-        financeDb.recurringTransactions
+        financeDb.recurringTransactions,
+        financeDb.savingsGoals,
+        financeDb.savingsGoalContributions
       ],
       async () => {
         await financeDb.wallets.clear();
@@ -45,14 +49,20 @@ export const backupRepository: BackupRepository = {
         await financeDb.settings.clear();
         await financeDb.budgets.clear();
         await financeDb.recurringTransactions.clear();
+        await financeDb.savingsGoals.clear();
+        await financeDb.savingsGoalContributions.clear();
         await financeDb.wallets.bulkPut(parsed.wallets);
         await financeDb.categories.bulkPut(parsed.categories);
         await financeDb.transactions.bulkPut(parsed.transactions);
-        if (parsed.version === 2 || parsed.version === 3) {
+        if (parsed.version === 2 || parsed.version === 3 || parsed.version === 4) {
           await financeDb.budgets.bulkPut(parsed.budgets);
         }
-        if (parsed.version === 3) {
+        if (parsed.version === 3 || parsed.version === 4) {
           await financeDb.recurringTransactions.bulkPut(parsed.recurringTransactions);
+        }
+        if (parsed.version === 4) {
+          await financeDb.savingsGoals.bulkPut(parsed.savingsGoals);
+          await financeDb.savingsGoalContributions.bulkPut(parsed.savingsGoalContributions);
         }
         await financeDb.settings.put(parsed.settings);
       }
