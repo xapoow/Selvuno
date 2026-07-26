@@ -36,14 +36,18 @@ describe("finance repositories", () => {
     const wallet = await walletRepository.createWallet({
       name: "Savings",
       currency: "eur",
-      initialBalanceMinor: 12500
+      initialBalanceMinor: 12500,
+      color: "#7b61ff",
+      icon: "piggy-bank"
     });
     const updated = await walletRepository.updateWallet(wallet.id, { name: "Reserve" });
 
     expect(updated).toMatchObject({
       name: "Reserve",
       currency: "EUR",
-      initialBalanceMinor: 12500
+      initialBalanceMinor: 12500,
+      color: "#7b61ff",
+      icon: "piggy-bank"
     });
     expect(await walletRepository.listWallets()).toHaveLength(2);
 
@@ -51,6 +55,23 @@ describe("finance repositories", () => {
 
     expect(await walletRepository.listWallets()).toHaveLength(1);
     expect(await walletRepository.listWallets({ includeArchived: true })).toHaveLength(2);
+
+    await walletRepository.restoreWallet(wallet.id);
+
+    expect(await walletRepository.listWallets()).toHaveLength(2);
+    expect(
+      (await walletRepository.listWallets()).find((item) => item.id === wallet.id)
+    ).toMatchObject({ archivedAt: null, color: "#7b61ff", icon: "piggy-bank" });
+  });
+
+  it("does not archive the last active wallet", async () => {
+    await seedLocalData();
+    const [wallet] = await walletRepository.listWallets();
+
+    await expect(walletRepository.archiveWallet(wallet.id)).rejects.toThrow(
+      "last active wallet"
+    );
+    expect(await walletRepository.listWallets()).toHaveLength(1);
   });
 
   it("updates settings without clearing existing currency", async () => {
@@ -128,7 +149,12 @@ describe("finance repositories", () => {
     });
 
     await financeDb.settings.put({ ...settings, currency: undefined, colorTheme: undefined } as never);
-    await financeDb.wallets.put({ ...wallet, currency: undefined } as never);
+    await financeDb.wallets.put({
+      ...wallet,
+      currency: undefined,
+      color: undefined,
+      icon: undefined
+    } as never);
     await financeDb.transactions.put({ ...transaction, currency: undefined, tags: undefined } as never);
 
     await seedLocalData();
@@ -137,6 +163,10 @@ describe("finance repositories", () => {
     expect((await settingsRepository.getSettings()).colorTheme).toBe("sage");
     expect((await walletRepository.listWallets())[0].currency).toBeTruthy();
     expect((await walletRepository.listWallets())[0].initialBalanceMinor).toBe(0);
+    expect((await walletRepository.listWallets())[0]).toMatchObject({
+      color: "#207a6f",
+      icon: "wallet-cards"
+    });
     expect((await transactionRepository.listTransactions({ includeDeleted: true }))[0].currency).toBeTruthy();
     expect((await transactionRepository.listTransactions({ includeDeleted: true }))[0].tags).toEqual([]);
   });

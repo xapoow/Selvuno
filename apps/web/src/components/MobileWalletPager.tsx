@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Wallet, WalletView } from "@myfinances/types";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeftRight, Layers3, WalletCards } from "lucide-react";
+import { ArrowLeftRight, Layers3 } from "lucide-react";
 import { getCurrencyLabel } from "../lib/currencies";
+import { WalletIcon } from "../lib/icons";
 
 const SWIPE_DISTANCE_PX = 64;
 const SWIPE_VELOCITY_PX = 520;
@@ -13,6 +14,8 @@ export interface MobileWalletPageOption {
   name: string;
   currency: string;
   kind: "all" | "wallet";
+  color?: string;
+  icon?: string;
 }
 
 interface MobileWalletPagerProps {
@@ -37,7 +40,9 @@ export function getMobileWalletOptions(
     value: wallet.id,
     name: wallet.name,
     currency: wallet.currency,
-    kind: "wallet" as const
+    kind: "wallet" as const,
+    color: wallet.color,
+    icon: wallet.icon
   }));
 
   return includeAll
@@ -65,7 +70,6 @@ export function MobileWalletPager({
   const resolvedActiveIndex = options.findIndex((option) => option.value === activeWalletId);
   const activeIndex = resolvedActiveIndex >= 0 ? resolvedActiveIndex : 0;
   const activeOption = options[activeIndex] ?? options[0];
-  const ActiveIcon = activeOption?.kind === "all" ? Layers3 : WalletCards;
 
   useEffect(() => {
     try {
@@ -129,8 +133,21 @@ export function MobileWalletPager({
               transition={{ type: "spring", stiffness: 420, damping: 34, mass: 0.72 }}
               className="flex min-w-0 flex-1 items-center gap-3"
             >
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-app bg-accent-soft text-accent">
-                <ActiveIcon className="h-[18px] w-[18px]" />
+              <span
+                className={`grid h-10 w-10 shrink-0 place-items-center rounded-app ${
+                  activeOption.kind === "all" ? "bg-accent-soft text-accent" : "text-white"
+                }`}
+                style={
+                  activeOption.kind === "wallet"
+                    ? { backgroundColor: activeOption.color }
+                    : undefined
+                }
+              >
+                {activeOption.kind === "all" ? (
+                  <Layers3 className="h-[18px] w-[18px]" />
+                ) : (
+                  <WalletIcon name={activeOption.icon ?? "wallet-cards"} className="h-[18px] w-[18px]" />
+                )}
               </span>
               <span className="min-w-0 flex-1">
                 {eyebrow ? <span className="block text-xs font-semibold uppercase text-muted">{eyebrow}</span> : null}

@@ -295,6 +295,15 @@ export interface Dictionary {
     transferSaveError: string;
     confirmDeleteTransfer: string;
     walletUnavailable: string;
+    icon: string;
+    color: string;
+    manageArchive: string;
+    archiveTitle: string;
+    archiveEmpty: string;
+    restore: string;
+    archiveError: string;
+    restoreError: string;
+    cannotArchiveLast: string;
   };
   goals: {
     tabWallets: string;
@@ -627,7 +636,16 @@ export const dictionaries: Record<Language, Dictionary> = {
       saveTransfer: "Save transfer",
       transferSaveError: "Unable to save the transfer.",
       confirmDeleteTransfer: "Delete this transfer?",
-      walletUnavailable: "Unavailable wallet"
+      walletUnavailable: "Unavailable wallet",
+      icon: "Wallet icon",
+      color: "Wallet color",
+      manageArchive: "Manage archive",
+      archiveTitle: "Archived wallets",
+      archiveEmpty: "The archive is empty.",
+      restore: "Restore",
+      archiveError: "Unable to archive the wallet.",
+      restoreError: "Unable to restore the wallet.",
+      cannotArchiveLast: "Create another wallet before archiving this one."
     },
     goals: {
       tabWallets: "Wallets",
@@ -1063,7 +1081,16 @@ export const dictionaries: Record<Language, Dictionary> = {
       saveTransfer: "Сохранить перевод",
       transferSaveError: "Не удалось сохранить перевод.",
       confirmDeleteTransfer: "Удалить этот перевод?",
-      walletUnavailable: "Недоступный кошелек"
+      walletUnavailable: "Недоступный кошелек",
+      icon: "Иконка кошелька",
+      color: "Цвет кошелька",
+      manageArchive: "Управление архивом",
+      archiveTitle: "Архивные кошельки",
+      archiveEmpty: "Архив пока пуст.",
+      restore: "Восстановить",
+      archiveError: "Не удалось архивировать кошелек.",
+      restoreError: "Не удалось восстановить кошелек.",
+      cannotArchiveLast: "Сначала создай другой кошелек, затем архивируй этот."
     },
     goals: {
       tabWallets: "Кошельки",

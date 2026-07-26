@@ -62,6 +62,8 @@ describe("transaction totals", () => {
       id: "22222222-2222-4222-8222-222222222222",
       name: "Main",
       initialBalanceMinor: 2500,
+      color: "#207a6f",
+      icon: "wallet-cards",
       archivedAt: null
     };
     const transfers: WalletTransfer[] = [

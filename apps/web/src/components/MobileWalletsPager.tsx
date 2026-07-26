@@ -10,6 +10,7 @@ import { type Dictionary } from "../i18n";
 
 interface MobileWalletsPagerProps {
   wallets: Wallet[];
+  archivedWallets: Wallet[];
   transactions: Transaction[];
   transfers: WalletTransfer[];
   settings: Settings;
@@ -17,21 +18,25 @@ interface MobileWalletsPagerProps {
   onCreate: (input: WalletInput) => Promise<void>;
   onUpdate: (id: string, input: Partial<WalletInput>) => Promise<void>;
   onArchive: (id: string) => Promise<void>;
+  onRestore: (id: string) => Promise<void>;
 }
 
 export function MobileWalletsPager({
   wallets,
+  archivedWallets,
   transactions,
   transfers,
   settings,
   t,
   onCreate,
   onUpdate,
-  onArchive
+  onArchive,
+  onRestore
 }: MobileWalletsPagerProps) {
   return (
     <WalletsView
       wallets={wallets}
+      archivedWallets={archivedWallets}
       transactions={transactions}
       transfers={transfers}
       settings={settings}
@@ -39,6 +44,7 @@ export function MobileWalletsPager({
       onCreate={onCreate}
       onUpdate={onUpdate}
       onArchive={onArchive}
+      onRestore={onRestore}
     />
   );
 }
