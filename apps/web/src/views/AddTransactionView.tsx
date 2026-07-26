@@ -44,7 +44,7 @@ export function AddTransactionView({
 
   return (
     <div className="grid gap-5">
-      <div className="max-w-md">
+      <div className="mx-auto w-full max-w-lg">
         <SegmentedControl
           value={mode}
           onChange={setMode}
@@ -56,9 +56,17 @@ export function AddTransactionView({
       </div>
       {activeWallet ? (
         mode === "single" ? (
-          <div className="grid gap-4">
-            <h2 className="text-xl font-semibold text-foreground">{t.transaction.addTitle}</h2>
-            <div className="app-surface rounded-app p-4">
+          <div className="mx-auto grid w-full max-w-2xl gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-semibold text-foreground">{t.transaction.addTitle}</h2>
+                <p className="mt-1 text-sm text-muted">{t.transaction.quickHint}</p>
+              </div>
+              <span className="app-control rounded-full px-3 py-1.5 text-xs font-semibold text-muted">
+                {activeWallet.name} · {activeWallet.currency}
+              </span>
+            </div>
+            <div className="app-surface rounded-app p-3 sm:p-5">
               <TransactionForm
                 wallets={wallets}
                 categories={categories}
