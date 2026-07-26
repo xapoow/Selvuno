@@ -6,11 +6,14 @@ import { CookieNotice } from "./components/CookieNotice";
 import { HeaderNavigation } from "./components/HeaderNavigation";
 import { MobileWalletDashboardPager } from "./components/MobileWalletDashboardPager";
 import { MobileWalletHistoryPager } from "./components/MobileWalletHistoryPager";
+import { NotificationCenter } from "./components/NotificationCenter";
+import { UpdateAnnouncement } from "./components/UpdateAnnouncement";
 import { WalletSwitcher } from "./components/WalletSwitcher";
 import { ErrorScreen } from "./components/ErrorScreen";
 import { getDictionary } from "./i18n";
 import { applyRootVisualTheme } from "./lib/colorThemes";
 import { useExchangeRates } from "./lib/exchangeRates";
+import { buildAppNotifications } from "./lib/notifications";
 import { useAppStore } from "./state/appStore";
 import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
 import { AddTransactionView } from "./views/AddTransactionView";
@@ -130,6 +133,16 @@ export function App() {
   }
 
   const t = getDictionary(settings.locale);
+  const notifications = buildAppNotifications({
+    settings,
+    categories,
+    transactions,
+    budgets,
+    recurringTransactions,
+    savingsGoals,
+    savingsGoalContributions,
+    t
+  });
 
   if (!settings.onboardingCompleted) {
     return (
@@ -166,6 +179,9 @@ export function App() {
       </aside>
 
       <main className="mx-auto w-full max-w-[1180px] px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:px-8 md:pb-10 md:pt-7 lg:px-10">
+        <div className="mb-3 flex justify-end">
+          <NotificationCenter notifications={notifications} t={t} />
+        </div>
         {showsWalletContext ? (
           <div className={activeView === "add" ? "mb-6" : "mb-6 hidden md:block"}>
             <WalletSwitcher
@@ -351,6 +367,7 @@ export function App() {
       </main>
 
       <BottomNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
+      <UpdateAnnouncement t={t} />
       <CookieNotice />
     </div>
   );
