@@ -7,5 +7,6 @@ export const queryKeys = {
   budgets: ["budgets"] as const,
   recurringTransactions: ["recurring-transactions"] as const,
   savingsGoals: ["savings-goals"] as const,
-  savingsGoalContributions: ["savings-goal-contributions"] as const
+  savingsGoalContributions: ["savings-goal-contributions"] as const,
+  walletTransfers: ["wallet-transfers"] as const
 };

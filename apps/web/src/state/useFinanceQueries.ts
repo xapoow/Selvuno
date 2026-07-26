@@ -7,7 +7,8 @@ import type {
   SavingsGoalInput,
   SettingsUpdate,
   TransactionInput,
-  WalletInput
+  WalletInput,
+  WalletTransferInput
 } from "@myfinances/types";
 import { seedLocalData } from "../db/database";
 import { backupRepository } from "../repositories/backupRepository";
@@ -18,6 +19,7 @@ import { savingsGoalRepository } from "../repositories/savingsGoalRepository";
 import { settingsRepository } from "../repositories/settingsRepository";
 import { transactionRepository } from "../repositories/transactionRepository";
 import { walletRepository } from "../repositories/walletRepository";
+import { walletTransferRepository } from "../repositories/walletTransferRepository";
 import { queryKeys } from "../lib/queryKeys";
 
 export function useFinanceData() {
@@ -71,6 +73,11 @@ export function useFinanceData() {
     queryFn: () => savingsGoalRepository.listContributions(),
     enabled
   });
+  const walletTransfers = useQuery({
+    queryKey: queryKeys.walletTransfers,
+    queryFn: () => walletTransferRepository.listTransfers(),
+    enabled
+  });
 
   return {
     bootstrap,
@@ -81,7 +88,8 @@ export function useFinanceData() {
     budgets,
     recurringTransactions,
     savingsGoals,
-    savingsGoalContributions
+    savingsGoalContributions,
+    walletTransfers
   };
 }
 
@@ -94,7 +102,8 @@ function invalidateFinance(queryClient: ReturnType<typeof useQueryClient>) {
     queryClient.invalidateQueries({ queryKey: queryKeys.budgets }),
     queryClient.invalidateQueries({ queryKey: queryKeys.recurringTransactions }),
     queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalContributions })
+    queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalContributions }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.walletTransfers })
   ]);
 }
 
@@ -129,6 +138,15 @@ export function useFinanceMutations() {
     }),
     archiveWallet: useMutation({
       mutationFn: (id: string) => walletRepository.archiveWallet(id),
+      onSuccess: invalidate
+    }),
+    createWalletTransfer: useMutation({
+      mutationFn: (input: WalletTransferInput) =>
+        walletTransferRepository.createTransfer(input),
+      onSuccess: invalidate
+    }),
+    deleteWalletTransfer: useMutation({
+      mutationFn: (id: string) => walletTransferRepository.deleteTransfer(id),
       onSuccess: invalidate
     }),
     createCategory: useMutation({

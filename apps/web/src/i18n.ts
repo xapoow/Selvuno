@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "categories" | "backup" | "sync";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.2.0";
+export const appVersion = "0.3.0";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -123,6 +123,27 @@ export interface Dictionary {
     operations: string;
     categoriesBreakdown: string;
     categoryComparison: string;
+  };
+  analytics: {
+    period: string;
+    week: string;
+    month: string;
+    year: string;
+    custom: string;
+    dateFrom: string;
+    dateTo: string;
+    currentPeriod: string;
+    previousPeriod: string;
+    change: string;
+    comparedWithPrevious: string;
+    allCategories: string;
+    missingRates: string;
+    noComparison: string;
+    unchanged: string;
+    expenseIncreased: string;
+    expenseDecreased: string;
+    incomeIncreased: string;
+    incomeDecreased: string;
   };
   budget: {
     title: string;
@@ -256,6 +277,24 @@ export interface Dictionary {
     update: string;
     saveError: string;
     swipeHint: string;
+    initialBalance: string;
+    initialBalanceHint: string;
+    initialBalanceError: string;
+    transfers: string;
+    transferDescription: string;
+    addTransfer: string;
+    transferEmpty: string;
+    transferNeedsWallets: string;
+    fromWallet: string;
+    toWallet: string;
+    sentAmount: string;
+    receivedAmount: string;
+    transferDate: string;
+    transferNote: string;
+    saveTransfer: string;
+    transferSaveError: string;
+    confirmDeleteTransfer: string;
+    walletUnavailable: string;
   };
   goals: {
     tabWallets: string;
@@ -445,6 +484,27 @@ export const dictionaries: Record<Language, Dictionary> = {
       categoriesBreakdown: "Category breakdown",
       categoryComparison: "Your largest categories"
     },
+    analytics: {
+      period: "Period",
+      week: "Week",
+      month: "Month",
+      year: "Year",
+      custom: "Custom",
+      dateFrom: "From",
+      dateTo: "To",
+      currentPeriod: "Current period",
+      previousPeriod: "Previous period",
+      change: "Change",
+      comparedWithPrevious: "Compared with the previous period",
+      allCategories: "All categories",
+      missingRates: "Some foreign-currency operations are not included.",
+      noComparison: "There is not enough previous-period data for a percentage comparison.",
+      unchanged: "The value stayed unchanged compared with the previous period.",
+      expenseIncreased: "Expenses increased by {percentage}% compared with the previous period.",
+      expenseDecreased: "Expenses decreased by {percentage}% compared with the previous period.",
+      incomeIncreased: "Income increased by {percentage}% compared with the previous period.",
+      incomeDecreased: "Income decreased by {percentage}% compared with the previous period."
+    },
     budget: {
       title: "Budget",
       monthPlan: "Monthly budget",
@@ -543,7 +603,25 @@ export const dictionaries: Record<Language, Dictionary> = {
       create: "Create wallet",
       update: "Update wallet",
       saveError: "Unable to save wallet.",
-      swipeHint: "Swipe this card to switch wallets"
+      swipeHint: "Swipe this card to switch wallets",
+      initialBalance: "Initial balance",
+      initialBalanceHint: "The amount already in this wallet. It is not counted as income.",
+      initialBalanceError: "Enter a valid initial balance.",
+      transfers: "Transfers",
+      transferDescription: "Move money between wallets without changing income or expenses.",
+      addTransfer: "New transfer",
+      transferEmpty: "No transfers yet.",
+      transferNeedsWallets: "Create at least two wallets to make a transfer.",
+      fromWallet: "From wallet",
+      toWallet: "To wallet",
+      sentAmount: "Sent amount",
+      receivedAmount: "Received amount",
+      transferDate: "Transfer date",
+      transferNote: "Note",
+      saveTransfer: "Save transfer",
+      transferSaveError: "Unable to save the transfer.",
+      confirmDeleteTransfer: "Delete this transfer?",
+      walletUnavailable: "Unavailable wallet"
     },
     goals: {
       tabWallets: "Wallets",
@@ -610,12 +688,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "A focused update for planning, saving, and keeping track of what needs attention.",
+      intro: "A clearer picture of your money across periods and wallets.",
       gotIt: "Explore the update",
       notes: [
-        "Savings goals with progress and contribution history",
-        "Monthly budgets and recurring operations",
-        "A faster transaction flow and a new notification center"
+        "Week, month, year, and custom analytics periods",
+        "Comparison with the previous period and category filters",
+        "Initial wallet balances and transfers that do not distort cash flow"
       ]
     },
     categories: {
@@ -835,6 +913,27 @@ export const dictionaries: Record<Language, Dictionary> = {
       categoriesBreakdown: "По категориям",
       categoryComparison: "Самые крупные категории"
     },
+    analytics: {
+      period: "Период",
+      week: "Неделя",
+      month: "Месяц",
+      year: "Год",
+      custom: "Свой",
+      dateFrom: "С",
+      dateTo: "По",
+      currentPeriod: "Текущий период",
+      previousPeriod: "Предыдущий период",
+      change: "Изменение",
+      comparedWithPrevious: "Относительно предыдущего периода",
+      allCategories: "Все категории",
+      missingRates: "Некоторые операции в другой валюте не учтены.",
+      noComparison: "В предыдущем периоде недостаточно данных для сравнения в процентах.",
+      unchanged: "Значение не изменилось относительно предыдущего периода.",
+      expenseIncreased: "Расходы выросли на {percentage}% относительно предыдущего периода.",
+      expenseDecreased: "Расходы снизились на {percentage}% относительно предыдущего периода.",
+      incomeIncreased: "Доходы выросли на {percentage}% относительно предыдущего периода.",
+      incomeDecreased: "Доходы снизились на {percentage}% относительно предыдущего периода."
+    },
     budget: {
       title: "Бюджет",
       monthPlan: "Бюджет месяца",
@@ -933,7 +1032,25 @@ export const dictionaries: Record<Language, Dictionary> = {
       create: "Создать кошелек",
       update: "Обновить кошелек",
       saveError: "Не удалось сохранить кошелек.",
-      swipeHint: "Свайпни карточку, чтобы сменить кошелек"
+      swipeHint: "Свайпни карточку, чтобы сменить кошелек",
+      initialBalance: "Начальный баланс",
+      initialBalanceHint: "Сумма, которая уже была в кошельке. Она не считается доходом.",
+      initialBalanceError: "Укажи корректный начальный баланс.",
+      transfers: "Переводы",
+      transferDescription: "Перемещай деньги между кошельками без искажения доходов и расходов.",
+      addTransfer: "Новый перевод",
+      transferEmpty: "Переводов пока нет.",
+      transferNeedsWallets: "Для перевода нужно создать хотя бы два кошелька.",
+      fromWallet: "Из кошелька",
+      toWallet: "В кошелек",
+      sentAmount: "Сумма списания",
+      receivedAmount: "Сумма зачисления",
+      transferDate: "Дата перевода",
+      transferNote: "Заметка",
+      saveTransfer: "Сохранить перевод",
+      transferSaveError: "Не удалось сохранить перевод.",
+      confirmDeleteTransfer: "Удалить этот перевод?",
+      walletUnavailable: "Недоступный кошелек"
     },
     goals: {
       tabWallets: "Кошельки",
@@ -1000,12 +1117,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Обновление для удобного планирования, накоплений и контроля важных событий.",
+      intro: "Более ясная картина денег по периодам и кошелькам.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Цели накоплений с прогрессом и историей пополнений",
-        "Месячные бюджеты и регулярные операции",
-        "Быстрое добавление операций и новый центр уведомлений"
+        "Аналитика за неделю, месяц, год и свой период",
+        "Сравнение с предыдущим периодом и фильтры по категориям",
+        "Начальные балансы и переводы без искажения доходов и расходов"
       ]
     },
     categories: {
