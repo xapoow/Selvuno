@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { financeDb, resetDatabaseForTests, seedLocalData } from "../db/database";
 import { backupRepository } from "./backupRepository";
+import { budgetRepository } from "./budgetRepository";
 import { categoryRepository } from "./categoryRepository";
+import { recurringTransactionRepository } from "./recurringTransactionRepository";
 import { settingsRepository } from "./settingsRepository";
 import { transactionRepository } from "./transactionRepository";
 import { walletRepository } from "./walletRepository";
@@ -160,8 +162,112 @@ describe("finance repositories", () => {
     expect(await transactionRepository.listTransactions({ walletId: wallet.id, includeDeleted: true })).toHaveLength(1);
   });
 
+  it("materializes due recurring transactions once and advances the schedule", async () => {
+    await seedLocalData();
+    const [wallet] = await walletRepository.listWallets();
+    const [category] = await categoryRepository.listCategories("expense");
+    const schedule = await recurringTransactionRepository.createRecurringTransaction({
+      walletId: wallet.id,
+      categoryId: category.id,
+      type: "expense",
+      amountMinor: 1299,
+      currency: wallet.currency,
+      frequency: "daily",
+      startDate: "2026-07-24",
+      note: "Subscription",
+      tags: ["Auto"]
+    });
+
+    expect(await recurringTransactionRepository.materializeDueTransactions("2026-07-26")).toBe(3);
+    expect(await recurringTransactionRepository.materializeDueTransactions("2026-07-26")).toBe(0);
+
+    const transactions = await transactionRepository.listTransactions({ walletId: wallet.id });
+    expect(transactions.map((transaction) => transaction.recurrenceDate).sort()).toEqual([
+      "2026-07-24",
+      "2026-07-25",
+      "2026-07-26"
+    ]);
+    expect(new Set(transactions.map((transaction) => transaction.recurringTransactionId))).toEqual(
+      new Set([schedule.id])
+    );
+    expect((await recurringTransactionRepository.listRecurringTransactions())[0].nextRunDate).toBe("2026-07-27");
+
+    const updated = await recurringTransactionRepository.updateRecurringTransaction(schedule.id, {
+      note: undefined
+    });
+    expect(updated.note).toBeUndefined();
+    expect(updated.nextRunDate).toBe("2026-07-27");
+  });
+
+  it("does not materialize paused recurring transactions", async () => {
+    await seedLocalData();
+    const [wallet] = await walletRepository.listWallets();
+    const [category] = await categoryRepository.listCategories("income");
+    const schedule = await recurringTransactionRepository.createRecurringTransaction({
+      walletId: wallet.id,
+      categoryId: category.id,
+      type: "income",
+      amountMinor: 100000,
+      currency: wallet.currency,
+      frequency: "monthly",
+      startDate: "2026-07-01"
+    });
+    await recurringTransactionRepository.setRecurringTransactionPaused(schedule.id, true);
+
+    expect(await recurringTransactionRepository.materializeDueTransactions("2026-07-26")).toBe(0);
+    expect(await transactionRepository.listTransactions()).toHaveLength(0);
+  });
+
+  it("creates, updates, and clears monthly category budgets", async () => {
+    await seedLocalData();
+    const [category] = await categoryRepository.listCategories("expense");
+
+    await budgetRepository.setBudget({
+      categoryId: category.id,
+      month: "2026-07",
+      amountMinor: 50000,
+      currency: "usd"
+    });
+    expect(await budgetRepository.listBudgets("2026-07")).toMatchObject([
+      { categoryId: category.id, amountMinor: 50000, currency: "USD" }
+    ]);
+
+    await budgetRepository.setBudget({
+      categoryId: category.id,
+      month: "2026-07",
+      amountMinor: 65000,
+      currency: "USD"
+    });
+    expect((await budgetRepository.listBudgets("2026-07"))[0].amountMinor).toBe(65000);
+
+    await budgetRepository.setBudget({
+      categoryId: category.id,
+      month: "2026-07",
+      amountMinor: 0,
+      currency: "USD"
+    });
+    expect(await budgetRepository.listBudgets("2026-07")).toHaveLength(0);
+  });
+
   it("exports and restores a JSON backup", async () => {
     await seedLocalData();
+    const [category] = await categoryRepository.listCategories("expense");
+    await budgetRepository.setBudget({
+      categoryId: category.id,
+      month: "2026-07",
+      amountMinor: 42000,
+      currency: "USD"
+    });
+    const [wallet] = await walletRepository.listWallets();
+    await recurringTransactionRepository.createRecurringTransaction({
+      walletId: wallet.id,
+      categoryId: category.id,
+      type: "expense",
+      amountMinor: 1599,
+      currency: wallet.currency,
+      frequency: "monthly",
+      startDate: "2026-08-01"
+    });
     const backup = await backupRepository.exportBackup();
 
     await resetDatabaseForTests();
@@ -170,6 +276,33 @@ describe("finance repositories", () => {
     const restored = await backupRepository.exportBackup();
     expect(restored.wallets).toHaveLength(backup.wallets.length);
     expect(restored.categories).toHaveLength(backup.categories.length);
+    expect(restored.budgets).toHaveLength(backup.budgets.length);
+    expect(restored.budgets).toHaveLength(1);
+    expect(restored.recurringTransactions).toHaveLength(1);
     expect(restored.settings).toMatchObject({ id: "default" });
+  });
+
+  it("restores legacy version 2 backups without recurring transactions", async () => {
+    await seedLocalData();
+    const backup = await backupRepository.exportBackup();
+    const { recurringTransactions: _recurringTransactions, ...legacyBackup } = backup;
+
+    await resetDatabaseForTests();
+    await backupRepository.importBackup({ ...legacyBackup, version: 2 });
+
+    expect(await recurringTransactionRepository.listRecurringTransactions()).toHaveLength(0);
+    expect((await backupRepository.exportBackup()).wallets).toHaveLength(backup.wallets.length);
+  });
+
+  it("restores legacy version 1 backups without budgets", async () => {
+    await seedLocalData();
+    const backup = await backupRepository.exportBackup();
+    const { budgets: _budgets, ...legacyBackup } = backup;
+
+    await resetDatabaseForTests();
+    await backupRepository.importBackup({ ...legacyBackup, version: 1 });
+
+    expect(await budgetRepository.listBudgets()).toHaveLength(0);
+    expect((await backupRepository.exportBackup()).wallets).toHaveLength(backup.wallets.length);
   });
 });

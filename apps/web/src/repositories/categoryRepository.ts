@@ -37,7 +37,26 @@ export const categoryRepository: CategoryRepository = {
       icon: next.icon,
       type: next.type
     });
-    await financeDb.categories.put(next);
+    await financeDb.transaction(
+      "rw",
+      [financeDb.categories, financeDb.recurringTransactions],
+      async () => {
+        await financeDb.categories.put(next);
+        if (next.type !== current.type) {
+          const recurringTransactions = await financeDb.recurringTransactions.where("categoryId").equals(id).toArray();
+          await Promise.all(
+            recurringTransactions.map((schedule) =>
+              financeDb.recurringTransactions.put({
+                ...schedule,
+                type: next.type,
+                updatedAt: next.updatedAt,
+                syncStatus: "pending"
+              })
+            )
+          );
+        }
+      }
+    );
     return next;
   },
 
@@ -47,12 +66,29 @@ export const categoryRepository: CategoryRepository = {
       return;
     }
     const now = nowIso();
-    await financeDb.categories.put({
-      ...current,
-      deletedAt: now,
-      updatedAt: now,
-      syncStatus: "pending"
-    });
+    await financeDb.transaction(
+      "rw",
+      [financeDb.categories, financeDb.recurringTransactions],
+      async () => {
+        await financeDb.categories.put({
+          ...current,
+          deletedAt: now,
+          updatedAt: now,
+          syncStatus: "pending"
+        });
+        const recurringTransactions = await financeDb.recurringTransactions.where("categoryId").equals(id).toArray();
+        await Promise.all(
+          recurringTransactions.map((schedule) =>
+            financeDb.recurringTransactions.put({
+              ...schedule,
+              paused: true,
+              updatedAt: now,
+              syncStatus: "pending"
+            })
+          )
+        );
+      }
+    );
   },
 
   async listCategories(type) {

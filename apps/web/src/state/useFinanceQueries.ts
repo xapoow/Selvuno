@@ -1,13 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   CategoryInput,
+  MonthlyBudgetInput,
+  RecurringTransactionInput,
   SettingsUpdate,
   TransactionInput,
   WalletInput
 } from "@myfinances/types";
 import { seedLocalData } from "../db/database";
 import { backupRepository } from "../repositories/backupRepository";
+import { budgetRepository } from "../repositories/budgetRepository";
 import { categoryRepository } from "../repositories/categoryRepository";
+import { recurringTransactionRepository } from "../repositories/recurringTransactionRepository";
 import { settingsRepository } from "../repositories/settingsRepository";
 import { transactionRepository } from "../repositories/transactionRepository";
 import { walletRepository } from "../repositories/walletRepository";
@@ -18,6 +22,7 @@ export function useFinanceData() {
     queryKey: queryKeys.bootstrap,
     queryFn: async () => {
       await seedLocalData();
+      await recurringTransactionRepository.materializeDueTransactions();
       return true;
     }
   });
@@ -43,8 +48,18 @@ export function useFinanceData() {
     queryFn: () => transactionRepository.listTransactions({ walletId: "all" }),
     enabled
   });
+  const budgets = useQuery({
+    queryKey: queryKeys.budgets,
+    queryFn: () => budgetRepository.listBudgets(),
+    enabled
+  });
+  const recurringTransactions = useQuery({
+    queryKey: queryKeys.recurringTransactions,
+    queryFn: () => recurringTransactionRepository.listRecurringTransactions(),
+    enabled
+  });
 
-  return { bootstrap, settings, wallets, categories, transactions };
+  return { bootstrap, settings, wallets, categories, transactions, budgets, recurringTransactions };
 }
 
 function invalidateFinance(queryClient: ReturnType<typeof useQueryClient>) {
@@ -52,7 +67,9 @@ function invalidateFinance(queryClient: ReturnType<typeof useQueryClient>) {
     queryClient.invalidateQueries({ queryKey: queryKeys.settings }),
     queryClient.invalidateQueries({ queryKey: queryKeys.wallets }),
     queryClient.invalidateQueries({ queryKey: queryKeys.categories }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.transactions })
+    queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.budgets }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.recurringTransactions })
   ]);
 }
 
@@ -100,6 +117,40 @@ export function useFinanceMutations() {
     }),
     deleteCategory: useMutation({
       mutationFn: (id: string) => categoryRepository.deleteCategory(id),
+      onSuccess: invalidate
+    }),
+    setBudget: useMutation({
+      mutationFn: (input: MonthlyBudgetInput) => budgetRepository.setBudget(input),
+      onSuccess: invalidate
+    }),
+    createRecurringTransaction: useMutation({
+      mutationFn: async (input: RecurringTransactionInput) => {
+        const schedule = await recurringTransactionRepository.createRecurringTransaction(input);
+        await recurringTransactionRepository.materializeDueTransactions();
+        return schedule;
+      },
+      onSuccess: invalidate
+    }),
+    updateRecurringTransaction: useMutation({
+      mutationFn: async ({ id, input }: { id: string; input: Partial<RecurringTransactionInput> }) => {
+        const schedule = await recurringTransactionRepository.updateRecurringTransaction(id, input);
+        await recurringTransactionRepository.materializeDueTransactions();
+        return schedule;
+      },
+      onSuccess: invalidate
+    }),
+    setRecurringTransactionPaused: useMutation({
+      mutationFn: async ({ id, paused }: { id: string; paused: boolean }) => {
+        const schedule = await recurringTransactionRepository.setRecurringTransactionPaused(id, paused);
+        if (!paused) {
+          await recurringTransactionRepository.materializeDueTransactions();
+        }
+        return schedule;
+      },
+      onSuccess: invalidate
+    }),
+    deleteRecurringTransaction: useMutation({
+      mutationFn: (id: string) => recurringTransactionRepository.deleteRecurringTransaction(id),
       onSuccess: invalidate
     }),
     updateSettings: useMutation({

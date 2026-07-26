@@ -32,10 +32,24 @@ export function App() {
   const wallets = data.wallets.data ?? [];
   const categories = data.categories.data ?? [];
   const transactions = data.transactions.data ?? [];
+  const budgets = data.budgets.data ?? [];
+  const recurringTransactions = data.recurringTransactions.data ?? [];
   const isLoading =
-    data.bootstrap.isLoading || data.settings.isLoading || data.wallets.isLoading || data.categories.isLoading;
+    data.bootstrap.isLoading ||
+    data.settings.isLoading ||
+    data.wallets.isLoading ||
+    data.categories.isLoading ||
+    data.transactions.isLoading ||
+    data.budgets.isLoading ||
+    data.recurringTransactions.isLoading;
   const isError =
-    data.bootstrap.isError || data.settings.isError || data.wallets.isError || data.categories.isError;
+    data.bootstrap.isError ||
+    data.settings.isError ||
+    data.wallets.isError ||
+    data.categories.isError ||
+    data.transactions.isError ||
+    data.budgets.isError ||
+    data.recurringTransactions.isError;
   const fallbackT = getDictionary(settings?.locale ?? (typeof navigator === "undefined" ? "en-US" : navigator.language));
 
   useEffect(() => {
@@ -87,7 +101,10 @@ export function App() {
           data.bootstrap.error instanceof Error ? data.bootstrap.error.message : null,
           data.settings.error instanceof Error ? data.settings.error.message : null,
           data.wallets.error instanceof Error ? data.wallets.error.message : null,
-          data.categories.error instanceof Error ? data.categories.error.message : null
+          data.categories.error instanceof Error ? data.categories.error.message : null,
+          data.transactions.error instanceof Error ? data.transactions.error.message : null,
+          data.budgets.error instanceof Error ? data.budgets.error.message : null,
+          data.recurringTransactions.error instanceof Error ? data.recurringTransactions.error.message : null
         ]
           .filter(Boolean)
           .join("\n")}
@@ -167,12 +184,14 @@ export function App() {
                   wallets={wallets}
                   categories={categories}
                   transactions={transactions}
+                  budgets={budgets}
                   settings={settings}
                   activeWalletId={activeWalletId}
                   allLabel={t.wallets.allWallets}
                   t={t}
                   onChange={handleWalletChange}
                   onAdd={() => setActiveView("add")}
+                  onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
                 />
               </div>
               <div className="hidden overflow-hidden md:block">
@@ -186,6 +205,7 @@ export function App() {
                     wallets={wallets}
                     categories={categories}
                     transactions={transactions}
+                    budgets={budgets}
                     settings={settings}
                     activeWalletId={activeWalletId}
                     displayCurrency={displayCurrency}
@@ -194,6 +214,7 @@ export function App() {
                     hasExchangeRateError={exchangeRates.isError && conversionNeeded}
                     t={t}
                     onAdd={() => setActiveView("add")}
+                    onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
                   />
                 </motion.div>
               </div>
@@ -203,10 +224,23 @@ export function App() {
             <AddTransactionView
               wallets={wallets}
               categories={categories}
+              recurringTransactions={recurringTransactions}
               settings={{ ...settings, activeWalletId: addWalletId }}
               t={t}
               onSubmit={async (input) => {
                 await mutations.addTransaction.mutateAsync(input);
+              }}
+              onCreateRecurring={async (input) => {
+                await mutations.createRecurringTransaction.mutateAsync(input);
+              }}
+              onUpdateRecurring={async (id, input) => {
+                await mutations.updateRecurringTransaction.mutateAsync({ id, input });
+              }}
+              onSetRecurringPaused={async (id, paused) => {
+                await mutations.setRecurringTransactionPaused.mutateAsync({ id, paused });
+              }}
+              onDeleteRecurring={async (id) => {
+                await mutations.deleteRecurringTransaction.mutateAsync(id);
               }}
             />
           ) : null}

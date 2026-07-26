@@ -6,6 +6,11 @@ export type SyncStatus = z.infer<typeof syncStatusSchema>;
 export const transactionTypeSchema = z.enum(["expense", "income"]);
 export type TransactionType = z.infer<typeof transactionTypeSchema>;
 export const transactionTagSchema = z.string().trim().min(1).max(32);
+export const calendarDateSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/);
+export type CalendarDate = z.infer<typeof calendarDateSchema>;
+
+export const recurrenceFrequencySchema = z.enum(["daily", "weekly", "monthly", "yearly"]);
+export type RecurrenceFrequency = z.infer<typeof recurrenceFrequencySchema>;
 
 export const themePreferenceSchema = z.enum(["light", "dark", "system"]);
 export type ThemePreference = z.infer<typeof themePreferenceSchema>;
@@ -66,6 +71,25 @@ export const categoryInputSchema = z.object({
 });
 export type CategoryInput = z.infer<typeof categoryInputSchema>;
 
+export const budgetMonthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
+export type BudgetMonth = z.infer<typeof budgetMonthSchema>;
+
+export const monthlyBudgetSchema = baseEntitySchema.extend({
+  categoryId: z.string().uuid(),
+  month: budgetMonthSchema,
+  amountMinor: z.number().int().positive(),
+  currency: z.string().length(3)
+});
+export type MonthlyBudget = z.infer<typeof monthlyBudgetSchema>;
+
+export const monthlyBudgetInputSchema = z.object({
+  categoryId: z.string().uuid(),
+  month: budgetMonthSchema,
+  amountMinor: z.number().int().nonnegative(),
+  currency: z.string().length(3)
+});
+export type MonthlyBudgetInput = z.infer<typeof monthlyBudgetInputSchema>;
+
 export const transactionSchema = baseEntitySchema.extend({
   walletId: z.string().uuid(),
   categoryId: z.string().uuid(),
@@ -74,7 +98,9 @@ export const transactionSchema = baseEntitySchema.extend({
   type: transactionTypeSchema,
   note: z.string().max(240).optional(),
   tags: z.array(transactionTagSchema).max(12).default([]),
-  transactionDate: z.string().datetime()
+  transactionDate: z.string().datetime(),
+  recurringTransactionId: z.string().uuid().optional(),
+  recurrenceDate: calendarDateSchema.optional()
 });
 export type Transaction = z.infer<typeof transactionSchema>;
 
@@ -89,6 +115,34 @@ export const transactionInputSchema = z.object({
   transactionDate: z.string().datetime()
 });
 export type TransactionInput = z.infer<typeof transactionInputSchema>;
+
+export const recurringTransactionSchema = baseEntitySchema.extend({
+  walletId: z.string().uuid(),
+  categoryId: z.string().uuid(),
+  amountMinor: z.number().int().positive(),
+  currency: z.string().length(3),
+  type: transactionTypeSchema,
+  note: z.string().max(240).optional(),
+  tags: z.array(transactionTagSchema).max(12).default([]),
+  frequency: recurrenceFrequencySchema,
+  startDate: calendarDateSchema,
+  nextRunDate: calendarDateSchema,
+  paused: z.boolean()
+});
+export type RecurringTransaction = z.infer<typeof recurringTransactionSchema>;
+
+export const recurringTransactionInputSchema = z.object({
+  walletId: z.string().uuid(),
+  categoryId: z.string().uuid(),
+  amountMinor: z.number().int().positive(),
+  currency: z.string().length(3),
+  type: transactionTypeSchema,
+  note: z.string().max(240).optional(),
+  tags: z.array(transactionTagSchema).max(12).optional(),
+  frequency: recurrenceFrequencySchema,
+  startDate: calendarDateSchema
+});
+export type RecurringTransactionInput = z.infer<typeof recurringTransactionInputSchema>;
 
 export const transactionFilterSchema = z.object({
   walletId: walletViewSchema.default("all"),
@@ -121,7 +175,7 @@ export const settingsUpdateSchema = settingsSchema
   .partial();
 export type SettingsUpdate = z.infer<typeof settingsUpdateSchema>;
 
-export const backupSchema = z.object({
+const backupV1Schema = z.object({
   version: z.literal(1),
   exportedAt: z.string().datetime(),
   wallets: z.array(walletSchema),
@@ -129,4 +183,18 @@ export const backupSchema = z.object({
   transactions: z.array(transactionSchema),
   settings: settingsSchema
 });
+
+const backupV2Schema = backupV1Schema.extend({
+  version: z.literal(2),
+  budgets: z.array(monthlyBudgetSchema)
+});
+
+const backupV3Schema = backupV2Schema.extend({
+  version: z.literal(3),
+  recurringTransactions: z.array(recurringTransactionSchema)
+});
+
+export const backupSchema = z.discriminatedUnion("version", [backupV1Schema, backupV2Schema, backupV3Schema]);
 export type FinanceBackup = z.infer<typeof backupSchema>;
+export type FinanceBackupV2 = z.infer<typeof backupV2Schema>;
+export type FinanceBackupV3 = z.infer<typeof backupV3Schema>;

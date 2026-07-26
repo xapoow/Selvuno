@@ -1,4 +1,12 @@
-import type { Category, Settings, Transaction, Wallet, WalletView } from "@myfinances/types";
+import type {
+  Category,
+  MonthlyBudget,
+  MonthlyBudgetInput,
+  Settings,
+  Transaction,
+  Wallet,
+  WalletView
+} from "@myfinances/types";
 import { DashboardView } from "../views/DashboardView";
 import { type Dictionary } from "../i18n";
 import { useExchangeRates } from "../lib/exchangeRates";
@@ -8,12 +16,14 @@ interface MobileWalletDashboardPagerProps {
   wallets: Wallet[];
   categories: Category[];
   transactions: Transaction[];
+  budgets: MonthlyBudget[];
   settings: Settings;
   activeWalletId: WalletView;
   allLabel: string;
   t: Dictionary;
   onChange: (value: WalletView) => void;
   onAdd: () => void;
+  onSetBudget: (input: MonthlyBudgetInput) => Promise<unknown>;
 }
 
 function MobileWalletDashboardSlide({
@@ -21,9 +31,11 @@ function MobileWalletDashboardSlide({
   wallets,
   categories,
   transactions,
+  budgets,
   settings,
   t,
-  onAdd
+  onAdd,
+  onSetBudget
 }: Omit<MobileWalletDashboardPagerProps, "activeWalletId" | "allLabel" | "onChange"> & {
   walletView: WalletView;
 }) {
@@ -42,6 +54,7 @@ function MobileWalletDashboardSlide({
       wallets={wallets}
       categories={categories}
       transactions={transactions}
+      budgets={budgets}
       settings={settings}
       activeWalletId={walletView}
       displayCurrency={displayCurrency}
@@ -50,6 +63,7 @@ function MobileWalletDashboardSlide({
       hasExchangeRateError={exchangeRates.isError && conversionNeeded}
       t={t}
       onAdd={onAdd}
+      onSetBudget={onSetBudget}
     />
   );
 }
@@ -58,12 +72,14 @@ export function MobileWalletDashboardPager({
   wallets,
   categories,
   transactions,
+  budgets,
   settings,
   activeWalletId,
   allLabel,
   t,
   onChange,
-  onAdd
+  onAdd,
+  onSetBudget
 }: MobileWalletDashboardPagerProps) {
   return (
     <MobileWalletPager
@@ -80,9 +96,11 @@ export function MobileWalletDashboardPager({
           wallets={wallets}
           categories={categories}
           transactions={transactions}
+          budgets={budgets}
           settings={settings}
           t={t}
           onAdd={onAdd}
+          onSetBudget={onSetBudget}
         />
       )}
     </MobileWalletPager>
