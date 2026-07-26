@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.2.0";
+export const appVersion = "0.3.0";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -694,12 +694,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "A focused update for planning, saving, and keeping track of what needs attention.",
+      intro: "A clearer picture of your money across periods and wallets.",
       gotIt: "Explore the update",
       notes: [
-        "Savings goals with progress and contribution history",
-        "Monthly budgets and recurring operations",
-        "A faster transaction flow and a new notification center"
+        "Week, month, year, and custom analytics periods",
+        "Comparison with the previous period and category filters",
+        "Initial wallet balances and transfers that do not distort cash flow"
       ]
     },
     categories: {
@@ -1130,12 +1130,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Обновление для удобного планирования, накоплений и контроля важных событий.",
+      intro: "Более ясная картина денег по периодам и кошелькам.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Цели накоплений с прогрессом и историей пополнений",
-        "Месячные бюджеты и регулярные операции",
-        "Быстрое добавление операций и новый центр уведомлений"
+        "Аналитика за неделю, месяц, год и свой период",
+        "Сравнение с предыдущим периодом и фильтры по категориям",
+        "Начальные балансы и переводы без искажения доходов и расходов"
       ]
     },
     categories: {
