@@ -277,6 +277,24 @@ export interface Dictionary {
     update: string;
     saveError: string;
     swipeHint: string;
+    initialBalance: string;
+    initialBalanceHint: string;
+    initialBalanceError: string;
+    transfers: string;
+    transferDescription: string;
+    addTransfer: string;
+    transferEmpty: string;
+    transferNeedsWallets: string;
+    fromWallet: string;
+    toWallet: string;
+    sentAmount: string;
+    receivedAmount: string;
+    transferDate: string;
+    transferNote: string;
+    saveTransfer: string;
+    transferSaveError: string;
+    confirmDeleteTransfer: string;
+    walletUnavailable: string;
   };
   goals: {
     tabWallets: string;
@@ -591,7 +609,25 @@ export const dictionaries: Record<Language, Dictionary> = {
       create: "Create wallet",
       update: "Update wallet",
       saveError: "Unable to save wallet.",
-      swipeHint: "Swipe this card to switch wallets"
+      swipeHint: "Swipe this card to switch wallets",
+      initialBalance: "Initial balance",
+      initialBalanceHint: "The amount already in this wallet. It is not counted as income.",
+      initialBalanceError: "Enter a valid initial balance.",
+      transfers: "Transfers",
+      transferDescription: "Move money between wallets without changing income or expenses.",
+      addTransfer: "New transfer",
+      transferEmpty: "No transfers yet.",
+      transferNeedsWallets: "Create at least two wallets to make a transfer.",
+      fromWallet: "From wallet",
+      toWallet: "To wallet",
+      sentAmount: "Sent amount",
+      receivedAmount: "Received amount",
+      transferDate: "Transfer date",
+      transferNote: "Note",
+      saveTransfer: "Save transfer",
+      transferSaveError: "Unable to save the transfer.",
+      confirmDeleteTransfer: "Delete this transfer?",
+      walletUnavailable: "Unavailable wallet"
     },
     goals: {
       tabWallets: "Wallets",
@@ -1009,7 +1045,25 @@ export const dictionaries: Record<Language, Dictionary> = {
       create: "Создать кошелек",
       update: "Обновить кошелек",
       saveError: "Не удалось сохранить кошелек.",
-      swipeHint: "Свайпни карточку, чтобы сменить кошелек"
+      swipeHint: "Свайпни карточку, чтобы сменить кошелек",
+      initialBalance: "Начальный баланс",
+      initialBalanceHint: "Сумма, которая уже была в кошельке. Она не считается доходом.",
+      initialBalanceError: "Укажи корректный начальный баланс.",
+      transfers: "Переводы",
+      transferDescription: "Перемещай деньги между кошельками без искажения доходов и расходов.",
+      addTransfer: "Новый перевод",
+      transferEmpty: "Переводов пока нет.",
+      transferNeedsWallets: "Для перевода нужно создать хотя бы два кошелька.",
+      fromWallet: "Из кошелька",
+      toWallet: "В кошелек",
+      sentAmount: "Сумма списания",
+      receivedAmount: "Сумма зачисления",
+      transferDate: "Дата перевода",
+      transferNote: "Заметка",
+      saveTransfer: "Сохранить перевод",
+      transferSaveError: "Не удалось сохранить перевод.",
+      confirmDeleteTransfer: "Удалить этот перевод?",
+      walletUnavailable: "Недоступный кошелек"
     },
     goals: {
       tabWallets: "Кошельки",

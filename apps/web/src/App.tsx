@@ -38,6 +38,7 @@ export function App() {
   const recurringTransactions = data.recurringTransactions.data ?? [];
   const savingsGoals = data.savingsGoals.data ?? [];
   const savingsGoalContributions = data.savingsGoalContributions.data ?? [];
+  const walletTransfers = data.walletTransfers.data ?? [];
   const isLoading =
     data.bootstrap.isLoading ||
     data.settings.isLoading ||
@@ -47,7 +48,8 @@ export function App() {
     data.budgets.isLoading ||
     data.recurringTransactions.isLoading ||
     data.savingsGoals.isLoading ||
-    data.savingsGoalContributions.isLoading;
+    data.savingsGoalContributions.isLoading ||
+    data.walletTransfers.isLoading;
   const isError =
     data.bootstrap.isError ||
     data.settings.isError ||
@@ -57,7 +59,8 @@ export function App() {
     data.budgets.isError ||
     data.recurringTransactions.isError ||
     data.savingsGoals.isError ||
-    data.savingsGoalContributions.isError;
+    data.savingsGoalContributions.isError ||
+    data.walletTransfers.isError;
   const fallbackT = getDictionary(settings?.locale ?? (typeof navigator === "undefined" ? "en-US" : navigator.language));
 
   useEffect(() => {
@@ -85,12 +88,27 @@ export function App() {
   const displayCurrency = settings ? activeWallet?.currency ?? settings.currency : "USD";
   const conversionNeeded = Boolean(
     settings &&
-      transactions.some(
+      (transactions.some(
         (transaction) =>
           !transaction.deletedAt &&
           (activeWalletId === "all" || transaction.walletId === activeWalletId) &&
           transaction.currency.toUpperCase() !== displayCurrency
-      )
+      ) ||
+        wallets.some(
+          (wallet) =>
+            !wallet.deletedAt &&
+            (activeWalletId === "all" || wallet.id === activeWalletId) &&
+            wallet.currency.toUpperCase() !== displayCurrency &&
+            wallet.initialBalanceMinor !== 0
+        ) ||
+        walletTransfers.some(
+          (transfer) =>
+            !transfer.deletedAt &&
+            (((activeWalletId === "all" || transfer.fromWalletId === activeWalletId) &&
+              transfer.fromCurrency.toUpperCase() !== displayCurrency) ||
+              ((activeWalletId === "all" || transfer.toWalletId === activeWalletId) &&
+                transfer.toCurrency.toUpperCase() !== displayCurrency))
+        ))
   );
   const exchangeRates = useExchangeRates(displayCurrency, conversionNeeded);
   const handleWalletChange = (nextWalletId: WalletView, direction = 1) => {
@@ -116,7 +134,8 @@ export function App() {
           data.savingsGoals.error instanceof Error ? data.savingsGoals.error.message : null,
           data.savingsGoalContributions.error instanceof Error
             ? data.savingsGoalContributions.error.message
-            : null
+            : null,
+          data.walletTransfers.error instanceof Error ? data.walletTransfers.error.message : null
         ]
           .filter(Boolean)
           .join("\n")}
@@ -209,6 +228,7 @@ export function App() {
                   wallets={wallets}
                   categories={categories}
                   transactions={transactions}
+                  transfers={walletTransfers}
                   budgets={budgets}
                   settings={settings}
                   activeWalletId={activeWalletId}
@@ -230,6 +250,7 @@ export function App() {
                     wallets={wallets}
                     categories={categories}
                     transactions={transactions}
+                    transfers={walletTransfers}
                     budgets={budgets}
                     settings={settings}
                     activeWalletId={activeWalletId}
@@ -318,6 +339,7 @@ export function App() {
               transactions={transactions}
               goals={savingsGoals}
               contributions={savingsGoalContributions}
+              transfers={walletTransfers}
               settings={settings}
               t={t}
               onCreateWallet={async (input) => {
@@ -340,6 +362,10 @@ export function App() {
               onDeleteContribution={(id) =>
                 mutations.deleteSavingsGoalContribution.mutateAsync(id)
               }
+              onCreateTransfer={async (input) => {
+                await mutations.createWalletTransfer.mutateAsync(input);
+              }}
+              onDeleteTransfer={(id) => mutations.deleteWalletTransfer.mutateAsync(id)}
             />
           ) : null}
           {activeView === "settings" ? (

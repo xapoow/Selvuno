@@ -7,7 +7,8 @@ import type {
   SavingsGoalContribution,
   Settings,
   Transaction,
-  Wallet
+  Wallet,
+  WalletTransfer
 } from "@myfinances/types";
 import { DEFAULT_CURRENCY, detectDefaultLocaleSettings, inferCurrencyFromLocale } from "@myfinances/utils";
 
@@ -22,6 +23,7 @@ export class FinanceDatabase extends Dexie {
   recurringTransactions!: Table<RecurringTransaction, string>;
   savingsGoals!: Table<SavingsGoal, string>;
   savingsGoalContributions!: Table<SavingsGoalContribution, string>;
+  walletTransfers!: Table<WalletTransfer, string>;
 
   constructor(name = "myfinances") {
     super(name);
@@ -60,6 +62,31 @@ export class FinanceDatabase extends Dexie {
       savingsGoals: "id, walletId, targetDate, deletedAt, updatedAt",
       savingsGoalContributions: "id, goalId, contributionDate, deletedAt, updatedAt"
     });
+    this.version(5)
+      .stores({
+        wallets: "id, name, currency, archivedAt, deletedAt, updatedAt",
+        categories: "id, name, type, deletedAt, updatedAt",
+        transactions:
+          "id, walletId, categoryId, type, transactionDate, recurringTransactionId, &[recurringTransactionId+recurrenceDate], deletedAt, updatedAt",
+        settings: "id",
+        budgets: "id, month, categoryId, [categoryId+month], deletedAt, updatedAt",
+        recurringTransactions:
+          "id, walletId, categoryId, type, frequency, nextRunDate, paused, deletedAt, updatedAt",
+        savingsGoals: "id, walletId, targetDate, deletedAt, updatedAt",
+        savingsGoalContributions: "id, goalId, contributionDate, deletedAt, updatedAt",
+        walletTransfers:
+          "id, fromWalletId, toWalletId, transferDate, deletedAt, updatedAt"
+      })
+      .upgrade((transaction) =>
+        transaction
+          .table("wallets")
+          .toCollection()
+          .modify((wallet: Partial<Wallet>) => {
+            if (!Number.isInteger(wallet.initialBalanceMinor)) {
+              wallet.initialBalanceMinor = 0;
+            }
+          })
+      );
   }
 }
 
@@ -176,6 +203,7 @@ export async function seedLocalData(db = financeDb): Promise<void> {
       ...createEntityBase(),
       name: "Everyday",
       currency: DEFAULT_CURRENCY,
+      initialBalanceMinor: 0,
       archivedAt: null
     });
   }
@@ -186,6 +214,7 @@ export async function seedLocalData(db = financeDb): Promise<void> {
       .filter(
         (wallet) =>
           !wallet.currency ||
+          !Number.isInteger(wallet.initialBalanceMinor) ||
           (shouldMigrateDefaultCurrency &&
             wallet.name === "Everyday" &&
             (wallet.currency === previousAutoCurrency || wallet.currency !== DEFAULT_CURRENCY))
@@ -193,7 +222,15 @@ export async function seedLocalData(db = financeDb): Promise<void> {
       .map((wallet) =>
         db.wallets.put({
           ...wallet,
-          currency: DEFAULT_CURRENCY,
+          currency:
+            shouldMigrateDefaultCurrency &&
+            wallet.name === "Everyday" &&
+            (wallet.currency === previousAutoCurrency || wallet.currency !== DEFAULT_CURRENCY)
+              ? DEFAULT_CURRENCY
+              : wallet.currency || DEFAULT_CURRENCY,
+          initialBalanceMinor: Number.isInteger(wallet.initialBalanceMinor)
+            ? wallet.initialBalanceMinor
+            : 0,
           updatedAt: now
         })
       )

@@ -8,6 +8,7 @@ import { savingsGoalRepository } from "./savingsGoalRepository";
 import { settingsRepository } from "./settingsRepository";
 import { transactionRepository } from "./transactionRepository";
 import { walletRepository } from "./walletRepository";
+import { walletTransferRepository } from "./walletTransferRepository";
 
 describe("finance repositories", () => {
   beforeEach(async () => {
@@ -32,10 +33,18 @@ describe("finance repositories", () => {
   it("creates, updates, and archives wallets", async () => {
     await seedLocalData();
 
-    const wallet = await walletRepository.createWallet({ name: "Savings", currency: "eur" });
+    const wallet = await walletRepository.createWallet({
+      name: "Savings",
+      currency: "eur",
+      initialBalanceMinor: 12500
+    });
     const updated = await walletRepository.updateWallet(wallet.id, { name: "Reserve" });
 
-    expect(updated).toMatchObject({ name: "Reserve", currency: "EUR" });
+    expect(updated).toMatchObject({
+      name: "Reserve",
+      currency: "EUR",
+      initialBalanceMinor: 12500
+    });
     expect(await walletRepository.listWallets()).toHaveLength(2);
 
     await walletRepository.archiveWallet(wallet.id);
@@ -127,6 +136,7 @@ describe("finance repositories", () => {
     expect((await settingsRepository.getSettings()).currency).toBeTruthy();
     expect((await settingsRepository.getSettings()).colorTheme).toBe("sage");
     expect((await walletRepository.listWallets())[0].currency).toBeTruthy();
+    expect((await walletRepository.listWallets())[0].initialBalanceMinor).toBe(0);
     expect((await transactionRepository.listTransactions({ includeDeleted: true }))[0].currency).toBeTruthy();
     expect((await transactionRepository.listTransactions({ includeDeleted: true }))[0].tags).toEqual([]);
   });
@@ -161,6 +171,54 @@ describe("finance repositories", () => {
 
     expect(await transactionRepository.listTransactions({ walletId: wallet.id })).toHaveLength(0);
     expect(await transactionRepository.listTransactions({ walletId: wallet.id, includeDeleted: true })).toHaveLength(1);
+  });
+
+  it("moves money between wallets without creating income or expense transactions", async () => {
+    await seedLocalData();
+    const [source] = await walletRepository.listWallets();
+    const destination = await walletRepository.createWallet({
+      name: "Travel",
+      currency: "eur",
+      initialBalanceMinor: 2000
+    });
+
+    const transfer = await walletTransferRepository.createTransfer({
+      fromWalletId: source.id,
+      toWalletId: destination.id,
+      fromAmountMinor: 11000,
+      toAmountMinor: 10000,
+      transferDate: "2026-07-26T12:00:00.000Z",
+      note: "Trip fund"
+    });
+
+    expect(transfer).toMatchObject({
+      fromCurrency: source.currency,
+      toCurrency: "EUR",
+      fromAmountMinor: 11000,
+      toAmountMinor: 10000
+    });
+    expect(await transactionRepository.listTransactions()).toHaveLength(0);
+    expect(await walletTransferRepository.listTransfers()).toHaveLength(1);
+
+    await walletTransferRepository.deleteTransfer(transfer.id);
+
+    expect(await walletTransferRepository.listTransfers()).toHaveLength(0);
+    expect(await walletTransferRepository.listTransfers({ includeDeleted: true })).toHaveLength(1);
+  });
+
+  it("rejects transfers that use the same wallet twice", async () => {
+    await seedLocalData();
+    const [wallet] = await walletRepository.listWallets();
+
+    await expect(
+      walletTransferRepository.createTransfer({
+        fromWalletId: wallet.id,
+        toWalletId: wallet.id,
+        fromAmountMinor: 1000,
+        toAmountMinor: 1000,
+        transferDate: "2026-07-26T12:00:00.000Z"
+      })
+    ).rejects.toThrow();
   });
 
   it("materializes due recurring transactions once and advances the schedule", async () => {
@@ -241,7 +299,6 @@ describe("finance repositories", () => {
       amountMinor: 5000,
       contributionDate: "2026-07-26T12:00:00.000Z"
     });
-
     expect(await savingsGoalRepository.listGoals()).toMatchObject([
       { id: goal.id, name: "Emergency fund", targetAmountMinor: 100000 }
     ]);
@@ -317,6 +374,17 @@ describe("finance repositories", () => {
       amountMinor: 25000,
       contributionDate: "2026-07-26T12:00:00.000Z"
     });
+    const secondWallet = await walletRepository.createWallet({
+      name: "Reserve",
+      currency: wallet.currency
+    });
+    await walletTransferRepository.createTransfer({
+      fromWalletId: wallet.id,
+      toWalletId: secondWallet.id,
+      fromAmountMinor: 5000,
+      toAmountMinor: 5000,
+      transferDate: "2026-07-26T12:00:00.000Z"
+    });
     const backup = await backupRepository.exportBackup();
 
     await resetDatabaseForTests();
@@ -330,7 +398,20 @@ describe("finance repositories", () => {
     expect(restored.recurringTransactions).toHaveLength(1);
     expect(restored.savingsGoals).toHaveLength(1);
     expect(restored.savingsGoalContributions).toHaveLength(1);
+    expect(restored.walletTransfers).toHaveLength(1);
     expect(restored.settings).toMatchObject({ id: "default" });
+  });
+
+  it("restores legacy version 4 backups without wallet transfers", async () => {
+    await seedLocalData();
+    const backup = await backupRepository.exportBackup();
+    const { walletTransfers: _walletTransfers, ...legacyBackup } = backup;
+
+    await resetDatabaseForTests();
+    await backupRepository.importBackup({ ...legacyBackup, version: 4 });
+
+    expect(await walletTransferRepository.listTransfers()).toHaveLength(0);
+    expect((await walletRepository.listWallets())[0].initialBalanceMinor).toBe(0);
   });
 
   it("restores legacy version 3 backups without savings goals", async () => {
