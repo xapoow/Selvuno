@@ -1,5 +1,13 @@
 import { useState } from "react";
-import type { Category, Settings, Transaction, Wallet, WalletView } from "@myfinances/types";
+import type {
+  Category,
+  MonthlyBudget,
+  MonthlyBudgetInput,
+  Settings,
+  Transaction,
+  Wallet,
+  WalletView
+} from "@myfinances/types";
 import { BarChart3, PlusCircle } from "lucide-react";
 import { filterTransactionsByWallet, formatMoney } from "@myfinances/utils";
 import {
@@ -7,19 +15,23 @@ import {
   type AnalyticsCategoryItem,
   type AnalyticsTrendItem
 } from "../components/AnalyticsView";
+import { BudgetOverviewCard } from "../components/BudgetOverviewCard";
+import { BudgetPlanView } from "../components/BudgetPlanView";
 import { TransactionRow } from "../components/TransactionRow";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Section } from "../components/ui/Section";
 import { StatPanel } from "../components/ui/StatPanel";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { cn } from "../lib/cn";
-import { convertMinorToBaseCurrency, type ExchangeRateTable } from "../lib/exchangeRates";
+import { calculateMonthlyBudgetProgress, formatBudgetMonth, getBudgetMonth } from "../lib/budgets";
+import { convertMinorToBaseCurrency, type ExchangeRateTable, useExchangeRates } from "../lib/exchangeRates";
 import { getTimeGreeting } from "../lib/greetings";
 
 interface DashboardViewProps {
   wallets: Wallet[];
   categories: Category[];
   transactions: Transaction[];
+  budgets: MonthlyBudget[];
   settings: Settings;
   activeWalletId: WalletView;
   displayCurrency: string;
@@ -28,12 +40,14 @@ interface DashboardViewProps {
   hasExchangeRateError: boolean;
   t: Dictionary;
   onAdd: () => void;
+  onSetBudget: (input: MonthlyBudgetInput) => Promise<unknown>;
 }
 
 export function DashboardView({
   wallets,
   categories,
   transactions,
+  budgets,
   settings,
   activeWalletId,
   displayCurrency,
@@ -41,10 +55,30 @@ export function DashboardView({
   isUpdatingExchangeRates,
   hasExchangeRateError,
   t,
-  onAdd
+  onAdd,
+  onSetBudget
 }: DashboardViewProps) {
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
+  const [budgetOpen, setBudgetOpen] = useState(false);
   const [chartType, setChartType] = useState<"expense" | "income">("expense");
+  const budgetConversionNeeded =
+    transactions.some(
+      (transaction) =>
+        !transaction.deletedAt &&
+        transaction.type === "expense" &&
+        transaction.currency.toUpperCase() !== settings.currency
+    ) || budgets.some((budget) => !budget.deletedAt && budget.currency.toUpperCase() !== settings.currency);
+  const budgetExchangeRates = useExchangeRates(settings.currency, budgetConversionNeeded);
+  const currentBudgetMonth = getBudgetMonth(new Date(), settings.timeZone);
+  const budgetProgress = calculateMonthlyBudgetProgress({
+    month: currentBudgetMonth,
+    timeZone: settings.timeZone,
+    currency: settings.currency,
+    categories,
+    budgets,
+    transactions,
+    exchangeRates: budgetExchangeRates.data
+  });
   const visibleTransactions = filterTransactionsByWallet(transactions, activeWalletId).filter(
     (transaction) => !transaction.deletedAt
   );
@@ -138,6 +172,22 @@ export function DashboardView({
     };
   });
 
+  if (budgetOpen) {
+    return (
+      <BudgetPlanView
+        initialMonth={currentBudgetMonth}
+        categories={categories}
+        budgets={budgets}
+        transactions={transactions}
+        settings={settings}
+        exchangeRates={budgetExchangeRates.data}
+        t={t}
+        onSetBudget={onSetBudget}
+        onBack={() => setBudgetOpen(false)}
+      />
+    );
+  }
+
   if (analyticsOpen) {
     return (
       <AnalyticsView
@@ -189,6 +239,15 @@ export function DashboardView({
           />
         </div>
       </section>
+
+      <BudgetOverviewCard
+        currency={settings.currency}
+        locale={settings.locale}
+        monthLabel={formatBudgetMonth(currentBudgetMonth, settings.locale)}
+        progress={budgetProgress}
+        t={t}
+        onOpen={() => setBudgetOpen(true)}
+      />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(330px,0.85fr)]">
         <Section title={t.dashboard.cashFlow}>

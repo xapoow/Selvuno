@@ -32,10 +32,19 @@ export function App() {
   const wallets = data.wallets.data ?? [];
   const categories = data.categories.data ?? [];
   const transactions = data.transactions.data ?? [];
+  const budgets = data.budgets.data ?? [];
   const isLoading =
-    data.bootstrap.isLoading || data.settings.isLoading || data.wallets.isLoading || data.categories.isLoading;
+    data.bootstrap.isLoading ||
+    data.settings.isLoading ||
+    data.wallets.isLoading ||
+    data.categories.isLoading ||
+    data.budgets.isLoading;
   const isError =
-    data.bootstrap.isError || data.settings.isError || data.wallets.isError || data.categories.isError;
+    data.bootstrap.isError ||
+    data.settings.isError ||
+    data.wallets.isError ||
+    data.categories.isError ||
+    data.budgets.isError;
   const fallbackT = getDictionary(settings?.locale ?? (typeof navigator === "undefined" ? "en-US" : navigator.language));
 
   useEffect(() => {
@@ -87,7 +96,8 @@ export function App() {
           data.bootstrap.error instanceof Error ? data.bootstrap.error.message : null,
           data.settings.error instanceof Error ? data.settings.error.message : null,
           data.wallets.error instanceof Error ? data.wallets.error.message : null,
-          data.categories.error instanceof Error ? data.categories.error.message : null
+          data.categories.error instanceof Error ? data.categories.error.message : null,
+          data.budgets.error instanceof Error ? data.budgets.error.message : null
         ]
           .filter(Boolean)
           .join("\n")}
@@ -167,12 +177,14 @@ export function App() {
                   wallets={wallets}
                   categories={categories}
                   transactions={transactions}
+                  budgets={budgets}
                   settings={settings}
                   activeWalletId={activeWalletId}
                   allLabel={t.wallets.allWallets}
                   t={t}
                   onChange={handleWalletChange}
                   onAdd={() => setActiveView("add")}
+                  onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
                 />
               </div>
               <div className="hidden overflow-hidden md:block">
@@ -186,6 +198,7 @@ export function App() {
                     wallets={wallets}
                     categories={categories}
                     transactions={transactions}
+                    budgets={budgets}
                     settings={settings}
                     activeWalletId={activeWalletId}
                     displayCurrency={displayCurrency}
@@ -194,6 +207,7 @@ export function App() {
                     hasExchangeRateError={exchangeRates.isError && conversionNeeded}
                     t={t}
                     onAdd={() => setActiveView("add")}
+                    onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
                   />
                 </motion.div>
               </div>
