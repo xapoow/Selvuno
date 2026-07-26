@@ -32,6 +32,7 @@ export function App() {
 
   const settings = data.settings.data;
   const wallets = data.wallets.data ?? [];
+  const archivedWallets = data.archivedWallets.data ?? [];
   const categories = data.categories.data ?? [];
   const transactions = data.transactions.data ?? [];
   const budgets = data.budgets.data ?? [];
@@ -43,6 +44,7 @@ export function App() {
     data.bootstrap.isLoading ||
     data.settings.isLoading ||
     data.wallets.isLoading ||
+    data.archivedWallets.isLoading ||
     data.categories.isLoading ||
     data.transactions.isLoading ||
     data.budgets.isLoading ||
@@ -54,6 +56,7 @@ export function App() {
     data.bootstrap.isError ||
     data.settings.isError ||
     data.wallets.isError ||
+    data.archivedWallets.isError ||
     data.categories.isError ||
     data.transactions.isError ||
     data.budgets.isError ||
@@ -127,6 +130,7 @@ export function App() {
           data.bootstrap.error instanceof Error ? data.bootstrap.error.message : null,
           data.settings.error instanceof Error ? data.settings.error.message : null,
           data.wallets.error instanceof Error ? data.wallets.error.message : null,
+          data.archivedWallets.error instanceof Error ? data.archivedWallets.error.message : null,
           data.categories.error instanceof Error ? data.categories.error.message : null,
           data.transactions.error instanceof Error ? data.transactions.error.message : null,
           data.budgets.error instanceof Error ? data.budgets.error.message : null,
@@ -336,6 +340,7 @@ export function App() {
           {activeView === "wallets" ? (
             <WalletsHubView
               wallets={wallets}
+              archivedWallets={archivedWallets}
               transactions={transactions}
               goals={savingsGoals}
               contributions={savingsGoalContributions}
@@ -349,6 +354,9 @@ export function App() {
                 await mutations.updateWallet.mutateAsync({ id, input });
               }}
               onArchiveWallet={(id) => mutations.archiveWallet.mutateAsync(id)}
+              onRestoreWallet={async (id) => {
+                await mutations.restoreWallet.mutateAsync(id);
+              }}
               onCreateGoal={async (input) => {
                 await mutations.createSavingsGoal.mutateAsync(input);
               }}

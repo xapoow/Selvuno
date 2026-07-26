@@ -46,6 +46,8 @@ export const walletSchema = baseEntitySchema.extend({
   name: z.string().min(1).max(64),
   currency: z.string().length(3),
   initialBalanceMinor: z.number().int().default(0),
+  color: z.string().min(4).max(32).default("#207a6f"),
+  icon: z.string().min(1).max(32).default("wallet-cards"),
   archivedAt: z.string().datetime().nullable()
 });
 export type Wallet = z.infer<typeof walletSchema>;
@@ -53,7 +55,9 @@ export type Wallet = z.infer<typeof walletSchema>;
 export const walletInputSchema = z.object({
   name: z.string().min(1).max(64),
   currency: z.string().length(3),
-  initialBalanceMinor: z.number().int().optional()
+  initialBalanceMinor: z.number().int().optional(),
+  color: z.string().min(4).max(32).optional(),
+  icon: z.string().min(1).max(32).optional()
 });
 export type WalletInput = z.infer<typeof walletInputSchema>;
 
@@ -270,15 +274,21 @@ const backupV5Schema = backupV4Schema.extend({
   walletTransfers: z.array(walletTransferSchema)
 });
 
+const backupV6Schema = backupV5Schema.extend({
+  version: z.literal(6)
+});
+
 export const backupSchema = z.discriminatedUnion("version", [
   backupV1Schema,
   backupV2Schema,
   backupV3Schema,
   backupV4Schema,
-  backupV5Schema
+  backupV5Schema,
+  backupV6Schema
 ]);
 export type FinanceBackup = z.infer<typeof backupSchema>;
 export type FinanceBackupV2 = z.infer<typeof backupV2Schema>;
 export type FinanceBackupV3 = z.infer<typeof backupV3Schema>;
 export type FinanceBackupV4 = z.infer<typeof backupV4Schema>;
 export type FinanceBackupV5 = z.infer<typeof backupV5Schema>;
+export type FinanceBackupV6 = z.infer<typeof backupV6Schema>;

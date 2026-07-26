@@ -43,6 +43,14 @@ export function useFinanceData() {
     queryFn: () => walletRepository.listWallets(),
     enabled
   });
+  const archivedWallets = useQuery({
+    queryKey: queryKeys.archivedWallets,
+    queryFn: async () =>
+      (await walletRepository.listWallets({ includeArchived: true })).filter(
+        (wallet) => Boolean(wallet.archivedAt)
+      ),
+    enabled
+  });
   const categories = useQuery({
     queryKey: queryKeys.categories,
     queryFn: () => categoryRepository.listCategories(),
@@ -83,6 +91,7 @@ export function useFinanceData() {
     bootstrap,
     settings,
     wallets,
+    archivedWallets,
     categories,
     transactions,
     budgets,
@@ -97,6 +106,7 @@ function invalidateFinance(queryClient: ReturnType<typeof useQueryClient>) {
   return Promise.all([
     queryClient.invalidateQueries({ queryKey: queryKeys.settings }),
     queryClient.invalidateQueries({ queryKey: queryKeys.wallets }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.archivedWallets }),
     queryClient.invalidateQueries({ queryKey: queryKeys.categories }),
     queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
     queryClient.invalidateQueries({ queryKey: queryKeys.budgets }),
@@ -138,6 +148,10 @@ export function useFinanceMutations() {
     }),
     archiveWallet: useMutation({
       mutationFn: (id: string) => walletRepository.archiveWallet(id),
+      onSuccess: invalidate
+    }),
+    restoreWallet: useMutation({
+      mutationFn: (id: string) => walletRepository.restoreWallet(id),
       onSuccess: invalidate
     }),
     createWalletTransfer: useMutation({

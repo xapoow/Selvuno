@@ -6,6 +6,7 @@ export interface WalletRepository {
   createWallet(input: WalletInput): Promise<Wallet>;
   updateWallet(id: string, input: Partial<WalletInput>): Promise<Wallet>;
   archiveWallet(id: string): Promise<void>;
+  restoreWallet(id: string): Promise<Wallet>;
   listWallets(options?: { includeArchived?: boolean }): Promise<Wallet[]>;
 }
 
@@ -19,6 +20,8 @@ export const walletRepository: WalletRepository = {
       ...createEntityBase(),
       ...parsed,
       initialBalanceMinor: parsed.initialBalanceMinor ?? 0,
+      color: parsed.color ?? "#207a6f",
+      icon: parsed.icon ?? "wallet-cards",
       archivedAt: null
     };
     await financeDb.wallets.add(wallet);
@@ -40,7 +43,9 @@ export const walletRepository: WalletRepository = {
     walletInputSchema.partial().parse({
       name: next.name,
       currency: next.currency,
-      initialBalanceMinor: next.initialBalanceMinor
+      initialBalanceMinor: next.initialBalanceMinor,
+      color: next.color,
+      icon: next.icon
     });
     await financeDb.transaction(
       "rw",
@@ -117,6 +122,12 @@ export const walletRepository: WalletRepository = {
     if (!current || current.deletedAt) {
       return;
     }
+    const activeWalletCount = await financeDb.wallets
+      .filter((wallet) => !wallet.deletedAt && !wallet.archivedAt)
+      .count();
+    if (activeWalletCount <= 1) {
+      throw new Error("The last active wallet cannot be archived.");
+    }
     const now = nowIso();
     await financeDb.transaction(
       "rw",
@@ -141,6 +152,21 @@ export const walletRepository: WalletRepository = {
         );
       }
     );
+  },
+
+  async restoreWallet(id) {
+    const current = await financeDb.wallets.get(id);
+    if (!current || current.deletedAt) {
+      throw new Error("Wallet not found.");
+    }
+    const restored: Wallet = {
+      ...current,
+      archivedAt: null,
+      updatedAt: nowIso(),
+      syncStatus: "pending"
+    };
+    await financeDb.wallets.put(restored);
+    return restored;
   },
 
   async listWallets(options) {

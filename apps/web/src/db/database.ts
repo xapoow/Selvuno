@@ -87,6 +87,30 @@ export class FinanceDatabase extends Dexie {
             }
           })
       );
+    this.version(6)
+      .stores({
+        wallets: "id, name, currency, archivedAt, deletedAt, updatedAt",
+        categories: "id, name, type, deletedAt, updatedAt",
+        transactions:
+          "id, walletId, categoryId, type, transactionDate, recurringTransactionId, &[recurringTransactionId+recurrenceDate], deletedAt, updatedAt",
+        settings: "id",
+        budgets: "id, month, categoryId, [categoryId+month], deletedAt, updatedAt",
+        recurringTransactions:
+          "id, walletId, categoryId, type, frequency, nextRunDate, paused, deletedAt, updatedAt",
+        savingsGoals: "id, walletId, targetDate, deletedAt, updatedAt",
+        savingsGoalContributions: "id, goalId, contributionDate, deletedAt, updatedAt",
+        walletTransfers:
+          "id, fromWalletId, toWalletId, transferDate, deletedAt, updatedAt"
+      })
+      .upgrade((transaction) =>
+        transaction
+          .table("wallets")
+          .toCollection()
+          .modify((wallet: Partial<Wallet>) => {
+            wallet.color ||= "#207a6f";
+            wallet.icon ||= "wallet-cards";
+          })
+      );
   }
 }
 
@@ -204,6 +228,8 @@ export async function seedLocalData(db = financeDb): Promise<void> {
       name: "Everyday",
       currency: DEFAULT_CURRENCY,
       initialBalanceMinor: 0,
+      color: "#207a6f",
+      icon: "wallet-cards",
       archivedAt: null
     });
   }
@@ -215,6 +241,8 @@ export async function seedLocalData(db = financeDb): Promise<void> {
         (wallet) =>
           !wallet.currency ||
           !Number.isInteger(wallet.initialBalanceMinor) ||
+          !wallet.color ||
+          !wallet.icon ||
           (shouldMigrateDefaultCurrency &&
             wallet.name === "Everyday" &&
             (wallet.currency === previousAutoCurrency || wallet.currency !== DEFAULT_CURRENCY))
@@ -231,6 +259,8 @@ export async function seedLocalData(db = financeDb): Promise<void> {
           initialBalanceMinor: Number.isInteger(wallet.initialBalanceMinor)
             ? wallet.initialBalanceMinor
             : 0,
+          color: wallet.color || "#207a6f",
+          icon: wallet.icon || "wallet-cards",
           updatedAt: now
         })
       )
