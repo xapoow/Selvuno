@@ -5,6 +5,7 @@ import type {
   Settings,
   Transaction,
   Wallet,
+  WalletTransfer,
   WalletView
 } from "@myfinances/types";
 import { DashboardView } from "../views/DashboardView";
@@ -16,6 +17,7 @@ interface MobileWalletDashboardPagerProps {
   wallets: Wallet[];
   categories: Category[];
   transactions: Transaction[];
+  transfers: WalletTransfer[];
   budgets: MonthlyBudget[];
   settings: Settings;
   activeWalletId: WalletView;
@@ -31,6 +33,7 @@ function MobileWalletDashboardSlide({
   wallets,
   categories,
   transactions,
+  transfers,
   budgets,
   settings,
   t,
@@ -41,12 +44,28 @@ function MobileWalletDashboardSlide({
 }) {
   const activeWallet = walletView === "all" ? undefined : wallets.find((wallet) => wallet.id === walletView);
   const displayCurrency = activeWallet?.currency ?? settings.currency;
-  const conversionNeeded = transactions.some(
-    (transaction) =>
-      !transaction.deletedAt &&
-      (walletView === "all" || transaction.walletId === walletView) &&
-      transaction.currency.toUpperCase() !== displayCurrency
-  );
+  const conversionNeeded =
+    transactions.some(
+      (transaction) =>
+        !transaction.deletedAt &&
+        (walletView === "all" || transaction.walletId === walletView) &&
+        transaction.currency.toUpperCase() !== displayCurrency
+    ) ||
+    wallets.some(
+      (wallet) =>
+        !wallet.deletedAt &&
+        (walletView === "all" || wallet.id === walletView) &&
+        wallet.initialBalanceMinor !== 0 &&
+        wallet.currency.toUpperCase() !== displayCurrency
+    ) ||
+    transfers.some(
+      (transfer) =>
+        !transfer.deletedAt &&
+        (((walletView === "all" || transfer.fromWalletId === walletView) &&
+          transfer.fromCurrency.toUpperCase() !== displayCurrency) ||
+          ((walletView === "all" || transfer.toWalletId === walletView) &&
+            transfer.toCurrency.toUpperCase() !== displayCurrency))
+    );
   const exchangeRates = useExchangeRates(displayCurrency, conversionNeeded);
 
   return (
@@ -54,6 +73,7 @@ function MobileWalletDashboardSlide({
       wallets={wallets}
       categories={categories}
       transactions={transactions}
+      transfers={transfers}
       budgets={budgets}
       settings={settings}
       activeWalletId={walletView}
@@ -72,6 +92,7 @@ export function MobileWalletDashboardPager({
   wallets,
   categories,
   transactions,
+  transfers,
   budgets,
   settings,
   activeWalletId,
@@ -96,6 +117,7 @@ export function MobileWalletDashboardPager({
           wallets={wallets}
           categories={categories}
           transactions={transactions}
+          transfers={transfers}
           budgets={budgets}
           settings={settings}
           t={t}

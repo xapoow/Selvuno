@@ -45,15 +45,44 @@ export const baseEntitySchema = z.object({
 export const walletSchema = baseEntitySchema.extend({
   name: z.string().min(1).max(64),
   currency: z.string().length(3),
+  initialBalanceMinor: z.number().int().default(0),
   archivedAt: z.string().datetime().nullable()
 });
 export type Wallet = z.infer<typeof walletSchema>;
 
 export const walletInputSchema = z.object({
   name: z.string().min(1).max(64),
-  currency: z.string().length(3)
+  currency: z.string().length(3),
+  initialBalanceMinor: z.number().int().optional()
 });
 export type WalletInput = z.infer<typeof walletInputSchema>;
+
+export const walletTransferSchema = baseEntitySchema.extend({
+  fromWalletId: z.string().uuid(),
+  toWalletId: z.string().uuid(),
+  fromAmountMinor: z.number().int().positive(),
+  toAmountMinor: z.number().int().positive(),
+  fromCurrency: z.string().length(3),
+  toCurrency: z.string().length(3),
+  transferDate: z.string().datetime(),
+  note: z.string().max(160).optional()
+});
+export type WalletTransfer = z.infer<typeof walletTransferSchema>;
+
+export const walletTransferInputSchema = z
+  .object({
+    fromWalletId: z.string().uuid(),
+    toWalletId: z.string().uuid(),
+    fromAmountMinor: z.number().int().positive(),
+    toAmountMinor: z.number().int().positive(),
+    transferDate: z.string().datetime(),
+    note: z.string().max(160).optional()
+  })
+  .refine((input) => input.fromWalletId !== input.toWalletId, {
+    message: "Choose two different wallets.",
+    path: ["toWalletId"]
+  });
+export type WalletTransferInput = z.infer<typeof walletTransferInputSchema>;
 
 export const categorySchema = baseEntitySchema.extend({
   name: z.string().min(1).max(48),
@@ -236,13 +265,20 @@ const backupV4Schema = backupV3Schema.extend({
   savingsGoalContributions: z.array(savingsGoalContributionSchema)
 });
 
+const backupV5Schema = backupV4Schema.extend({
+  version: z.literal(5),
+  walletTransfers: z.array(walletTransferSchema)
+});
+
 export const backupSchema = z.discriminatedUnion("version", [
   backupV1Schema,
   backupV2Schema,
   backupV3Schema,
-  backupV4Schema
+  backupV4Schema,
+  backupV5Schema
 ]);
 export type FinanceBackup = z.infer<typeof backupSchema>;
 export type FinanceBackupV2 = z.infer<typeof backupV2Schema>;
 export type FinanceBackupV3 = z.infer<typeof backupV3Schema>;
 export type FinanceBackupV4 = z.infer<typeof backupV4Schema>;
+export type FinanceBackupV5 = z.infer<typeof backupV5Schema>;

@@ -18,6 +18,7 @@ export const walletRepository: WalletRepository = {
     const wallet: Wallet = {
       ...createEntityBase(),
       ...parsed,
+      initialBalanceMinor: parsed.initialBalanceMinor ?? 0,
       archivedAt: null
     };
     await financeDb.wallets.add(wallet);
@@ -38,7 +39,8 @@ export const walletRepository: WalletRepository = {
     };
     walletInputSchema.partial().parse({
       name: next.name,
-      currency: next.currency
+      currency: next.currency,
+      initialBalanceMinor: next.initialBalanceMinor
     });
     await financeDb.transaction(
       "rw",
@@ -46,7 +48,8 @@ export const walletRepository: WalletRepository = {
         financeDb.wallets,
         financeDb.transactions,
         financeDb.recurringTransactions,
-        financeDb.savingsGoals
+        financeDb.savingsGoals,
+        financeDb.walletTransfers
       ],
       async () => {
         await financeDb.wallets.put(next);
@@ -57,6 +60,10 @@ export const walletRepository: WalletRepository = {
             .equals(id)
             .toArray();
           const savingsGoals = await financeDb.savingsGoals.where("walletId").equals(id).toArray();
+          const [outgoingTransfers, incomingTransfers] = await Promise.all([
+            financeDb.walletTransfers.where("fromWalletId").equals(id).toArray(),
+            financeDb.walletTransfers.where("toWalletId").equals(id).toArray()
+          ]);
           await Promise.all([
             ...transactions.map((transaction) =>
               financeDb.transactions.put({
@@ -78,6 +85,22 @@ export const walletRepository: WalletRepository = {
               financeDb.savingsGoals.put({
                 ...goal,
                 currency: next.currency,
+                updatedAt: next.updatedAt,
+                syncStatus: "pending"
+              })
+            ),
+            ...outgoingTransfers.map((transfer) =>
+              financeDb.walletTransfers.put({
+                ...transfer,
+                fromCurrency: next.currency,
+                updatedAt: next.updatedAt,
+                syncStatus: "pending"
+              })
+            ),
+            ...incomingTransfers.map((transfer) =>
+              financeDb.walletTransfers.put({
+                ...transfer,
+                toCurrency: next.currency,
                 updatedAt: next.updatedAt,
                 syncStatus: "pending"
               })

@@ -6,6 +6,7 @@ import type {
   Settings,
   Transaction,
   Wallet,
+  WalletTransfer,
   WalletView
 } from "@myfinances/types";
 import { BarChart3, PlusCircle } from "lucide-react";
@@ -30,6 +31,7 @@ interface DashboardViewProps {
   wallets: Wallet[];
   categories: Category[];
   transactions: Transaction[];
+  transfers: WalletTransfer[];
   budgets: MonthlyBudget[];
   settings: Settings;
   activeWalletId: WalletView;
@@ -46,6 +48,7 @@ export function DashboardView({
   wallets,
   categories,
   transactions,
+  transfers,
   budgets,
   settings,
   activeWalletId,
@@ -100,7 +103,74 @@ export function DashboardView({
       conversionMissing: convertedAmountMinor === null && transaction.currency.toUpperCase() !== displayCurrency
     };
   });
-  const hasMissingRates = displayTransactions.some((transaction) => transaction.conversionMissing);
+  const visibleWallets =
+    activeWalletId === "all"
+      ? wallets
+      : wallets.filter((wallet) => wallet.id === activeWalletId);
+  const rawBalanceAdjustments: Array<{
+    amountMinor: number;
+    currency: string;
+    direction: -1 | 1;
+  }> = [
+    ...visibleWallets
+      .filter((wallet) => !wallet.deletedAt && wallet.initialBalanceMinor !== 0)
+      .map((wallet) => ({
+        amountMinor: wallet.initialBalanceMinor,
+        currency: wallet.currency,
+        direction: 1 as const
+      })),
+    ...transfers
+      .filter(
+        (transfer) =>
+          !transfer.deletedAt &&
+          (activeWalletId === "all" ||
+            transfer.fromWalletId === activeWalletId ||
+            transfer.toWalletId === activeWalletId)
+      )
+      .flatMap((transfer): Array<{
+        amountMinor: number;
+        currency: string;
+        direction: -1 | 1;
+      }> => {
+        const adjustments: Array<{
+          amountMinor: number;
+          currency: string;
+          direction: -1 | 1;
+        }> = [];
+        if (activeWalletId === "all" || transfer.fromWalletId === activeWalletId) {
+          adjustments.push({
+            amountMinor: transfer.fromAmountMinor,
+            currency: transfer.fromCurrency,
+            direction: -1 as const
+          });
+        }
+        if (activeWalletId === "all" || transfer.toWalletId === activeWalletId) {
+          adjustments.push({
+            amountMinor: transfer.toAmountMinor,
+            currency: transfer.toCurrency,
+            direction: 1 as const
+          });
+        }
+        return adjustments;
+      })
+  ];
+  const normalizedBalanceAdjustments = rawBalanceAdjustments.map((adjustment) => {
+    const convertedAmountMinor = convertMinorToBaseCurrency(
+      adjustment.amountMinor,
+      adjustment.currency,
+      displayCurrency,
+      exchangeRates
+    );
+    return {
+      ...adjustment,
+      convertedAmountMinor,
+      conversionMissing:
+        convertedAmountMinor === null && adjustment.currency.toUpperCase() !== displayCurrency
+    };
+  });
+  const hasMissingRates =
+    displayTransactions.some((transaction) => transaction.conversionMissing) ||
+    normalizedBalanceAdjustments.some((adjustment) => adjustment.conversionMissing);
   const totals = displayTransactions.reduce(
     (result, item) => {
       if (item.conversionMissing) {
@@ -117,11 +187,20 @@ export function DashboardView({
     },
     { incomeMinor: 0, expenseMinor: 0, balanceMinor: 0 }
   );
+  normalizedBalanceAdjustments.forEach((adjustment) => {
+    if (!adjustment.conversionMissing && adjustment.convertedAmountMinor !== null) {
+      totals.balanceMinor += adjustment.direction * adjustment.convertedAmountMinor;
+    }
+  });
   const recentTransactions = displayTransactions.slice(0, 4);
   const greeting = getTimeGreeting(new Date(), settings.timeZone, t);
-  const hasCurrencyConversion = displayTransactions.some(
-    (item) => item.transaction.currency.toUpperCase() !== displayCurrency
-  );
+  const hasCurrencyConversion =
+    displayTransactions.some(
+      (item) => item.transaction.currency.toUpperCase() !== displayCurrency
+    ) ||
+    normalizedBalanceAdjustments.some(
+      (item) => item.currency.toUpperCase() !== displayCurrency
+    );
   const buildCategoryTotals = (type: "expense" | "income"): AnalyticsCategoryItem[] =>
     categories
       .filter((category) => category.type === type)

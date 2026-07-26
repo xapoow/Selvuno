@@ -1,7 +1,14 @@
 import { useState } from "react";
-import type { Settings, Transaction, Wallet, WalletInput, WalletView } from "@myfinances/types";
+import type {
+  Settings,
+  Transaction,
+  Wallet,
+  WalletInput,
+  WalletTransfer,
+  WalletView
+} from "@myfinances/types";
 import { Edit3, Plus, WalletCards } from "lucide-react";
-import { calculateTransactionTotals, formatMoney } from "@myfinances/utils";
+import { calculateWalletTotals, formatMoney } from "@myfinances/utils";
 import { WalletForm } from "../components/WalletForm";
 import { BottomSheet } from "../components/ui/BottomSheet";
 import { Button } from "../components/ui/Button";
@@ -11,6 +18,7 @@ import type { Dictionary } from "../i18n";
 interface WalletsViewProps {
   wallets: Wallet[];
   transactions: Transaction[];
+  transfers: WalletTransfer[];
   settings: Settings;
   t: Dictionary;
   activeWalletId?: WalletView;
@@ -23,6 +31,7 @@ interface WalletsViewProps {
 export function WalletsView({
   wallets,
   transactions,
+  transfers,
   settings,
   t,
   activeWalletId = "all",
@@ -54,7 +63,7 @@ export function WalletsView({
       {visibleWallets.length ? (
         <div className="grid gap-2">
           {visibleWallets.map((wallet) => {
-            const totals = calculateTransactionTotals(transactions, wallet.id);
+            const totals = calculateWalletTotals(wallet, transactions, transfers);
             return (
               <article key={wallet.id} className="app-surface grid gap-3 rounded-app p-4">
                 <div className="flex items-start justify-between gap-3">

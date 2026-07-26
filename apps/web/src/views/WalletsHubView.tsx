@@ -7,19 +7,23 @@ import type {
   Settings,
   Transaction,
   Wallet,
-  WalletInput
+  WalletInput,
+  WalletTransfer,
+  WalletTransferInput
 } from "@myfinances/types";
 import { MobileWalletsPager } from "../components/MobileWalletsPager";
 import { SegmentedControl } from "../components/ui/SegmentedControl";
 import type { Dictionary } from "../i18n";
 import { SavingsGoalsView } from "./SavingsGoalsView";
 import { WalletsView } from "./WalletsView";
+import { WalletTransfersView } from "./WalletTransfersView";
 
 interface WalletsHubViewProps {
   wallets: Wallet[];
   transactions: Transaction[];
   goals: SavingsGoal[];
   contributions: SavingsGoalContribution[];
+  transfers: WalletTransfer[];
   settings: Settings;
   t: Dictionary;
   onCreateWallet: (input: WalletInput) => Promise<void>;
@@ -30,6 +34,8 @@ interface WalletsHubViewProps {
   onDeleteGoal: (id: string) => Promise<void>;
   onContribute: (input: SavingsGoalContributionInput) => Promise<void>;
   onDeleteContribution: (id: string) => Promise<void>;
+  onCreateTransfer: (input: WalletTransferInput) => Promise<void>;
+  onDeleteTransfer: (id: string) => Promise<void>;
 }
 
 export function WalletsHubView({
@@ -37,6 +43,7 @@ export function WalletsHubView({
   transactions,
   goals,
   contributions,
+  transfers,
   settings,
   t,
   onCreateWallet,
@@ -46,9 +53,11 @@ export function WalletsHubView({
   onUpdateGoal,
   onDeleteGoal,
   onContribute,
-  onDeleteContribution
+  onDeleteContribution,
+  onCreateTransfer,
+  onDeleteTransfer
 }: WalletsHubViewProps) {
-  const [mode, setMode] = useState<"wallets" | "goals">("wallets");
+  const [mode, setMode] = useState<"wallets" | "transfers" | "goals">("wallets");
 
   return (
     <div className="grid gap-5">
@@ -58,6 +67,7 @@ export function WalletsHubView({
           onChange={setMode}
           options={[
             { value: "wallets", label: t.goals.tabWallets },
+            { value: "transfers", label: t.wallets.transfers },
             { value: "goals", label: t.goals.tabGoals }
           ]}
         />
@@ -69,6 +79,7 @@ export function WalletsHubView({
             <MobileWalletsPager
               wallets={wallets}
               transactions={transactions}
+              transfers={transfers}
               settings={settings}
               t={t}
               onCreate={onCreateWallet}
@@ -80,6 +91,7 @@ export function WalletsHubView({
             <WalletsView
               wallets={wallets}
               transactions={transactions}
+              transfers={transfers}
               settings={settings}
               t={t}
               onCreate={onCreateWallet}
@@ -88,6 +100,15 @@ export function WalletsHubView({
             />
           </div>
         </>
+      ) : mode === "transfers" ? (
+        <WalletTransfersView
+          wallets={wallets}
+          transfers={transfers}
+          settings={settings}
+          t={t}
+          onCreate={onCreateTransfer}
+          onDelete={onDeleteTransfer}
+        />
       ) : (
         <SavingsGoalsView
           wallets={wallets}

@@ -1,9 +1,15 @@
-import type { Transaction, WalletView } from "@myfinances/types";
+import type { Transaction, Wallet, WalletTransfer, WalletView } from "@myfinances/types";
 
 export interface TransactionTotals {
   incomeMinor: number;
   expenseMinor: number;
   balanceMinor: number;
+}
+
+export interface WalletTotals extends TransactionTotals {
+  initialBalanceMinor: number;
+  transferInMinor: number;
+  transferOutMinor: number;
 }
 
 export function filterTransactionsByWallet(
@@ -34,4 +40,38 @@ export function calculateTransactionTotals(
       },
       { incomeMinor: 0, expenseMinor: 0, balanceMinor: 0 }
     );
+}
+
+export function calculateWalletTotals(
+  wallet: Wallet,
+  transactions: Transaction[],
+  transfers: WalletTransfer[]
+): WalletTotals {
+  const transactionTotals = calculateTransactionTotals(transactions, wallet.id);
+  const transferTotals = transfers
+    .filter((transfer) => !transfer.deletedAt)
+    .reduce(
+      (totals, transfer) => {
+        if (transfer.fromWalletId === wallet.id) {
+          totals.transferOutMinor += transfer.fromAmountMinor;
+        }
+        if (transfer.toWalletId === wallet.id) {
+          totals.transferInMinor += transfer.toAmountMinor;
+        }
+        return totals;
+      },
+      { transferInMinor: 0, transferOutMinor: 0 }
+    );
+  const initialBalanceMinor = wallet.initialBalanceMinor ?? 0;
+
+  return {
+    ...transactionTotals,
+    ...transferTotals,
+    initialBalanceMinor,
+    balanceMinor:
+      initialBalanceMinor +
+      transactionTotals.balanceMinor +
+      transferTotals.transferInMinor -
+      transferTotals.transferOutMinor
+  };
 }
