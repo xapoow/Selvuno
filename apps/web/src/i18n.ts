@@ -158,6 +158,32 @@ export interface Dictionary {
     update: string;
     saveError: string;
   };
+  recurring: {
+    tabSingle: string;
+    tabRecurring: string;
+    title: string;
+    description: string;
+    add: string;
+    newTitle: string;
+    editTitle: string;
+    frequency: string;
+    firstDate: string;
+    nextRun: string;
+    daily: string;
+    weekly: string;
+    monthly: string;
+    yearly: string;
+    create: string;
+    update: string;
+    pause: string;
+    resume: string;
+    paused: string;
+    empty: string;
+    confirmDelete: string;
+    chooseCategory: string;
+    saveError: string;
+    openAppHint: string;
+  };
   cookieNotice: {
     title: string;
     body: string;
@@ -387,6 +413,32 @@ export const dictionaries: Record<Language, Dictionary> = {
       save: "Save transaction",
       update: "Update transaction",
       saveError: "Unable to save transaction."
+    },
+    recurring: {
+      tabSingle: "One-time",
+      tabRecurring: "Recurring",
+      title: "Recurring transactions",
+      description: "Salary, subscriptions, and regular bills will be added when the app opens.",
+      add: "Add schedule",
+      newTitle: "New recurring transaction",
+      editTitle: "Edit recurring transaction",
+      frequency: "Repeats",
+      firstDate: "First occurrence",
+      nextRun: "Next",
+      daily: "Every day",
+      weekly: "Every week",
+      monthly: "Every month",
+      yearly: "Every year",
+      create: "Create schedule",
+      update: "Update schedule",
+      pause: "Pause",
+      resume: "Resume",
+      paused: "Paused",
+      empty: "No recurring transactions for this wallet yet.",
+      confirmDelete: "Delete this recurring transaction?",
+      chooseCategory: "Choose a category.",
+      saveError: "Unable to save recurring transaction.",
+      openAppHint: "Due operations are created automatically when MyFinances opens."
     },
     history: {
       title: "History",
@@ -683,6 +735,32 @@ export const dictionaries: Record<Language, Dictionary> = {
       save: "Сохранить операцию",
       update: "Обновить операцию",
       saveError: "Не удалось сохранить операцию."
+    },
+    recurring: {
+      tabSingle: "Разовая",
+      tabRecurring: "Регулярные",
+      title: "Регулярные операции",
+      description: "Зарплата, подписки и постоянные платежи будут добавляться при открытии приложения.",
+      add: "Добавить расписание",
+      newTitle: "Новая регулярная операция",
+      editTitle: "Редактировать регулярную операцию",
+      frequency: "Повтор",
+      firstDate: "Первое списание",
+      nextRun: "Следующая",
+      daily: "Каждый день",
+      weekly: "Каждую неделю",
+      monthly: "Каждый месяц",
+      yearly: "Каждый год",
+      create: "Создать расписание",
+      update: "Обновить расписание",
+      pause: "Приостановить",
+      resume: "Продолжить",
+      paused: "Приостановлено",
+      empty: "Для этого кошелька регулярных операций пока нет.",
+      confirmDelete: "Удалить эту регулярную операцию?",
+      chooseCategory: "Выбери категорию.",
+      saveError: "Не удалось сохранить регулярную операцию.",
+      openAppHint: "Наступившие операции создаются автоматически при открытии MyFinances."
     },
     history: {
       title: "История",

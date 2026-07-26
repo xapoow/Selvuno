@@ -40,22 +40,37 @@ export const walletRepository: WalletRepository = {
       name: next.name,
       currency: next.currency
     });
-    await financeDb.transaction("rw", financeDb.wallets, financeDb.transactions, async () => {
+    await financeDb.transaction(
+      "rw",
+      [financeDb.wallets, financeDb.transactions, financeDb.recurringTransactions],
+      async () => {
       await financeDb.wallets.put(next);
       if (next.currency !== current.currency) {
         const transactions = await financeDb.transactions.where("walletId").equals(id).toArray();
+        const recurringTransactions = await financeDb.recurringTransactions.where("walletId").equals(id).toArray();
         await Promise.all(
-          transactions.map((transaction) =>
-            financeDb.transactions.put({
-              ...transaction,
-              currency: next.currency,
-              updatedAt: next.updatedAt,
-              syncStatus: "pending"
-            })
-          )
+          [
+            ...transactions.map((transaction) =>
+              financeDb.transactions.put({
+                ...transaction,
+                currency: next.currency,
+                updatedAt: next.updatedAt,
+                syncStatus: "pending"
+              })
+            ),
+            ...recurringTransactions.map((schedule) =>
+              financeDb.recurringTransactions.put({
+                ...schedule,
+                currency: next.currency,
+                updatedAt: next.updatedAt,
+                syncStatus: "pending"
+              })
+            )
+          ]
         );
       }
-    });
+      }
+    );
     return next;
   },
 
@@ -65,12 +80,29 @@ export const walletRepository: WalletRepository = {
       return;
     }
     const now = nowIso();
-    await financeDb.wallets.put({
-      ...current,
-      archivedAt: now,
-      updatedAt: now,
-      syncStatus: "pending"
-    });
+    await financeDb.transaction(
+      "rw",
+      [financeDb.wallets, financeDb.recurringTransactions],
+      async () => {
+        await financeDb.wallets.put({
+          ...current,
+          archivedAt: now,
+          updatedAt: now,
+          syncStatus: "pending"
+        });
+        const recurringTransactions = await financeDb.recurringTransactions.where("walletId").equals(id).toArray();
+        await Promise.all(
+          recurringTransactions.map((schedule) =>
+            financeDb.recurringTransactions.put({
+              ...schedule,
+              paused: true,
+              updatedAt: now,
+              syncStatus: "pending"
+            })
+          )
+        );
+      }
+    );
   },
 
   async listWallets(options) {
