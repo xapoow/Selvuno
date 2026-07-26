@@ -42,14 +42,22 @@ export const walletRepository: WalletRepository = {
     });
     await financeDb.transaction(
       "rw",
-      [financeDb.wallets, financeDb.transactions, financeDb.recurringTransactions],
+      [
+        financeDb.wallets,
+        financeDb.transactions,
+        financeDb.recurringTransactions,
+        financeDb.savingsGoals
+      ],
       async () => {
-      await financeDb.wallets.put(next);
-      if (next.currency !== current.currency) {
-        const transactions = await financeDb.transactions.where("walletId").equals(id).toArray();
-        const recurringTransactions = await financeDb.recurringTransactions.where("walletId").equals(id).toArray();
-        await Promise.all(
-          [
+        await financeDb.wallets.put(next);
+        if (next.currency !== current.currency) {
+          const transactions = await financeDb.transactions.where("walletId").equals(id).toArray();
+          const recurringTransactions = await financeDb.recurringTransactions
+            .where("walletId")
+            .equals(id)
+            .toArray();
+          const savingsGoals = await financeDb.savingsGoals.where("walletId").equals(id).toArray();
+          await Promise.all([
             ...transactions.map((transaction) =>
               financeDb.transactions.put({
                 ...transaction,
@@ -65,10 +73,17 @@ export const walletRepository: WalletRepository = {
                 updatedAt: next.updatedAt,
                 syncStatus: "pending"
               })
+            ),
+            ...savingsGoals.map((goal) =>
+              financeDb.savingsGoals.put({
+                ...goal,
+                currency: next.currency,
+                updatedAt: next.updatedAt,
+                syncStatus: "pending"
+              })
             )
-          ]
-        );
-      }
+          ]);
+        }
       }
     );
     return next;

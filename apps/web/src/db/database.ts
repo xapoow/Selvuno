@@ -3,6 +3,8 @@ import type {
   Category,
   MonthlyBudget,
   RecurringTransaction,
+  SavingsGoal,
+  SavingsGoalContribution,
   Settings,
   Transaction,
   Wallet
@@ -18,6 +20,8 @@ export class FinanceDatabase extends Dexie {
   settings!: Table<Settings, string>;
   budgets!: Table<MonthlyBudget, string>;
   recurringTransactions!: Table<RecurringTransaction, string>;
+  savingsGoals!: Table<SavingsGoal, string>;
+  savingsGoalContributions!: Table<SavingsGoalContribution, string>;
 
   constructor(name = "myfinances") {
     super(name);
@@ -43,6 +47,18 @@ export class FinanceDatabase extends Dexie {
       budgets: "id, month, categoryId, [categoryId+month], deletedAt, updatedAt",
       recurringTransactions:
         "id, walletId, categoryId, type, frequency, nextRunDate, paused, deletedAt, updatedAt"
+    });
+    this.version(4).stores({
+      wallets: "id, name, currency, archivedAt, deletedAt, updatedAt",
+      categories: "id, name, type, deletedAt, updatedAt",
+      transactions:
+        "id, walletId, categoryId, type, transactionDate, recurringTransactionId, &[recurringTransactionId+recurrenceDate], deletedAt, updatedAt",
+      settings: "id",
+      budgets: "id, month, categoryId, [categoryId+month], deletedAt, updatedAt",
+      recurringTransactions:
+        "id, walletId, categoryId, type, frequency, nextRunDate, paused, deletedAt, updatedAt",
+      savingsGoals: "id, walletId, targetDate, deletedAt, updatedAt",
+      savingsGoalContributions: "id, goalId, contributionDate, deletedAt, updatedAt"
     });
   }
 }

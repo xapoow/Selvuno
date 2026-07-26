@@ -5,5 +5,7 @@ export const queryKeys = {
   categories: ["categories"] as const,
   transactions: ["transactions"] as const,
   budgets: ["budgets"] as const,
-  recurringTransactions: ["recurring-transactions"] as const
+  recurringTransactions: ["recurring-transactions"] as const,
+  savingsGoals: ["savings-goals"] as const,
+  savingsGoalContributions: ["savings-goal-contributions"] as const
 };
