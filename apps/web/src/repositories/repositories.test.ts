@@ -4,6 +4,7 @@ import { backupRepository } from "./backupRepository";
 import { budgetRepository } from "./budgetRepository";
 import { categoryRepository } from "./categoryRepository";
 import { recurringTransactionRepository } from "./recurringTransactionRepository";
+import { savingsGoalRepository } from "./savingsGoalRepository";
 import { settingsRepository } from "./settingsRepository";
 import { transactionRepository } from "./transactionRepository";
 import { walletRepository } from "./walletRepository";
@@ -218,6 +219,42 @@ describe("finance repositories", () => {
     expect(await transactionRepository.listTransactions()).toHaveLength(0);
   });
 
+  it("tracks savings goal contributions and removes them with the goal", async () => {
+    await seedLocalData();
+    const [wallet] = await walletRepository.listWallets();
+    const goal = await savingsGoalRepository.createGoal({
+      walletId: wallet.id,
+      name: "Emergency fund",
+      targetAmountMinor: 100000,
+      currency: wallet.currency,
+      targetDate: "2026-12-31",
+      color: "#207a6f"
+    });
+    const first = await savingsGoalRepository.addContribution({
+      goalId: goal.id,
+      amountMinor: 15000,
+      contributionDate: "2026-07-25T12:00:00.000Z",
+      note: "First step"
+    });
+    await savingsGoalRepository.addContribution({
+      goalId: goal.id,
+      amountMinor: 5000,
+      contributionDate: "2026-07-26T12:00:00.000Z"
+    });
+
+    expect(await savingsGoalRepository.listGoals()).toMatchObject([
+      { id: goal.id, name: "Emergency fund", targetAmountMinor: 100000 }
+    ]);
+    expect(await savingsGoalRepository.listContributions()).toHaveLength(2);
+
+    await savingsGoalRepository.deleteContribution(first.id);
+    expect(await savingsGoalRepository.listContributions()).toHaveLength(1);
+
+    await savingsGoalRepository.deleteGoal(goal.id);
+    expect(await savingsGoalRepository.listGoals()).toHaveLength(0);
+    expect(await savingsGoalRepository.listContributions()).toHaveLength(0);
+  });
+
   it("creates, updates, and clears monthly category budgets", async () => {
     await seedLocalData();
     const [category] = await categoryRepository.listCategories("expense");
@@ -268,6 +305,18 @@ describe("finance repositories", () => {
       frequency: "monthly",
       startDate: "2026-08-01"
     });
+    const goal = await savingsGoalRepository.createGoal({
+      walletId: wallet.id,
+      name: "New laptop",
+      targetAmountMinor: 250000,
+      currency: wallet.currency,
+      color: "#3f73c9"
+    });
+    await savingsGoalRepository.addContribution({
+      goalId: goal.id,
+      amountMinor: 25000,
+      contributionDate: "2026-07-26T12:00:00.000Z"
+    });
     const backup = await backupRepository.exportBackup();
 
     await resetDatabaseForTests();
@@ -279,7 +328,25 @@ describe("finance repositories", () => {
     expect(restored.budgets).toHaveLength(backup.budgets.length);
     expect(restored.budgets).toHaveLength(1);
     expect(restored.recurringTransactions).toHaveLength(1);
+    expect(restored.savingsGoals).toHaveLength(1);
+    expect(restored.savingsGoalContributions).toHaveLength(1);
     expect(restored.settings).toMatchObject({ id: "default" });
+  });
+
+  it("restores legacy version 3 backups without savings goals", async () => {
+    await seedLocalData();
+    const backup = await backupRepository.exportBackup();
+    const {
+      savingsGoals: _savingsGoals,
+      savingsGoalContributions: _savingsGoalContributions,
+      ...legacyBackup
+    } = backup;
+
+    await resetDatabaseForTests();
+    await backupRepository.importBackup({ ...legacyBackup, version: 3 });
+
+    expect(await savingsGoalRepository.listGoals()).toHaveLength(0);
+    expect(await savingsGoalRepository.listContributions()).toHaveLength(0);
   });
 
   it("restores legacy version 2 backups without recurring transactions", async () => {

@@ -229,6 +229,42 @@ export interface Dictionary {
     saveError: string;
     swipeHint: string;
   };
+  goals: {
+    tabWallets: string;
+    tabGoals: string;
+    title: string;
+    description: string;
+    add: string;
+    empty: string;
+    newTitle: string;
+    editTitle: string;
+    name: string;
+    namePlaceholder: string;
+    targetAmount: string;
+    targetDate: string;
+    noDeadline: string;
+    addDeadline: string;
+    removeDeadline: string;
+    saved: string;
+    remaining: string;
+    completed: string;
+    create: string;
+    update: string;
+    contribute: string;
+    contributionTitle: string;
+    contributionAmount: string;
+    contributionDate: string;
+    contributionNote: string;
+    addContribution: string;
+    history: string;
+    noContributions: string;
+    confirmDelete: string;
+    confirmDeleteContribution: string;
+    saveError: string;
+    contributionError: string;
+    walletMissing: string;
+    overdue: string;
+  };
   categories: {
     title: string;
     icon: string;
@@ -486,6 +522,42 @@ export const dictionaries: Record<Language, Dictionary> = {
       update: "Update wallet",
       saveError: "Unable to save wallet.",
       swipeHint: "Swipe this card to switch wallets"
+    },
+    goals: {
+      tabWallets: "Wallets",
+      tabGoals: "Goals",
+      title: "Savings goals",
+      description: "Set money aside without mixing it with income and expenses.",
+      add: "Add goal",
+      empty: "Create your first goal and start moving toward it.",
+      newTitle: "New savings goal",
+      editTitle: "Edit savings goal",
+      name: "Goal name",
+      namePlaceholder: "Emergency fund, trip, new laptop",
+      targetAmount: "Target amount",
+      targetDate: "Target date",
+      noDeadline: "No deadline",
+      addDeadline: "Add deadline",
+      removeDeadline: "Remove deadline",
+      saved: "Saved",
+      remaining: "Remaining",
+      completed: "Goal reached",
+      create: "Create goal",
+      update: "Update goal",
+      contribute: "Add money",
+      contributionTitle: "Add to goal",
+      contributionAmount: "Amount",
+      contributionDate: "Date",
+      contributionNote: "Note",
+      addContribution: "Save contribution",
+      history: "Contribution history",
+      noContributions: "No contributions yet.",
+      confirmDelete: "Delete this goal and its contribution history?",
+      confirmDeleteContribution: "Delete this contribution?",
+      saveError: "Unable to save the goal.",
+      contributionError: "Unable to save the contribution.",
+      walletMissing: "Wallet unavailable",
+      overdue: "Deadline passed"
     },
     cookieNotice: {
       title: "Your privacy",
@@ -815,6 +887,42 @@ export const dictionaries: Record<Language, Dictionary> = {
       update: "Обновить кошелек",
       saveError: "Не удалось сохранить кошелек.",
       swipeHint: "Свайпни карточку, чтобы сменить кошелек"
+    },
+    goals: {
+      tabWallets: "Кошельки",
+      tabGoals: "Цели",
+      title: "Цели накоплений",
+      description: "Откладывай деньги отдельно от доходов и расходов.",
+      add: "Добавить цель",
+      empty: "Создай первую цель и начни двигаться к ней.",
+      newTitle: "Новая цель",
+      editTitle: "Редактировать цель",
+      name: "Название цели",
+      namePlaceholder: "Подушка, поездка, новый ноутбук",
+      targetAmount: "Нужно накопить",
+      targetDate: "Срок",
+      noDeadline: "Без срока",
+      addDeadline: "Добавить срок",
+      removeDeadline: "Убрать срок",
+      saved: "Накоплено",
+      remaining: "Осталось",
+      completed: "Цель достигнута",
+      create: "Создать цель",
+      update: "Обновить цель",
+      contribute: "Пополнить",
+      contributionTitle: "Пополнение цели",
+      contributionAmount: "Сумма",
+      contributionDate: "Дата",
+      contributionNote: "Заметка",
+      addContribution: "Сохранить пополнение",
+      history: "История пополнений",
+      noContributions: "Пополнений пока нет.",
+      confirmDelete: "Удалить цель вместе с историей пополнений?",
+      confirmDeleteContribution: "Удалить это пополнение?",
+      saveError: "Не удалось сохранить цель.",
+      contributionError: "Не удалось сохранить пополнение.",
+      walletMissing: "Кошелек недоступен",
+      overdue: "Срок прошёл"
     },
     cookieNotice: {
       title: "О приватности",

@@ -6,7 +6,6 @@ import { CookieNotice } from "./components/CookieNotice";
 import { HeaderNavigation } from "./components/HeaderNavigation";
 import { MobileWalletDashboardPager } from "./components/MobileWalletDashboardPager";
 import { MobileWalletHistoryPager } from "./components/MobileWalletHistoryPager";
-import { MobileWalletsPager } from "./components/MobileWalletsPager";
 import { WalletSwitcher } from "./components/WalletSwitcher";
 import { ErrorScreen } from "./components/ErrorScreen";
 import { getDictionary } from "./i18n";
@@ -19,7 +18,7 @@ import { DashboardView } from "./views/DashboardView";
 import { HistoryView } from "./views/HistoryView";
 import { OnboardingView } from "./views/OnboardingView";
 import { SettingsView } from "./views/SettingsView";
-import { WalletsView } from "./views/WalletsView";
+import { WalletsHubView } from "./views/WalletsHubView";
 
 export function App() {
   const activeView = useAppStore((state) => state.activeView);
@@ -34,6 +33,8 @@ export function App() {
   const transactions = data.transactions.data ?? [];
   const budgets = data.budgets.data ?? [];
   const recurringTransactions = data.recurringTransactions.data ?? [];
+  const savingsGoals = data.savingsGoals.data ?? [];
+  const savingsGoalContributions = data.savingsGoalContributions.data ?? [];
   const isLoading =
     data.bootstrap.isLoading ||
     data.settings.isLoading ||
@@ -41,7 +42,9 @@ export function App() {
     data.categories.isLoading ||
     data.transactions.isLoading ||
     data.budgets.isLoading ||
-    data.recurringTransactions.isLoading;
+    data.recurringTransactions.isLoading ||
+    data.savingsGoals.isLoading ||
+    data.savingsGoalContributions.isLoading;
   const isError =
     data.bootstrap.isError ||
     data.settings.isError ||
@@ -49,7 +52,9 @@ export function App() {
     data.categories.isError ||
     data.transactions.isError ||
     data.budgets.isError ||
-    data.recurringTransactions.isError;
+    data.recurringTransactions.isError ||
+    data.savingsGoals.isError ||
+    data.savingsGoalContributions.isError;
   const fallbackT = getDictionary(settings?.locale ?? (typeof navigator === "undefined" ? "en-US" : navigator.language));
 
   useEffect(() => {
@@ -104,7 +109,11 @@ export function App() {
           data.categories.error instanceof Error ? data.categories.error.message : null,
           data.transactions.error instanceof Error ? data.transactions.error.message : null,
           data.budgets.error instanceof Error ? data.budgets.error.message : null,
-          data.recurringTransactions.error instanceof Error ? data.recurringTransactions.error.message : null
+          data.recurringTransactions.error instanceof Error ? data.recurringTransactions.error.message : null,
+          data.savingsGoals.error instanceof Error ? data.savingsGoals.error.message : null,
+          data.savingsGoalContributions.error instanceof Error
+            ? data.savingsGoalContributions.error.message
+            : null
         ]
           .filter(Boolean)
           .join("\n")}
@@ -288,38 +297,34 @@ export function App() {
             </>
           ) : null}
           {activeView === "wallets" ? (
-            <>
-              <div className="md:hidden">
-                <MobileWalletsPager
-                  wallets={wallets}
-                  transactions={transactions}
-                  settings={settings}
-                  t={t}
-                  onCreate={async (input) => {
-                    await mutations.createWallet.mutateAsync(input);
-                  }}
-                  onUpdate={async (id, input) => {
-                    await mutations.updateWallet.mutateAsync({ id, input });
-                  }}
-                  onArchive={(id) => mutations.archiveWallet.mutateAsync(id)}
-                />
-              </div>
-              <div className="hidden md:block">
-                <WalletsView
-                  wallets={wallets}
-                  transactions={transactions}
-                  settings={settings}
-                  t={t}
-                  onCreate={async (input) => {
-                    await mutations.createWallet.mutateAsync(input);
-                  }}
-                  onUpdate={async (id, input) => {
-                    await mutations.updateWallet.mutateAsync({ id, input });
-                  }}
-                  onArchive={(id) => mutations.archiveWallet.mutateAsync(id)}
-                />
-              </div>
-            </>
+            <WalletsHubView
+              wallets={wallets}
+              transactions={transactions}
+              goals={savingsGoals}
+              contributions={savingsGoalContributions}
+              settings={settings}
+              t={t}
+              onCreateWallet={async (input) => {
+                await mutations.createWallet.mutateAsync(input);
+              }}
+              onUpdateWallet={async (id, input) => {
+                await mutations.updateWallet.mutateAsync({ id, input });
+              }}
+              onArchiveWallet={(id) => mutations.archiveWallet.mutateAsync(id)}
+              onCreateGoal={async (input) => {
+                await mutations.createSavingsGoal.mutateAsync(input);
+              }}
+              onUpdateGoal={async (id, input) => {
+                await mutations.updateSavingsGoal.mutateAsync({ id, input });
+              }}
+              onDeleteGoal={(id) => mutations.deleteSavingsGoal.mutateAsync(id)}
+              onContribute={async (input) => {
+                await mutations.addSavingsGoalContribution.mutateAsync(input);
+              }}
+              onDeleteContribution={(id) =>
+                mutations.deleteSavingsGoalContribution.mutateAsync(id)
+              }
+            />
           ) : null}
           {activeView === "settings" ? (
             <SettingsView
