@@ -1,5 +1,12 @@
 import Dexie, { type Table } from "dexie";
-import type { Category, MonthlyBudget, Settings, Transaction, Wallet } from "@myfinances/types";
+import type {
+  Category,
+  MonthlyBudget,
+  RecurringTransaction,
+  Settings,
+  Transaction,
+  Wallet
+} from "@myfinances/types";
 import { DEFAULT_CURRENCY, detectDefaultLocaleSettings, inferCurrencyFromLocale } from "@myfinances/utils";
 
 const DEFAULT_LOCALE = "ru-RU";
@@ -10,6 +17,7 @@ export class FinanceDatabase extends Dexie {
   transactions!: Table<Transaction, string>;
   settings!: Table<Settings, string>;
   budgets!: Table<MonthlyBudget, string>;
+  recurringTransactions!: Table<RecurringTransaction, string>;
 
   constructor(name = "myfinances") {
     super(name);
@@ -25,6 +33,16 @@ export class FinanceDatabase extends Dexie {
       transactions: "id, walletId, categoryId, type, transactionDate, deletedAt, updatedAt",
       settings: "id",
       budgets: "id, month, categoryId, [categoryId+month], deletedAt, updatedAt"
+    });
+    this.version(3).stores({
+      wallets: "id, name, currency, archivedAt, deletedAt, updatedAt",
+      categories: "id, name, type, deletedAt, updatedAt",
+      transactions:
+        "id, walletId, categoryId, type, transactionDate, recurringTransactionId, &[recurringTransactionId+recurrenceDate], deletedAt, updatedAt",
+      settings: "id",
+      budgets: "id, month, categoryId, [categoryId+month], deletedAt, updatedAt",
+      recurringTransactions:
+        "id, walletId, categoryId, type, frequency, nextRunDate, paused, deletedAt, updatedAt"
     });
   }
 }

@@ -33,18 +33,23 @@ export function App() {
   const categories = data.categories.data ?? [];
   const transactions = data.transactions.data ?? [];
   const budgets = data.budgets.data ?? [];
+  const recurringTransactions = data.recurringTransactions.data ?? [];
   const isLoading =
     data.bootstrap.isLoading ||
     data.settings.isLoading ||
     data.wallets.isLoading ||
     data.categories.isLoading ||
-    data.budgets.isLoading;
+    data.transactions.isLoading ||
+    data.budgets.isLoading ||
+    data.recurringTransactions.isLoading;
   const isError =
     data.bootstrap.isError ||
     data.settings.isError ||
     data.wallets.isError ||
     data.categories.isError ||
-    data.budgets.isError;
+    data.transactions.isError ||
+    data.budgets.isError ||
+    data.recurringTransactions.isError;
   const fallbackT = getDictionary(settings?.locale ?? (typeof navigator === "undefined" ? "en-US" : navigator.language));
 
   useEffect(() => {
@@ -97,7 +102,9 @@ export function App() {
           data.settings.error instanceof Error ? data.settings.error.message : null,
           data.wallets.error instanceof Error ? data.wallets.error.message : null,
           data.categories.error instanceof Error ? data.categories.error.message : null,
-          data.budgets.error instanceof Error ? data.budgets.error.message : null
+          data.transactions.error instanceof Error ? data.transactions.error.message : null,
+          data.budgets.error instanceof Error ? data.budgets.error.message : null,
+          data.recurringTransactions.error instanceof Error ? data.recurringTransactions.error.message : null
         ]
           .filter(Boolean)
           .join("\n")}
@@ -217,10 +224,23 @@ export function App() {
             <AddTransactionView
               wallets={wallets}
               categories={categories}
+              recurringTransactions={recurringTransactions}
               settings={{ ...settings, activeWalletId: addWalletId }}
               t={t}
               onSubmit={async (input) => {
                 await mutations.addTransaction.mutateAsync(input);
+              }}
+              onCreateRecurring={async (input) => {
+                await mutations.createRecurringTransaction.mutateAsync(input);
+              }}
+              onUpdateRecurring={async (id, input) => {
+                await mutations.updateRecurringTransaction.mutateAsync({ id, input });
+              }}
+              onSetRecurringPaused={async (id, paused) => {
+                await mutations.setRecurringTransactionPaused.mutateAsync({ id, paused });
+              }}
+              onDeleteRecurring={async (id) => {
+                await mutations.deleteRecurringTransaction.mutateAsync(id);
               }}
             />
           ) : null}
