@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "categories" | "backup" | "sync";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.1.0";
+export const appVersion = "0.2.0";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -195,6 +195,34 @@ export interface Dictionary {
     title: string;
     body: string;
     accept: string;
+  };
+  notifications: {
+    title: string;
+    open: string;
+    unread: string;
+    markAllRead: string;
+    empty: string;
+    updateTitle: string;
+    updateBody: string;
+    budgetNearTitle: string;
+    budgetNearBody: string;
+    budgetExceededTitle: string;
+    budgetExceededBody: string;
+    recurringTitle: string;
+    recurringBody: string;
+    goalCompletedTitle: string;
+    goalCompletedBody: string;
+    goalDeadlineTitle: string;
+    goalDeadlineBody: string;
+    goalOverdueTitle: string;
+    goalOverdueBody: string;
+  };
+  updates: {
+    title: string;
+    eyebrow: string;
+    intro: string;
+    gotIt: string;
+    notes: string[];
   };
   history: {
     title: string;
@@ -558,6 +586,38 @@ export const dictionaries: Record<Language, Dictionary> = {
       body: "MyFinances stores your settings and finance data only on this device. We do not use advertising cookies.",
       accept: "Got it"
     },
+    notifications: {
+      title: "Notifications",
+      open: "Open notifications",
+      unread: "unread",
+      markAllRead: "Mark all as read",
+      empty: "You are all caught up.",
+      updateTitle: "MyFinances {version} is ready",
+      updateBody: "See the latest improvements in this update.",
+      budgetNearTitle: "Budget is running low",
+      budgetNearBody: "{category}: {percentage}% of the monthly limit has been used.",
+      budgetExceededTitle: "Budget exceeded",
+      budgetExceededBody: "{category}: spending reached {percentage}% of the monthly limit.",
+      recurringTitle: "Recurring operation is coming up",
+      recurringBody: "{category} is scheduled for {date}.",
+      goalCompletedTitle: "Savings goal reached",
+      goalCompletedBody: "You have collected the full amount for “{goal}”.",
+      goalDeadlineTitle: "Savings goal deadline is near",
+      goalDeadlineBody: "“{goal}” is due on {date}.",
+      goalOverdueTitle: "Savings goal is overdue",
+      goalOverdueBody: "The deadline for “{goal}” was {date}."
+    },
+    updates: {
+      title: "What’s new",
+      eyebrow: "Version {version}",
+      intro: "A focused update for planning, saving, and keeping track of what needs attention.",
+      gotIt: "Explore the update",
+      notes: [
+        "Savings goals with progress and contribution history",
+        "Monthly budgets and recurring operations",
+        "A faster transaction flow and a new notification center"
+      ]
+    },
     categories: {
       title: "Categories",
       icon: "Icon",
@@ -915,6 +975,38 @@ export const dictionaries: Record<Language, Dictionary> = {
       title: "О приватности",
       body: "MyFinances хранит настройки и финансовые данные только на этом устройстве. Рекламные cookies не используются.",
       accept: "Понятно"
+    },
+    notifications: {
+      title: "Уведомления",
+      open: "Открыть уведомления",
+      unread: "непрочитанных",
+      markAllRead: "Прочитать все",
+      empty: "Новых уведомлений нет.",
+      updateTitle: "MyFinances {version} уже здесь",
+      updateBody: "Посмотри, что изменилось в новой версии.",
+      budgetNearTitle: "Бюджет подходит к лимиту",
+      budgetNearBody: "{category}: использовано {percentage}% месячного лимита.",
+      budgetExceededTitle: "Бюджет превышен",
+      budgetExceededBody: "{category}: расходы достигли {percentage}% месячного лимита.",
+      recurringTitle: "Скоро регулярная операция",
+      recurringBody: "{category} запланирована на {date}.",
+      goalCompletedTitle: "Цель накоплений достигнута",
+      goalCompletedBody: "Полная сумма для цели «{goal}» уже накоплена.",
+      goalDeadlineTitle: "Приближается срок цели",
+      goalDeadlineBody: "Срок цели «{goal}» — {date}.",
+      goalOverdueTitle: "Срок цели прошёл",
+      goalOverdueBody: "Цель «{goal}» нужно было завершить {date}."
+    },
+    updates: {
+      title: "Что нового",
+      eyebrow: "Версия {version}",
+      intro: "Обновление для удобного планирования, накоплений и контроля важных событий.",
+      gotIt: "Посмотреть обновление",
+      notes: [
+        "Цели накоплений с прогрессом и историей пополнений",
+        "Месячные бюджеты и регулярные операции",
+        "Быстрое добавление операций и новый центр уведомлений"
+      ]
     },
     categories: {
       title: "Категории",
