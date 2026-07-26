@@ -149,11 +149,18 @@ export interface Dictionary {
     addTitle: string;
     editTitle: string;
     amount: string;
+    quickHint: string;
     tags: string;
     tagsPlaceholder: string;
     chooseCategory: string;
     chooseWalletAndCategory: string;
     selectWalletFirst: string;
+    details: string;
+    detailsHint: string;
+    showDetails: string;
+    hideDetails: string;
+    allCategories: string;
+    fewerCategories: string;
     save: string;
     update: string;
     saveError: string;
@@ -399,11 +406,18 @@ export const dictionaries: Record<Language, Dictionary> = {
       addTitle: "Add transaction",
       editTitle: "Edit transaction",
       amount: "Amount",
+      quickHint: "Amount and category are enough — the rest is optional.",
       tags: "Tags",
       tagsPlaceholder: "coffee, travel, work",
       chooseCategory: "Choose a category.",
       chooseWalletAndCategory: "Choose a wallet and category.",
       selectWalletFirst: "Choose a specific wallet above before adding a transaction.",
+      details: "Details",
+      detailsHint: "Date, note, and tags",
+      showDetails: "Show details",
+      hideDetails: "Hide details",
+      allCategories: "All categories",
+      fewerCategories: "Show fewer",
       save: "Save transaction",
       update: "Update transaction",
       saveError: "Unable to save transaction."
@@ -714,11 +728,18 @@ export const dictionaries: Record<Language, Dictionary> = {
       addTitle: "Добавить операцию",
       editTitle: "Редактировать операцию",
       amount: "Сумма",
+      quickHint: "Достаточно суммы и категории — остальное необязательно.",
       tags: "Теги",
       tagsPlaceholder: "кофе, поездка, работа",
       chooseCategory: "Выбери категорию.",
       chooseWalletAndCategory: "Выбери кошелек и категорию.",
       selectWalletFirst: "Выбери конкретный кошелек сверху, чтобы добавить операцию.",
+      details: "Детали",
+      detailsHint: "Дата, заметка и теги",
+      showDetails: "Показать детали",
+      hideDetails: "Скрыть детали",
+      allCategories: "Все категории",
+      fewerCategories: "Свернуть",
       save: "Сохранить операцию",
       update: "Обновить операцию",
       saveError: "Не удалось сохранить операцию."
