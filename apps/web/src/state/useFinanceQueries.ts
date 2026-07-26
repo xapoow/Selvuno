@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   CategoryInput,
+  MonthlyBudgetInput,
   SettingsUpdate,
   TransactionInput,
   WalletInput
 } from "@myfinances/types";
 import { seedLocalData } from "../db/database";
 import { backupRepository } from "../repositories/backupRepository";
+import { budgetRepository } from "../repositories/budgetRepository";
 import { categoryRepository } from "../repositories/categoryRepository";
 import { settingsRepository } from "../repositories/settingsRepository";
 import { transactionRepository } from "../repositories/transactionRepository";
@@ -43,8 +45,13 @@ export function useFinanceData() {
     queryFn: () => transactionRepository.listTransactions({ walletId: "all" }),
     enabled
   });
+  const budgets = useQuery({
+    queryKey: queryKeys.budgets,
+    queryFn: () => budgetRepository.listBudgets(),
+    enabled
+  });
 
-  return { bootstrap, settings, wallets, categories, transactions };
+  return { bootstrap, settings, wallets, categories, transactions, budgets };
 }
 
 function invalidateFinance(queryClient: ReturnType<typeof useQueryClient>) {
@@ -52,7 +59,8 @@ function invalidateFinance(queryClient: ReturnType<typeof useQueryClient>) {
     queryClient.invalidateQueries({ queryKey: queryKeys.settings }),
     queryClient.invalidateQueries({ queryKey: queryKeys.wallets }),
     queryClient.invalidateQueries({ queryKey: queryKeys.categories }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.transactions })
+    queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.budgets })
   ]);
 }
 
@@ -100,6 +108,10 @@ export function useFinanceMutations() {
     }),
     deleteCategory: useMutation({
       mutationFn: (id: string) => categoryRepository.deleteCategory(id),
+      onSuccess: invalidate
+    }),
+    setBudget: useMutation({
+      mutationFn: (input: MonthlyBudgetInput) => budgetRepository.setBudget(input),
       onSuccess: invalidate
     }),
     updateSettings: useMutation({

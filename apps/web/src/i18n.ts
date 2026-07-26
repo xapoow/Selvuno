@@ -124,6 +124,27 @@ export interface Dictionary {
     categoriesBreakdown: string;
     categoryComparison: string;
   };
+  budget: {
+    title: string;
+    monthPlan: string;
+    description: string;
+    configure: string;
+    planned: string;
+    spent: string;
+    remaining: string;
+    categoryLimits: string;
+    limit: string;
+    back: string;
+    save: string;
+    saved: string;
+    saveError: string;
+    previousMonth: string;
+    nextMonth: string;
+    notConfigured: string;
+    noExpenseCategories: string;
+    overBy: string;
+    missingRates: string;
+  };
   transaction: {
     addTitle: string;
     editTitle: string;
@@ -332,6 +353,27 @@ export const dictionaries: Record<Language, Dictionary> = {
       operations: "operations",
       categoriesBreakdown: "Category breakdown",
       categoryComparison: "Your largest categories"
+    },
+    budget: {
+      title: "Budget",
+      monthPlan: "Monthly budget",
+      description: "Set category limits and keep the month under control.",
+      configure: "Plan budget",
+      planned: "Planned",
+      spent: "Spent",
+      remaining: "Remaining",
+      categoryLimits: "Category limits",
+      limit: "Limit",
+      back: "Back to overview",
+      save: "Save budget",
+      saved: "Budget saved",
+      saveError: "Unable to save budget.",
+      previousMonth: "Previous month",
+      nextMonth: "Next month",
+      notConfigured: "No limits are planned for this month yet.",
+      noExpenseCategories: "Create an expense category before planning a budget.",
+      overBy: "Over budget by",
+      missingRates: "Some foreign-currency expenses are not included."
     },
     transaction: {
       addTitle: "Add transaction",
@@ -607,6 +649,27 @@ export const dictionaries: Record<Language, Dictionary> = {
       operations: "операций",
       categoriesBreakdown: "По категориям",
       categoryComparison: "Самые крупные категории"
+    },
+    budget: {
+      title: "Бюджет",
+      monthPlan: "Бюджет месяца",
+      description: "Задай лимиты по категориям и контролируй расходы месяца.",
+      configure: "Запланировать",
+      planned: "Запланировано",
+      spent: "Потрачено",
+      remaining: "Осталось",
+      categoryLimits: "Лимиты категорий",
+      limit: "Лимит",
+      back: "Назад к обзору",
+      save: "Сохранить бюджет",
+      saved: "Бюджет сохранён",
+      saveError: "Не удалось сохранить бюджет.",
+      previousMonth: "Предыдущий месяц",
+      nextMonth: "Следующий месяц",
+      notConfigured: "На этот месяц лимиты пока не запланированы.",
+      noExpenseCategories: "Создай расходную категорию перед планированием бюджета.",
+      overBy: "Превышение на",
+      missingRates: "Некоторые расходы в другой валюте не учтены."
     },
     transaction: {
       addTitle: "Добавить операцию",

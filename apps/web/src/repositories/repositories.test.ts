@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { financeDb, resetDatabaseForTests, seedLocalData } from "../db/database";
 import { backupRepository } from "./backupRepository";
+import { budgetRepository } from "./budgetRepository";
 import { categoryRepository } from "./categoryRepository";
 import { settingsRepository } from "./settingsRepository";
 import { transactionRepository } from "./transactionRepository";
@@ -160,8 +161,46 @@ describe("finance repositories", () => {
     expect(await transactionRepository.listTransactions({ walletId: wallet.id, includeDeleted: true })).toHaveLength(1);
   });
 
+  it("creates, updates, and clears monthly category budgets", async () => {
+    await seedLocalData();
+    const [category] = await categoryRepository.listCategories("expense");
+
+    await budgetRepository.setBudget({
+      categoryId: category.id,
+      month: "2026-07",
+      amountMinor: 50000,
+      currency: "usd"
+    });
+    expect(await budgetRepository.listBudgets("2026-07")).toMatchObject([
+      { categoryId: category.id, amountMinor: 50000, currency: "USD" }
+    ]);
+
+    await budgetRepository.setBudget({
+      categoryId: category.id,
+      month: "2026-07",
+      amountMinor: 65000,
+      currency: "USD"
+    });
+    expect((await budgetRepository.listBudgets("2026-07"))[0].amountMinor).toBe(65000);
+
+    await budgetRepository.setBudget({
+      categoryId: category.id,
+      month: "2026-07",
+      amountMinor: 0,
+      currency: "USD"
+    });
+    expect(await budgetRepository.listBudgets("2026-07")).toHaveLength(0);
+  });
+
   it("exports and restores a JSON backup", async () => {
     await seedLocalData();
+    const [category] = await categoryRepository.listCategories("expense");
+    await budgetRepository.setBudget({
+      categoryId: category.id,
+      month: "2026-07",
+      amountMinor: 42000,
+      currency: "USD"
+    });
     const backup = await backupRepository.exportBackup();
 
     await resetDatabaseForTests();
@@ -170,6 +209,20 @@ describe("finance repositories", () => {
     const restored = await backupRepository.exportBackup();
     expect(restored.wallets).toHaveLength(backup.wallets.length);
     expect(restored.categories).toHaveLength(backup.categories.length);
+    expect(restored.budgets).toHaveLength(backup.budgets.length);
+    expect(restored.budgets).toHaveLength(1);
     expect(restored.settings).toMatchObject({ id: "default" });
+  });
+
+  it("restores legacy version 1 backups without budgets", async () => {
+    await seedLocalData();
+    const backup = await backupRepository.exportBackup();
+    const { budgets: _budgets, ...legacyBackup } = backup;
+
+    await resetDatabaseForTests();
+    await backupRepository.importBackup({ ...legacyBackup, version: 1 });
+
+    expect(await budgetRepository.listBudgets()).toHaveLength(0);
+    expect((await backupRepository.exportBackup()).wallets).toHaveLength(backup.wallets.length);
   });
 });

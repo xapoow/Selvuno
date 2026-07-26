@@ -1,5 +1,5 @@
 import Dexie, { type Table } from "dexie";
-import type { Category, Settings, Transaction, Wallet } from "@myfinances/types";
+import type { Category, MonthlyBudget, Settings, Transaction, Wallet } from "@myfinances/types";
 import { DEFAULT_CURRENCY, detectDefaultLocaleSettings, inferCurrencyFromLocale } from "@myfinances/utils";
 
 const DEFAULT_LOCALE = "ru-RU";
@@ -9,6 +9,7 @@ export class FinanceDatabase extends Dexie {
   categories!: Table<Category, string>;
   transactions!: Table<Transaction, string>;
   settings!: Table<Settings, string>;
+  budgets!: Table<MonthlyBudget, string>;
 
   constructor(name = "myfinances") {
     super(name);
@@ -17,6 +18,13 @@ export class FinanceDatabase extends Dexie {
       categories: "id, name, type, deletedAt, updatedAt",
       transactions: "id, walletId, categoryId, type, transactionDate, deletedAt, updatedAt",
       settings: "id"
+    });
+    this.version(2).stores({
+      wallets: "id, name, currency, archivedAt, deletedAt, updatedAt",
+      categories: "id, name, type, deletedAt, updatedAt",
+      transactions: "id, walletId, categoryId, type, transactionDate, deletedAt, updatedAt",
+      settings: "id",
+      budgets: "id, month, categoryId, [categoryId+month], deletedAt, updatedAt"
     });
   }
 }

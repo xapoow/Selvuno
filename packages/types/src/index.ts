@@ -66,6 +66,25 @@ export const categoryInputSchema = z.object({
 });
 export type CategoryInput = z.infer<typeof categoryInputSchema>;
 
+export const budgetMonthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
+export type BudgetMonth = z.infer<typeof budgetMonthSchema>;
+
+export const monthlyBudgetSchema = baseEntitySchema.extend({
+  categoryId: z.string().uuid(),
+  month: budgetMonthSchema,
+  amountMinor: z.number().int().positive(),
+  currency: z.string().length(3)
+});
+export type MonthlyBudget = z.infer<typeof monthlyBudgetSchema>;
+
+export const monthlyBudgetInputSchema = z.object({
+  categoryId: z.string().uuid(),
+  month: budgetMonthSchema,
+  amountMinor: z.number().int().nonnegative(),
+  currency: z.string().length(3)
+});
+export type MonthlyBudgetInput = z.infer<typeof monthlyBudgetInputSchema>;
+
 export const transactionSchema = baseEntitySchema.extend({
   walletId: z.string().uuid(),
   categoryId: z.string().uuid(),
@@ -121,7 +140,7 @@ export const settingsUpdateSchema = settingsSchema
   .partial();
 export type SettingsUpdate = z.infer<typeof settingsUpdateSchema>;
 
-export const backupSchema = z.object({
+const backupV1Schema = z.object({
   version: z.literal(1),
   exportedAt: z.string().datetime(),
   wallets: z.array(walletSchema),
@@ -129,4 +148,12 @@ export const backupSchema = z.object({
   transactions: z.array(transactionSchema),
   settings: settingsSchema
 });
+
+const backupV2Schema = backupV1Schema.extend({
+  version: z.literal(2),
+  budgets: z.array(monthlyBudgetSchema)
+});
+
+export const backupSchema = z.discriminatedUnion("version", [backupV1Schema, backupV2Schema]);
 export type FinanceBackup = z.infer<typeof backupSchema>;
+export type FinanceBackupV2 = z.infer<typeof backupV2Schema>;
