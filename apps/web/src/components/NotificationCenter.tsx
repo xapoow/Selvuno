@@ -40,6 +40,7 @@ interface NotificationCenterProps {
 
 export function NotificationCenter({ notifications, t }: NotificationCenterProps) {
   const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<AppNotification | null>(null);
   const [readIds, setReadIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -80,7 +81,10 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
         type="button"
         className="app-focus app-surface relative grid h-11 w-11 place-items-center rounded-app text-muted transition-colors hover:text-foreground"
         aria-label={`${t.notifications.open}${unreadCount ? `, ${unreadCount} ${t.notifications.unread}` : ""}`}
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setSelected(null);
+          setOpen(true);
+        }}
       >
         <Bell className="h-5 w-5" />
         {unreadCount ? (
@@ -103,7 +107,11 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
                     "app-focus flex w-full gap-3 rounded-app border border-line/60 bg-elevated p-3 text-left transition-opacity",
                     isRead && "opacity-60"
                   )}
-                  onClick={() => markAsRead(notification.id)}
+                  onClick={() => {
+                    markAsRead(notification.id);
+                    setOpen(false);
+                    setSelected(notification);
+                  }}
                 >
                   <span
                     className={cn(
@@ -136,6 +144,53 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
             <Check className="h-4 w-4" />
             {t.notifications.markAllRead}
           </Button>
+        ) : null}
+      </BottomSheet>
+
+      <BottomSheet
+        open={Boolean(selected)}
+        title={selected?.title ?? t.notifications.detailsTitle}
+        onClose={() => setSelected(null)}
+      >
+        {selected ? (
+          <div className="grid gap-4">
+            <div className="app-control flex items-start gap-3 rounded-app p-4">
+              <span
+                className={cn(
+                  "grid h-11 w-11 shrink-0 place-items-center rounded-app",
+                  toneStyles[selected.tone]
+                )}
+              >
+                <NotificationIcon tone={selected.tone} />
+              </span>
+              <p className="text-sm leading-6 text-muted">{selected.body}</p>
+            </div>
+            {selected.details.length ? (
+              <dl className="grid gap-2">
+                {selected.details.map((detail) => (
+                  <div
+                    key={`${detail.label}:${detail.value}`}
+                    className="app-control grid gap-1 rounded-app p-3 sm:grid-cols-[140px_1fr] sm:gap-3"
+                  >
+                    <dt className="text-xs font-semibold uppercase tracking-wide text-muted">
+                      {detail.label}
+                    </dt>
+                    <dd className="text-sm leading-5 text-foreground">{detail.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setSelected(null);
+                setOpen(true);
+              }}
+            >
+              {t.notifications.backToNotifications}
+            </Button>
+          </div>
         ) : null}
       </BottomSheet>
     </>

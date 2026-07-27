@@ -232,6 +232,19 @@ export interface Dictionary {
     unread: string;
     markAllRead: string;
     empty: string;
+    detailsTitle: string;
+    backToNotifications: string;
+    detailVersion: string;
+    detailChanges: string;
+    detailCategory: string;
+    detailUsage: string;
+    detailPeriod: string;
+    detailDate: string;
+    detailGoal: string;
+    detailStatus: string;
+    statusCompleted: string;
+    statusOverdue: string;
+    statusUpcoming: string;
     updateTitle: string;
     updateBody: string;
     budgetNearTitle: string;
@@ -745,6 +758,19 @@ export const dictionaries: Record<Language, Dictionary> = {
       unread: "unread",
       markAllRead: "Mark all as read",
       empty: "You are all caught up.",
+      detailsTitle: "Notification details",
+      backToNotifications: "Back to notifications",
+      detailVersion: "Version",
+      detailChanges: "Changes",
+      detailCategory: "Category",
+      detailUsage: "Limit used",
+      detailPeriod: "Period",
+      detailDate: "Date",
+      detailGoal: "Goal",
+      detailStatus: "Status",
+      statusCompleted: "Completed",
+      statusOverdue: "Overdue",
+      statusUpcoming: "Upcoming",
       updateTitle: "MyFinances {version} is ready",
       updateBody: "See the latest improvements in this update.",
       budgetNearTitle: "Budget is running low",
@@ -1227,6 +1253,19 @@ export const dictionaries: Record<Language, Dictionary> = {
       unread: "непрочитанных",
       markAllRead: "Прочитать все",
       empty: "Новых уведомлений нет.",
+      detailsTitle: "Подробнее об уведомлении",
+      backToNotifications: "Назад к уведомлениям",
+      detailVersion: "Версия",
+      detailChanges: "Изменения",
+      detailCategory: "Категория",
+      detailUsage: "Использовано лимита",
+      detailPeriod: "Период",
+      detailDate: "Дата",
+      detailGoal: "Цель",
+      detailStatus: "Статус",
+      statusCompleted: "Выполнено",
+      statusOverdue: "Просрочено",
+      statusUpcoming: "Скоро",
       updateTitle: "MyFinances {version} уже здесь",
       updateBody: "Посмотри, что изменилось в новой версии.",
       budgetNearTitle: "Бюджет подходит к лимиту",
