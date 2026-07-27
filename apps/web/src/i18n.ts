@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.3.0";
+export const appVersion = "0.4.0";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -722,12 +722,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "A clearer picture of your money across periods and wallets.",
+      intro: "See your month at a glance and make every wallet feel like yours.",
       gotIt: "Explore the update",
       notes: [
-        "Week, month, year, and custom analytics periods",
-        "Comparison with the previous period and category filters",
-        "Initial wallet balances and transfers that do not distort cash flow"
+        "Financial calendar with daily income, expenses, and balance",
+        "Operations for the selected day with the same history filters",
+        "Custom wallet colors and icons, plus reversible archiving"
       ]
     },
     categories: {
@@ -1172,12 +1172,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Более ясная картина денег по периодам и кошелькам.",
+      intro: "Весь месяц перед глазами, а каждый кошелёк выглядит по-своему.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Аналитика за неделю, месяц, год и свой период",
-        "Сравнение с предыдущим периодом и фильтры по категориям",
-        "Начальные балансы и переводы без искажения доходов и расходов"
+        "Финансовый календарь с доходами, расходами и балансом по дням",
+        "Операции выбранного дня с теми же фильтрами истории",
+        "Свои цвета и иконки кошельков, а также восстановление из архива"
       ]
     },
     categories: {
