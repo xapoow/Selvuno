@@ -4,6 +4,7 @@ import type {
   RecurringTransaction,
   RecurringTransactionInput,
   Settings,
+  Transaction,
   TransactionInput,
   Wallet
 } from "@myfinances/types";
@@ -18,6 +19,7 @@ interface AddTransactionViewProps {
   wallets: Wallet[];
   categories: Category[];
   recurringTransactions: RecurringTransaction[];
+  transactions: Transaction[];
   settings: Settings;
   t: Dictionary;
   onSubmit: (input: TransactionInput) => Promise<void>;
@@ -31,6 +33,7 @@ export function AddTransactionView({
   wallets,
   categories,
   recurringTransactions,
+  transactions,
   settings,
   t,
   onSubmit,
@@ -74,6 +77,9 @@ export function AddTransactionView({
                 t={t}
                 activeWalletId={settings.activeWalletId}
                 lockWalletToActive
+                recentTransactions={transactions.filter(
+                  (transaction) => transaction.walletId === activeWallet.id
+                )}
                 submitLabel={t.transaction.save}
                 onSubmit={onSubmit}
               />

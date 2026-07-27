@@ -171,6 +171,11 @@ export interface Dictionary {
     editTitle: string;
     amount: string;
     quickHint: string;
+    quickTemplates: string;
+    quickTemplatesHint: string;
+    calculate: string;
+    calculatorOperator: string;
+    calculatorError: string;
     tags: string;
     tagsPlaceholder: string;
     chooseCategory: string;
@@ -564,6 +569,11 @@ export const dictionaries: Record<Language, Dictionary> = {
       editTitle: "Edit transaction",
       amount: "Amount",
       quickHint: "Amount and category are enough — the rest is optional.",
+      quickTemplates: "Quick templates",
+      quickTemplatesHint: "Repeat a recent transaction in one tap.",
+      calculate: "Calculate",
+      calculatorOperator: "Calculator operator",
+      calculatorError: "Enter a positive amount or a valid calculation.",
       tags: "Tags",
       tagsPlaceholder: "coffee, travel, work",
       chooseCategory: "Choose a category.",
@@ -1027,6 +1037,11 @@ export const dictionaries: Record<Language, Dictionary> = {
       editTitle: "Редактировать операцию",
       amount: "Сумма",
       quickHint: "Достаточно суммы и категории — остальное необязательно.",
+      quickTemplates: "Быстрые шаблоны",
+      quickTemplatesHint: "Повтори недавнюю операцию одним нажатием.",
+      calculate: "Посчитать",
+      calculatorOperator: "Оператор калькулятора",
+      calculatorError: "Введи положительную сумму или корректное вычисление.",
       tags: "Теги",
       tagsPlaceholder: "кофе, поездка, работа",
       chooseCategory: "Выбери категорию.",
