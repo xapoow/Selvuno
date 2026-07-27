@@ -1,8 +1,9 @@
 import type { Wallet, WalletView } from "@myfinances/types";
 import { useState } from "react";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
-import { ChevronLeft, ChevronRight, Layers3, WalletCards } from "lucide-react";
+import { ChevronLeft, ChevronRight, Layers3 } from "lucide-react";
 import { cn } from "../lib/cn";
+import { WalletIcon } from "../lib/icons";
 
 interface WalletSwitcherProps {
   wallets: Wallet[];
@@ -20,6 +21,8 @@ interface WalletOption {
   name: string;
   currency: string;
   kind: "all" | "wallet";
+  color?: string;
+  icon?: string;
 }
 
 export function WalletSwitcher({
@@ -36,7 +39,9 @@ export function WalletSwitcher({
       value: wallet.id,
       name: wallet.name,
       currency: wallet.currency,
-      kind: "wallet" as const
+      kind: "wallet" as const,
+      color: wallet.color,
+      icon: wallet.icon
     }));
   const options: WalletOption[] = includeAll
     ? [{ value: "all", name: allLabel, currency: allCurrency, kind: "all" }, ...walletOptions]
@@ -48,7 +53,6 @@ export function WalletSwitcher({
   if (!activeOption) {
     return null;
   }
-  const ActiveIcon = activeOption.kind === "all" ? Layers3 : WalletCards;
   const canSwitch = options.length > 1;
 
   function selectByOffset(offset: number) {
@@ -105,8 +109,22 @@ export function WalletSwitcher({
           <div className="grid grid-cols-[24px_1fr_24px] items-center gap-2">
             <ChevronLeft className={cn("h-4 w-4 text-muted transition", !canSwitch && "opacity-35")} aria-hidden />
             <div className="grid justify-items-center gap-1 overflow-hidden text-center">
-              <span className="app-control grid h-9 w-9 place-items-center rounded-app text-accent">
-                <ActiveIcon className="h-4 w-4" />
+              <span
+                className={cn(
+                  "grid h-9 w-9 place-items-center rounded-app",
+                  activeOption.kind === "all" ? "app-control text-accent" : "text-white"
+                )}
+                style={
+                  activeOption.kind === "wallet"
+                    ? { backgroundColor: activeOption.color }
+                    : undefined
+                }
+              >
+                {activeOption.kind === "all" ? (
+                  <Layers3 className="h-4 w-4" />
+                ) : (
+                  <WalletIcon name={activeOption.icon ?? "wallet-cards"} className="h-4 w-4" />
+                )}
               </span>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.span
@@ -174,8 +192,22 @@ export function WalletSwitcher({
               className="flex min-w-0 items-center justify-center gap-3"
               aria-live="polite"
             >
-              <span className="app-control grid h-10 w-10 shrink-0 place-items-center rounded-app text-accent">
-                <ActiveIcon className="h-5 w-5" />
+              <span
+                className={cn(
+                  "grid h-10 w-10 shrink-0 place-items-center rounded-app",
+                  activeOption.kind === "all" ? "app-control text-accent" : "text-white"
+                )}
+                style={
+                  activeOption.kind === "wallet"
+                    ? { backgroundColor: activeOption.color }
+                    : undefined
+                }
+              >
+                {activeOption.kind === "all" ? (
+                  <Layers3 className="h-5 w-5" />
+                ) : (
+                  <WalletIcon name={activeOption.icon ?? "wallet-cards"} className="h-5 w-5" />
+                )}
               </span>
               <span className="grid min-w-0">
                 <span className="truncate text-base font-semibold text-foreground">{activeOption.name}</span>

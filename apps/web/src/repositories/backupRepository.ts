@@ -1,9 +1,9 @@
-import type { FinanceBackup, FinanceBackupV5 } from "@myfinances/types";
+import type { FinanceBackup, FinanceBackupV6 } from "@myfinances/types";
 import { backupSchema } from "@myfinances/types";
 import { financeDb, nowIso, seedLocalData } from "../db/database";
 
 export interface BackupRepository {
-  exportBackup(): Promise<FinanceBackupV5>;
+  exportBackup(): Promise<FinanceBackupV6>;
   importBackup(backup: unknown): Promise<FinanceBackup>;
 }
 
@@ -15,7 +15,7 @@ export const backupRepository: BackupRepository = {
       throw new Error("Settings not found.");
     }
     return backupSchema.parse({
-      version: 5,
+      version: 6,
       exportedAt: nowIso(),
       wallets: await financeDb.wallets.toArray(),
       categories: await financeDb.categories.toArray(),
@@ -26,7 +26,7 @@ export const backupRepository: BackupRepository = {
       savingsGoalContributions: await financeDb.savingsGoalContributions.toArray(),
       walletTransfers: await financeDb.walletTransfers.toArray(),
       settings
-    }) as FinanceBackupV5;
+    }) as FinanceBackupV6;
   },
 
   async importBackup(backup) {
@@ -66,18 +66,24 @@ export const backupRepository: BackupRepository = {
           parsed.version === 2 ||
           parsed.version === 3 ||
           parsed.version === 4 ||
-          parsed.version === 5
+          parsed.version === 5 ||
+          parsed.version === 6
         ) {
           await financeDb.budgets.bulkPut(parsed.budgets);
         }
-        if (parsed.version === 3 || parsed.version === 4 || parsed.version === 5) {
+        if (
+          parsed.version === 3 ||
+          parsed.version === 4 ||
+          parsed.version === 5 ||
+          parsed.version === 6
+        ) {
           await financeDb.recurringTransactions.bulkPut(parsed.recurringTransactions);
         }
-        if (parsed.version === 4 || parsed.version === 5) {
+        if (parsed.version === 4 || parsed.version === 5 || parsed.version === 6) {
           await financeDb.savingsGoals.bulkPut(parsed.savingsGoals);
           await financeDb.savingsGoalContributions.bulkPut(parsed.savingsGoalContributions);
         }
-        if (parsed.version === 5) {
+        if (parsed.version === 5 || parsed.version === 6) {
           await financeDb.walletTransfers.bulkPut(parsed.walletTransfers);
         }
         await financeDb.settings.put(parsed.settings);

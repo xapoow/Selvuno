@@ -7,16 +7,18 @@ import type {
   WalletTransfer,
   WalletView
 } from "@myfinances/types";
-import { Edit3, Plus, WalletCards } from "lucide-react";
+import { Archive, Edit3, Plus, RotateCcw, WalletCards } from "lucide-react";
 import { calculateWalletTotals, formatMoney } from "@myfinances/utils";
 import { WalletForm } from "../components/WalletForm";
 import { BottomSheet } from "../components/ui/BottomSheet";
 import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
 import type { Dictionary } from "../i18n";
+import { WalletIcon } from "../lib/icons";
 
 interface WalletsViewProps {
   wallets: Wallet[];
+  archivedWallets: Wallet[];
   transactions: Transaction[];
   transfers: WalletTransfer[];
   settings: Settings;
@@ -26,10 +28,12 @@ interface WalletsViewProps {
   onCreate: (input: WalletInput) => Promise<void>;
   onUpdate: (id: string, input: Partial<WalletInput>) => Promise<void>;
   onArchive: (id: string) => Promise<void>;
+  onRestore: (id: string) => Promise<void>;
 }
 
 export function WalletsView({
   wallets,
+  archivedWallets,
   transactions,
   transfers,
   settings,
@@ -38,10 +42,13 @@ export function WalletsView({
   showTitle = true,
   onCreate,
   onUpdate,
-  onArchive
+  onArchive,
+  onRestore
 }: WalletsViewProps) {
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Wallet | null>(null);
+  const [archiveOpen, setArchiveOpen] = useState(false);
+  const [operationError, setOperationError] = useState("");
   const visibleWallets =
     activeWalletId === "all" ? wallets : wallets.filter((wallet) => wallet.id === activeWalletId);
 
@@ -55,10 +62,26 @@ export function WalletsView({
         ) : (
           <span />
         )}
-        <Button size="icon" onClick={() => setCreating(true)} aria-label={t.wallets.add}>
-          <Plus className="h-5 w-5" />
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={() => setArchiveOpen(true)}
+            aria-label={t.wallets.manageArchive}
+          >
+            <Archive className="h-4 w-4" />
+          </Button>
+          <Button size="icon" onClick={() => setCreating(true)} aria-label={t.wallets.add}>
+            <Plus className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
+
+      {operationError ? (
+        <p className="rounded-app bg-expense/10 px-3 py-2 text-sm font-medium text-expense">
+          {operationError}
+        </p>
+      ) : null}
 
       {visibleWallets.length ? (
         <div className="grid gap-2">
@@ -67,9 +90,17 @@ export function WalletsView({
             return (
               <article key={wallet.id} className="app-surface grid gap-3 rounded-app p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="text-base font-semibold text-foreground">{wallet.name}</h3>
-                    <p className="text-sm text-muted">{wallet.currency}</p>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span
+                      className="grid h-11 w-11 shrink-0 place-items-center rounded-app text-white shadow-[0_8px_18px_rgb(0_0_0/0.16)]"
+                      style={{ backgroundColor: wallet.color }}
+                    >
+                      <WalletIcon name={wallet.icon} className="h-5 w-5" />
+                    </span>
+                    <div className="min-w-0">
+                      <h3 className="text-base font-semibold text-foreground">{wallet.name}</h3>
+                      <p className="text-sm text-muted">{wallet.currency}</p>
+                    </div>
                   </div>
                   <div className="flex gap-1">
                     <Button variant="ghost" size="icon" onClick={() => setEditing(wallet)} aria-label={t.wallets.editTitle}>
@@ -100,9 +131,18 @@ export function WalletsView({
                 <Button
                   variant="secondary"
                   size="small"
-                  onClick={() => {
+                  onClick={async () => {
+                    setOperationError("");
+                    if (wallets.length <= 1) {
+                      setOperationError(t.wallets.cannotArchiveLast);
+                      return;
+                    }
                     if (window.confirm(t.wallets.confirmArchive)) {
-                      void onArchive(wallet.id);
+                      try {
+                        await onArchive(wallet.id);
+                      } catch {
+                        setOperationError(t.wallets.archiveError);
+                      }
                     }
                   }}
                 >
@@ -140,6 +180,59 @@ export function WalletsView({
               setEditing(null);
             }}
           />
+        ) : null}
+      </BottomSheet>
+
+      <BottomSheet
+        open={archiveOpen}
+        title={t.wallets.archiveTitle}
+        onClose={() => {
+          setArchiveOpen(false);
+          setOperationError("");
+        }}
+      >
+        {archivedWallets.length ? (
+          <div className="grid gap-2">
+            {archivedWallets.map((wallet) => (
+              <article
+                key={wallet.id}
+                className="app-control flex items-center justify-between gap-3 rounded-app p-3"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <span
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-app text-white"
+                    style={{ backgroundColor: wallet.color }}
+                  >
+                    <WalletIcon name={wallet.icon} className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-foreground">{wallet.name}</p>
+                    <p className="text-xs text-muted">{wallet.currency}</p>
+                  </div>
+                </div>
+                <Button
+                  variant="secondary"
+                  size="small"
+                  onClick={async () => {
+                    setOperationError("");
+                    try {
+                      await onRestore(wallet.id);
+                    } catch {
+                      setOperationError(t.wallets.restoreError);
+                    }
+                  }}
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  {t.wallets.restore}
+                </Button>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <EmptyState icon={Archive} title={t.wallets.archiveEmpty} />
+        )}
+        {operationError ? (
+          <p className="mt-3 text-sm font-medium text-expense">{operationError}</p>
         ) : null}
       </BottomSheet>
     </div>

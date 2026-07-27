@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "categories" | "backup" | "sync";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.3.0";
+export const appVersion = "0.4.0";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -247,6 +247,11 @@ export interface Dictionary {
   };
   history: {
     title: string;
+    viewList: string;
+    viewCalendar: string;
+    calendarSelectedDay: string;
+    calendarEmptyDay: string;
+    calendarMissingRates: string;
     search: string;
     searchPlaceholder: string;
     allCategories: string;
@@ -295,6 +300,15 @@ export interface Dictionary {
     transferSaveError: string;
     confirmDeleteTransfer: string;
     walletUnavailable: string;
+    icon: string;
+    color: string;
+    manageArchive: string;
+    archiveTitle: string;
+    archiveEmpty: string;
+    restore: string;
+    archiveError: string;
+    restoreError: string;
+    cannotArchiveLast: string;
   };
   goals: {
     tabWallets: string;
@@ -574,6 +588,11 @@ export const dictionaries: Record<Language, Dictionary> = {
     },
     history: {
       title: "History",
+      viewList: "List",
+      viewCalendar: "Calendar",
+      calendarSelectedDay: "Selected day",
+      calendarEmptyDay: "No transactions on this day.",
+      calendarMissingRates: "Some totals exclude transactions without an exchange rate.",
       search: "Search",
       searchPlaceholder: "Tag, category, wallet, or note",
       allCategories: "All categories",
@@ -621,7 +640,16 @@ export const dictionaries: Record<Language, Dictionary> = {
       saveTransfer: "Save transfer",
       transferSaveError: "Unable to save the transfer.",
       confirmDeleteTransfer: "Delete this transfer?",
-      walletUnavailable: "Unavailable wallet"
+      walletUnavailable: "Unavailable wallet",
+      icon: "Wallet icon",
+      color: "Wallet color",
+      manageArchive: "Manage archive",
+      archiveTitle: "Archived wallets",
+      archiveEmpty: "The archive is empty.",
+      restore: "Restore",
+      archiveError: "Unable to archive the wallet.",
+      restoreError: "Unable to restore the wallet.",
+      cannotArchiveLast: "Create another wallet before archiving this one."
     },
     goals: {
       tabWallets: "Wallets",
@@ -688,12 +716,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "A clearer picture of your money across periods and wallets.",
+      intro: "See your month at a glance and make every wallet feel like yours.",
       gotIt: "Explore the update",
       notes: [
-        "Week, month, year, and custom analytics periods",
-        "Comparison with the previous period and category filters",
-        "Initial wallet balances and transfers that do not distort cash flow"
+        "Financial calendar with daily income, expenses, and balance",
+        "Operations for the selected day with the same history filters",
+        "Custom wallet colors and icons, plus reversible archiving"
       ]
     },
     categories: {
@@ -1003,6 +1031,11 @@ export const dictionaries: Record<Language, Dictionary> = {
     },
     history: {
       title: "История",
+      viewList: "Список",
+      viewCalendar: "Календарь",
+      calendarSelectedDay: "Выбранный день",
+      calendarEmptyDay: "В этот день операций нет.",
+      calendarMissingRates: "Некоторые итоги не включают операции без курса валют.",
       search: "Поиск",
       searchPlaceholder: "Тег, категория, кошелек или заметка",
       allCategories: "Все категории",
@@ -1050,7 +1083,16 @@ export const dictionaries: Record<Language, Dictionary> = {
       saveTransfer: "Сохранить перевод",
       transferSaveError: "Не удалось сохранить перевод.",
       confirmDeleteTransfer: "Удалить этот перевод?",
-      walletUnavailable: "Недоступный кошелек"
+      walletUnavailable: "Недоступный кошелек",
+      icon: "Иконка кошелька",
+      color: "Цвет кошелька",
+      manageArchive: "Управление архивом",
+      archiveTitle: "Архивные кошельки",
+      archiveEmpty: "Архив пока пуст.",
+      restore: "Восстановить",
+      archiveError: "Не удалось архивировать кошелек.",
+      restoreError: "Не удалось восстановить кошелек.",
+      cannotArchiveLast: "Сначала создай другой кошелек, затем архивируй этот."
     },
     goals: {
       tabWallets: "Кошельки",
@@ -1117,12 +1159,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Более ясная картина денег по периодам и кошелькам.",
+      intro: "Весь месяц перед глазами, а каждый кошелёк выглядит по-своему.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Аналитика за неделю, месяц, год и свой период",
-        "Сравнение с предыдущим периодом и фильтры по категориям",
-        "Начальные балансы и переводы без искажения доходов и расходов"
+        "Финансовый календарь с доходами, расходами и балансом по дням",
+        "Операции выбранного дня с теми же фильтрами истории",
+        "Свои цвета и иконки кошельков, а также восстановление из архива"
       ]
     },
     categories: {

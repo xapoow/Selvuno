@@ -20,6 +20,7 @@ import { WalletTransfersView } from "./WalletTransfersView";
 
 interface WalletsHubViewProps {
   wallets: Wallet[];
+  archivedWallets: Wallet[];
   transactions: Transaction[];
   goals: SavingsGoal[];
   contributions: SavingsGoalContribution[];
@@ -29,6 +30,7 @@ interface WalletsHubViewProps {
   onCreateWallet: (input: WalletInput) => Promise<void>;
   onUpdateWallet: (id: string, input: Partial<WalletInput>) => Promise<void>;
   onArchiveWallet: (id: string) => Promise<void>;
+  onRestoreWallet: (id: string) => Promise<void>;
   onCreateGoal: (input: SavingsGoalInput) => Promise<void>;
   onUpdateGoal: (id: string, input: SavingsGoalInput) => Promise<void>;
   onDeleteGoal: (id: string) => Promise<void>;
@@ -40,6 +42,7 @@ interface WalletsHubViewProps {
 
 export function WalletsHubView({
   wallets,
+  archivedWallets,
   transactions,
   goals,
   contributions,
@@ -49,6 +52,7 @@ export function WalletsHubView({
   onCreateWallet,
   onUpdateWallet,
   onArchiveWallet,
+  onRestoreWallet,
   onCreateGoal,
   onUpdateGoal,
   onDeleteGoal,
@@ -78,6 +82,7 @@ export function WalletsHubView({
           <div className="md:hidden">
             <MobileWalletsPager
               wallets={wallets}
+              archivedWallets={archivedWallets}
               transactions={transactions}
               transfers={transfers}
               settings={settings}
@@ -85,11 +90,13 @@ export function WalletsHubView({
               onCreate={onCreateWallet}
               onUpdate={onUpdateWallet}
               onArchive={onArchiveWallet}
+              onRestore={onRestoreWallet}
             />
           </div>
           <div className="hidden md:block">
             <WalletsView
               wallets={wallets}
+              archivedWallets={archivedWallets}
               transactions={transactions}
               transfers={transfers}
               settings={settings}
@@ -97,6 +104,7 @@ export function WalletsHubView({
               onCreate={onCreateWallet}
               onUpdate={onUpdateWallet}
               onArchive={onArchiveWallet}
+              onRestore={onRestoreWallet}
             />
           </div>
         </>
