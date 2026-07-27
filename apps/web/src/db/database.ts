@@ -111,6 +111,35 @@ export class FinanceDatabase extends Dexie {
             wallet.icon ||= "wallet-cards";
           })
       );
+    this.version(7)
+      .stores({
+        wallets: "id, name, currency, archivedAt, deletedAt, updatedAt",
+        categories: "id, sortOrder, name, type, deletedAt, updatedAt",
+        transactions:
+          "id, walletId, categoryId, type, transactionDate, recurringTransactionId, &[recurringTransactionId+recurrenceDate], deletedAt, updatedAt",
+        settings: "id",
+        budgets: "id, month, categoryId, [categoryId+month], deletedAt, updatedAt",
+        recurringTransactions:
+          "id, walletId, categoryId, type, frequency, nextRunDate, paused, deletedAt, updatedAt",
+        savingsGoals: "id, walletId, targetDate, deletedAt, updatedAt",
+        savingsGoalContributions: "id, goalId, contributionDate, deletedAt, updatedAt",
+        walletTransfers:
+          "id, fromWalletId, toWalletId, transferDate, deletedAt, updatedAt"
+      })
+      .upgrade(async (transaction) => {
+        const orderByType = new Map<string, number>();
+        await transaction
+          .table("categories")
+          .toCollection()
+          .modify((category: Partial<Category>) => {
+            const type = category.type ?? "expense";
+            const sortOrder = orderByType.get(type) ?? 0;
+            if (!Number.isInteger(category.sortOrder)) {
+              category.sortOrder = sortOrder;
+            }
+            orderByType.set(type, sortOrder + 1);
+          });
+      });
   }
 }
 
@@ -285,21 +314,23 @@ export async function seedLocalData(db = financeDb): Promise<void> {
   if ((await db.categories.count()) === 0) {
     await db.categories.bulkAdd([
       ...expenseCategories.map(
-        ([name, color, icon]): Category => ({
+        ([name, color, icon], sortOrder): Category => ({
           ...createEntityBase(),
           name,
           color,
           icon,
-          type: "expense"
+          type: "expense",
+          sortOrder
         })
       ),
       ...incomeCategories.map(
-        ([name, color, icon]): Category => ({
+        ([name, color, icon], sortOrder): Category => ({
           ...createEntityBase(),
           name,
           color,
           icon,
-          type: "income"
+          type: "income",
+          sortOrder
         })
       )
     ]);

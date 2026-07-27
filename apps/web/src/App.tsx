@@ -391,6 +391,12 @@ export function App() {
                 await mutations.updateCategory.mutateAsync({ id, input });
               }}
               onDeleteCategory={(id) => mutations.deleteCategory.mutateAsync(id)}
+              onReorderCategories={(type, orderedIds) =>
+                mutations.reorderCategories.mutateAsync({ type, orderedIds })
+              }
+              onReplaceCategory={(sourceId, targetId, deleteSource) =>
+                mutations.replaceCategory.mutateAsync({ sourceId, targetId, deleteSource })
+              }
               onExportBackup={() => mutations.exportBackup.mutateAsync()}
               onImportBackup={async (backup) => {
                 await mutations.importBackup.mutateAsync(backup);

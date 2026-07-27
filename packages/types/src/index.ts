@@ -92,7 +92,8 @@ export const categorySchema = baseEntitySchema.extend({
   name: z.string().min(1).max(48),
   color: z.string().min(4).max(32),
   icon: z.string().min(1).max(32),
-  type: transactionTypeSchema
+  type: transactionTypeSchema,
+  sortOrder: z.number().int().nonnegative().default(0)
 });
 export type Category = z.infer<typeof categorySchema>;
 
