@@ -9,6 +9,7 @@ import type {
   WalletView
 } from "@myfinances/types";
 import { ReceiptText } from "lucide-react";
+import { FinancialCalendar } from "../components/FinancialCalendar";
 import { TransactionForm } from "../components/TransactionForm";
 import { TransactionRow } from "../components/TransactionRow";
 import { BottomSheet } from "../components/ui/BottomSheet";
@@ -61,6 +62,7 @@ export function HistoryView({
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<HistorySort>("date-desc");
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const [editing, setEditing] = useState<Transaction | null>(null);
 
   const visibleTransactions = useMemo(
@@ -109,17 +111,9 @@ export function HistoryView({
     },
     [activeWalletId, categories, categoryFilter, searchQuery, settings.locale, t, transactions, typeFilter, wallets]
   );
-  const displayTransactions = useMemo(() => {
-    const collator = new Intl.Collator(settings.locale, { numeric: true, sensitivity: "base" });
-    const byNewest = (left: Transaction, right: Transaction) =>
-      Date.parse(right.transactionDate) - Date.parse(left.transactionDate);
-    const getCategoryLabel = (transaction: Transaction) =>
-      getCategoryName(categories.find((category) => category.id === transaction.categoryId)?.name, t);
-    const getWalletLabel = (transaction: Transaction) =>
-      wallets.find((wallet) => wallet.id === transaction.walletId)?.name ?? "";
-
-    return visibleTransactions
-      .map((transaction) => {
+  const convertedTransactions = useMemo(
+    () =>
+      visibleTransactions.map((transaction) => {
         const convertedAmountMinor = convertMinorToBaseCurrency(
           transaction.amountMinor,
           transaction.currency,
@@ -132,7 +126,19 @@ export function HistoryView({
           currency: convertedAmountMinor === null ? transaction.currency : displayCurrency,
           conversionMissing: convertedAmountMinor === null && transaction.currency.toUpperCase() !== displayCurrency
         };
-      })
+      }),
+    [displayCurrency, exchangeRates, visibleTransactions]
+  );
+  const displayTransactions = useMemo(() => {
+    const collator = new Intl.Collator(settings.locale, { numeric: true, sensitivity: "base" });
+    const byNewest = (left: Transaction, right: Transaction) =>
+      Date.parse(right.transactionDate) - Date.parse(left.transactionDate);
+    const getCategoryLabel = (transaction: Transaction) =>
+      getCategoryName(categories.find((category) => category.id === transaction.categoryId)?.name, t);
+    const getWalletLabel = (transaction: Transaction) =>
+      wallets.find((wallet) => wallet.id === transaction.walletId)?.name ?? "";
+
+    return [...convertedTransactions]
       .sort((left, right) => {
         if (sortBy === "date-desc") {
           return byNewest(left.transaction, right.transaction);
@@ -169,7 +175,7 @@ export function HistoryView({
           byNewest(left.transaction, right.transaction)
         );
       });
-  }, [categories, displayCurrency, exchangeRates, settings.locale, sortBy, t, visibleTransactions, wallets]);
+  }, [categories, convertedTransactions, settings.locale, sortBy, t, wallets]);
 
   async function handleDelete(transaction: Transaction) {
     if (window.confirm(t.history.confirmDelete)) {
@@ -179,11 +185,23 @@ export function HistoryView({
 
   return (
     <div className="grid gap-5">
-      {showTitle ? (
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {showTitle ? (
           <h2 className="text-xl font-semibold text-foreground">{t.history.title}</h2>
+        ) : (
+          <span />
+        )}
+        <div className="min-w-[190px]">
+          <SegmentedControl
+            value={viewMode}
+            onChange={setViewMode}
+            options={[
+              { value: "list", label: t.history.viewList },
+              { value: "calendar", label: t.history.viewCalendar }
+            ]}
+          />
         </div>
-      ) : null}
+      </div>
       <div className="app-surface grid gap-3 rounded-app p-3">
         <SegmentedControl
           value={typeFilter}
@@ -200,7 +218,7 @@ export function HistoryView({
           placeholder={t.history.searchPlaceholder}
           onChange={(event) => setSearchQuery(event.target.value)}
         />
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className={viewMode === "list" ? "grid grid-cols-1 gap-3 sm:grid-cols-2" : "grid gap-3"}>
           <SelectField label={t.common.category} value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
             <option value="all">{t.history.allCategories}</option>
             {categories.map((category) => (
@@ -209,19 +227,32 @@ export function HistoryView({
               </option>
             ))}
           </SelectField>
-          <SelectField label={t.history.sort} value={sortBy} onChange={(event) => setSortBy(event.target.value as HistorySort)}>
-            <option value="date-desc">{t.history.sortOptions.dateDesc}</option>
-            <option value="date-asc">{t.history.sortOptions.dateAsc}</option>
-            <option value="amount-desc">{t.history.sortOptions.amountDesc}</option>
-            <option value="amount-asc">{t.history.sortOptions.amountAsc}</option>
-            <option value="category-asc">{t.history.sortOptions.categoryAsc}</option>
-            <option value="category-desc">{t.history.sortOptions.categoryDesc}</option>
-            <option value="wallet-asc">{t.history.sortOptions.walletAsc}</option>
-            <option value="wallet-desc">{t.history.sortOptions.walletDesc}</option>
-          </SelectField>
+          {viewMode === "list" ? (
+            <SelectField label={t.history.sort} value={sortBy} onChange={(event) => setSortBy(event.target.value as HistorySort)}>
+              <option value="date-desc">{t.history.sortOptions.dateDesc}</option>
+              <option value="date-asc">{t.history.sortOptions.dateAsc}</option>
+              <option value="amount-desc">{t.history.sortOptions.amountDesc}</option>
+              <option value="amount-asc">{t.history.sortOptions.amountAsc}</option>
+              <option value="category-asc">{t.history.sortOptions.categoryAsc}</option>
+              <option value="category-desc">{t.history.sortOptions.categoryDesc}</option>
+              <option value="wallet-asc">{t.history.sortOptions.walletAsc}</option>
+              <option value="wallet-desc">{t.history.sortOptions.walletDesc}</option>
+            </SelectField>
+          ) : null}
         </div>
       </div>
-      {displayTransactions.length ? (
+      {viewMode === "calendar" ? (
+        <FinancialCalendar
+          wallets={wallets}
+          categories={categories}
+          items={convertedTransactions}
+          settings={settings}
+          displayCurrency={displayCurrency}
+          t={t}
+          onEdit={setEditing}
+          onDelete={handleDelete}
+        />
+      ) : displayTransactions.length ? (
         <div className="grid gap-2">
           {displayTransactions.map((item) => (
             <TransactionRow
