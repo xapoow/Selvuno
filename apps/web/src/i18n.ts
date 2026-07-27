@@ -415,6 +415,7 @@ export interface Dictionary {
     automaticBackupHint: string;
     backupHistory: string;
     backupHistoryEmpty: string;
+    backupOperations: string;
     backupReasonAutomatic: string;
     backupReasonRestore: string;
     restoreBackup: string;
@@ -864,6 +865,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       automaticBackupHint: "MyFinances saves recent versions on this device as your data changes.",
       backupHistory: "Restore history",
       backupHistoryEmpty: "Automatic backups will appear here after your next change.",
+      backupOperations: "transactions",
       backupReasonAutomatic: "Automatic backup",
       backupReasonRestore: "Before restoration",
       restoreBackup: "Restore",
@@ -1359,6 +1361,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       automaticBackupHint: "MyFinances сохраняет недавние версии на этом устройстве при изменении данных.",
       backupHistory: "История восстановления",
       backupHistoryEmpty: "Автоматические бэкапы появятся здесь после следующего изменения.",
+      backupOperations: "операций",
       backupReasonAutomatic: "Автоматический бэкап",
       backupReasonRestore: "Перед восстановлением",
       restoreBackup: "Восстановить",
