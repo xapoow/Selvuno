@@ -1,10 +1,22 @@
-import type { FinanceBackup, FinanceBackupV6 } from "@myfinances/types";
-import { backupSchema } from "@myfinances/types";
-import { financeDb, nowIso, seedLocalData } from "../db/database";
+import type {
+  BackupSnapshot,
+  BackupSnapshotReason,
+  FinanceBackup,
+  FinanceBackupV6
+} from "@myfinances/types";
+import { backupSchema, backupSnapshotSchema } from "@myfinances/types";
+import { createId, financeDb, nowIso, seedLocalData } from "../db/database";
+
+const MAX_AUTOMATIC_BACKUPS = 12;
+const BACKUP_SESSION_WINDOW_MS = 10 * 60 * 1000;
 
 export interface BackupRepository {
   exportBackup(): Promise<FinanceBackupV6>;
   importBackup(backup: unknown): Promise<FinanceBackup>;
+  createSnapshot(reason?: BackupSnapshotReason): Promise<BackupSnapshot>;
+  listSnapshots(): Promise<BackupSnapshot[]>;
+  restoreSnapshot(id: string): Promise<FinanceBackup>;
+  deleteSnapshot(id: string): Promise<void>;
 }
 
 export const backupRepository: BackupRepository = {
@@ -90,5 +102,48 @@ export const backupRepository: BackupRepository = {
       }
     );
     return parsed;
+  },
+
+  async createSnapshot(reason = "automatic") {
+    const backup = await this.exportBackup();
+    const latest = await financeDb.backupSnapshots.orderBy("createdAt").last();
+    const canReuseLatest =
+      reason === "automatic" &&
+      latest?.reason === "automatic" &&
+      Date.now() - Date.parse(latest.createdAt) < BACKUP_SESSION_WINDOW_MS;
+    const snapshot = backupSnapshotSchema.parse({
+      id: canReuseLatest && latest ? latest.id : createId(),
+      createdAt: nowIso(),
+      reason,
+      backup
+    });
+    await financeDb.backupSnapshots.put(snapshot);
+
+    const snapshots = await financeDb.backupSnapshots.orderBy("createdAt").toArray();
+    if (snapshots.length > MAX_AUTOMATIC_BACKUPS) {
+      await financeDb.backupSnapshots.bulkDelete(
+        snapshots.slice(0, snapshots.length - MAX_AUTOMATIC_BACKUPS).map((item) => item.id)
+      );
+    }
+    return snapshot;
+  },
+
+  async listSnapshots() {
+    return (await financeDb.backupSnapshots.orderBy("createdAt").reverse().toArray()).map(
+      (snapshot) => backupSnapshotSchema.parse(snapshot)
+    );
+  },
+
+  async restoreSnapshot(id) {
+    const snapshot = await financeDb.backupSnapshots.get(id);
+    if (!snapshot) {
+      throw new Error("Backup snapshot not found.");
+    }
+    await this.createSnapshot("before-restore");
+    return this.importBackup(snapshot.backup);
+  },
+
+  async deleteSnapshot(id) {
+    await financeDb.backupSnapshots.delete(id);
   }
 };

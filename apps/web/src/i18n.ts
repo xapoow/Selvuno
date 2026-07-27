@@ -222,6 +222,10 @@ export interface Dictionary {
     body: string;
     accept: string;
   };
+  connectivity: {
+    offline: string;
+    online: string;
+  };
   notifications: {
     title: string;
     open: string;
@@ -394,6 +398,16 @@ export interface Dictionary {
     importJson: string;
     importError: string;
     replaceBackup: string;
+    automaticBackup: string;
+    automaticBackupHint: string;
+    backupHistory: string;
+    backupHistoryEmpty: string;
+    backupReasonAutomatic: string;
+    backupReasonRestore: string;
+    restoreBackup: string;
+    restoreBackupConfirm: string;
+    deleteBackup: string;
+    deleteBackupConfirm: string;
     sync: string;
     comingSoon: string;
     syncTitle: string;
@@ -721,6 +735,10 @@ export const dictionaries: Record<Language, Dictionary> = {
       body: "MyFinances stores your settings and finance data only on this device. We do not use advertising cookies.",
       accept: "Got it"
     },
+    connectivity: {
+      offline: "Offline — changes stay safely on this device",
+      online: "Connection restored"
+    },
     notifications: {
       title: "Notifications",
       open: "Open notifications",
@@ -816,6 +834,16 @@ export const dictionaries: Record<Language, Dictionary> = {
       importJson: "Import JSON",
       importError: "Unable to import backup.",
       replaceBackup: "Replace local data with this backup?",
+      automaticBackup: "Automatic local backups",
+      automaticBackupHint: "MyFinances saves recent versions on this device as your data changes.",
+      backupHistory: "Restore history",
+      backupHistoryEmpty: "Automatic backups will appear here after your next change.",
+      backupReasonAutomatic: "Automatic backup",
+      backupReasonRestore: "Before restoration",
+      restoreBackup: "Restore",
+      restoreBackupConfirm: "Replace current local data with this saved version?",
+      deleteBackup: "Delete backup",
+      deleteBackupConfirm: "Delete this saved version?",
       sync: "Sync",
       comingSoon: "Coming soon",
       syncTitle: "Cloud sync is planned",
@@ -1189,6 +1217,10 @@ export const dictionaries: Record<Language, Dictionary> = {
       body: "MyFinances хранит настройки и финансовые данные только на этом устройстве. Рекламные cookies не используются.",
       accept: "Понятно"
     },
+    connectivity: {
+      offline: "Нет сети — изменения сохраняются на устройстве",
+      online: "Соединение восстановлено"
+    },
     notifications: {
       title: "Уведомления",
       open: "Открыть уведомления",
@@ -1284,6 +1316,16 @@ export const dictionaries: Record<Language, Dictionary> = {
       importJson: "Импорт JSON",
       importError: "Не удалось импортировать бэкап.",
       replaceBackup: "Заменить локальные данные этим бэкапом?",
+      automaticBackup: "Автоматические локальные бэкапы",
+      automaticBackupHint: "MyFinances сохраняет недавние версии на этом устройстве при изменении данных.",
+      backupHistory: "История восстановления",
+      backupHistoryEmpty: "Автоматические бэкапы появятся здесь после следующего изменения.",
+      backupReasonAutomatic: "Автоматический бэкап",
+      backupReasonRestore: "Перед восстановлением",
+      restoreBackup: "Восстановить",
+      restoreBackupConfirm: "Заменить текущие локальные данные этой сохранённой версией?",
+      deleteBackup: "Удалить бэкап",
+      deleteBackupConfirm: "Удалить эту сохранённую версию?",
       sync: "Синхронизация",
       comingSoon: "Скоро",
       syncTitle: "Облачная синхронизация запланирована",
