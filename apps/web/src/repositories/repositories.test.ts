@@ -473,6 +473,33 @@ describe("finance repositories", () => {
     expect(restored.settings).toMatchObject({ id: "default" });
   });
 
+  it("keeps automatic backup history and restores a saved version", async () => {
+    await seedLocalData();
+    const snapshot = await backupRepository.createSnapshot("automatic");
+    const [wallet] = await walletRepository.listWallets();
+    const [category] = await categoryRepository.listCategories("expense");
+    await transactionRepository.addTransaction({
+      walletId: wallet.id,
+      categoryId: category.id,
+      type: "expense",
+      amountMinor: 990,
+      currency: wallet.currency,
+      transactionDate: "2026-07-27T12:00:00.000Z"
+    });
+
+    expect(await transactionRepository.listTransactions({ walletId: "all" })).toHaveLength(1);
+
+    await backupRepository.restoreSnapshot(snapshot.id);
+
+    expect(await transactionRepository.listTransactions({ walletId: "all" })).toHaveLength(0);
+    expect(await backupRepository.listSnapshots()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: snapshot.id, reason: "automatic" }),
+        expect.objectContaining({ reason: "before-restore" })
+      ])
+    );
+  });
+
   it("restores legacy version 4 backups without wallet transfers", async () => {
     await seedLocalData();
     const backup = await backupRepository.exportBackup();

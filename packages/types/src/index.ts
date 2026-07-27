@@ -293,3 +293,14 @@ export type FinanceBackupV3 = z.infer<typeof backupV3Schema>;
 export type FinanceBackupV4 = z.infer<typeof backupV4Schema>;
 export type FinanceBackupV5 = z.infer<typeof backupV5Schema>;
 export type FinanceBackupV6 = z.infer<typeof backupV6Schema>;
+
+export const backupSnapshotReasonSchema = z.enum(["automatic", "before-restore"]);
+export type BackupSnapshotReason = z.infer<typeof backupSnapshotReasonSchema>;
+
+export const backupSnapshotSchema = z.object({
+  id: z.string().uuid(),
+  createdAt: z.string().datetime(),
+  reason: backupSnapshotReasonSchema,
+  backup: backupSchema
+});
+export type BackupSnapshot = z.infer<typeof backupSnapshotSchema>;

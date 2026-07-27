@@ -1,5 +1,6 @@
 import Dexie, { type Table } from "dexie";
 import type {
+  BackupSnapshot,
   Category,
   MonthlyBudget,
   RecurringTransaction,
@@ -24,6 +25,7 @@ export class FinanceDatabase extends Dexie {
   savingsGoals!: Table<SavingsGoal, string>;
   savingsGoalContributions!: Table<SavingsGoalContribution, string>;
   walletTransfers!: Table<WalletTransfer, string>;
+  backupSnapshots!: Table<BackupSnapshot, string>;
 
   constructor(name = "myfinances") {
     super(name);
@@ -140,6 +142,21 @@ export class FinanceDatabase extends Dexie {
             orderByType.set(type, sortOrder + 1);
           });
       });
+    this.version(8).stores({
+      wallets: "id, name, currency, archivedAt, deletedAt, updatedAt",
+      categories: "id, sortOrder, name, type, deletedAt, updatedAt",
+      transactions:
+        "id, walletId, categoryId, type, transactionDate, recurringTransactionId, &[recurringTransactionId+recurrenceDate], deletedAt, updatedAt",
+      settings: "id",
+      budgets: "id, month, categoryId, [categoryId+month], deletedAt, updatedAt",
+      recurringTransactions:
+        "id, walletId, categoryId, type, frequency, nextRunDate, paused, deletedAt, updatedAt",
+      savingsGoals: "id, walletId, targetDate, deletedAt, updatedAt",
+      savingsGoalContributions: "id, goalId, contributionDate, deletedAt, updatedAt",
+      walletTransfers:
+        "id, fromWalletId, toWalletId, transferDate, deletedAt, updatedAt",
+      backupSnapshots: "id, createdAt, reason"
+    });
   }
 }
 
