@@ -247,6 +247,11 @@ export interface Dictionary {
   };
   history: {
     title: string;
+    viewList: string;
+    viewCalendar: string;
+    calendarSelectedDay: string;
+    calendarEmptyDay: string;
+    calendarMissingRates: string;
     search: string;
     searchPlaceholder: string;
     allCategories: string;
@@ -589,6 +594,11 @@ export const dictionaries: Record<Language, Dictionary> = {
     },
     history: {
       title: "History",
+      viewList: "List",
+      viewCalendar: "Calendar",
+      calendarSelectedDay: "Selected day",
+      calendarEmptyDay: "No transactions on this day.",
+      calendarMissingRates: "Some totals exclude transactions without an exchange rate.",
       search: "Search",
       searchPlaceholder: "Tag, category, wallet, or note",
       allCategories: "All categories",
@@ -1034,6 +1044,11 @@ export const dictionaries: Record<Language, Dictionary> = {
     },
     history: {
       title: "История",
+      viewList: "Список",
+      viewCalendar: "Календарь",
+      calendarSelectedDay: "Выбранный день",
+      calendarEmptyDay: "В этот день операций нет.",
+      calendarMissingRates: "Некоторые итоги не включают операции без курса валют.",
       search: "Поиск",
       searchPlaceholder: "Тег, категория, кошелек или заметка",
       allCategories: "Все категории",
