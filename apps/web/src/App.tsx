@@ -275,6 +275,7 @@ export function App() {
               wallets={wallets}
               categories={categories}
               recurringTransactions={recurringTransactions}
+              transactions={transactions}
               settings={{ ...settings, activeWalletId: addWalletId }}
               t={t}
               onSubmit={async (input) => {
