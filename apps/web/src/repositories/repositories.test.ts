@@ -30,6 +30,47 @@ describe("finance repositories", () => {
     expect(await categoryRepository.listCategories("income")).not.toHaveLength(0);
   });
 
+  it("reorders categories and replaces their linked data", async () => {
+    await seedLocalData();
+    const expenseCategories = await categoryRepository.listCategories("expense");
+    const source = expenseCategories[0];
+    const target = await categoryRepository.createCategory({
+      name: "Everyday",
+      type: "expense",
+      color: "#3f73c9",
+      icon: "shopping-basket"
+    });
+    const [wallet] = await walletRepository.listWallets();
+    const transaction = await transactionRepository.addTransaction({
+      walletId: wallet.id,
+      categoryId: source.id,
+      type: "expense",
+      amountMinor: 2400,
+      currency: wallet.currency,
+      transactionDate: "2026-07-20T12:00:00.000Z"
+    });
+    await budgetRepository.setBudget({
+      categoryId: source.id,
+      month: "2026-07",
+      amountMinor: 10000,
+      currency: wallet.currency
+    });
+
+    const reorderedIds = [target.id, ...expenseCategories.map((category) => category.id)];
+    await categoryRepository.reorderCategories("expense", reorderedIds);
+    expect((await categoryRepository.listCategories("expense"))[0].id).toBe(target.id);
+
+    await categoryRepository.replaceCategory(source.id, target.id, true);
+
+    expect(
+      (await transactionRepository.listTransactions({ walletId: "all" })).find(
+        (item) => item.id === transaction.id
+      )?.categoryId
+    ).toBe(target.id);
+    expect((await budgetRepository.listBudgets())[0].categoryId).toBe(target.id);
+    expect((await categoryRepository.listCategories("expense")).some((item) => item.id === source.id)).toBe(false);
+  });
+
   it("creates, updates, and archives wallets", async () => {
     await seedLocalData();
 

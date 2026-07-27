@@ -349,6 +349,19 @@ export interface Dictionary {
   categories: {
     title: string;
     icon: string;
+    iconSearch: string;
+    iconSearchEmpty: string;
+    recentColors: string;
+    organize: string;
+    reorderHint: string;
+    actionReplace: string;
+    actionMerge: string;
+    source: string;
+    target: string;
+    replaceDescription: string;
+    mergeDescription: string;
+    applyAction: string;
+    chooseDifferent: string;
     newTitle: string;
     editTitle: string;
     create: string;
@@ -733,6 +746,19 @@ export const dictionaries: Record<Language, Dictionary> = {
     categories: {
       title: "Categories",
       icon: "Icon",
+      iconSearch: "Search icons",
+      iconSearchEmpty: "No icons match this search.",
+      recentColors: "Recently used",
+      organize: "Organize",
+      reorderHint: "Drag categories to change their order.",
+      actionReplace: "Replace",
+      actionMerge: "Merge",
+      source: "Category to replace",
+      target: "New category",
+      replaceDescription: "Move all transactions, schedules, and budgets to another category.",
+      mergeDescription: "Move everything to another category and remove the old category.",
+      applyAction: "Apply changes",
+      chooseDifferent: "Choose two different categories.",
       newTitle: "New category",
       editTitle: "Edit category",
       create: "Create category",
@@ -1183,6 +1209,19 @@ export const dictionaries: Record<Language, Dictionary> = {
     categories: {
       title: "Категории",
       icon: "Иконка",
+      iconSearch: "Поиск иконок",
+      iconSearchEmpty: "Подходящих иконок не найдено.",
+      recentColors: "Недавние цвета",
+      organize: "Управление",
+      reorderHint: "Перетаскивай категории, чтобы изменить порядок.",
+      actionReplace: "Заменить",
+      actionMerge: "Объединить",
+      source: "Категория для замены",
+      target: "Новая категория",
+      replaceDescription: "Перенести все операции, расписания и бюджеты в другую категорию.",
+      mergeDescription: "Перенести всё в другую категорию и удалить старую.",
+      applyAction: "Применить",
+      chooseDifferent: "Выбери две разные категории.",
       newTitle: "Новая категория",
       editTitle: "Редактировать категорию",
       create: "Создать категорию",

@@ -176,6 +176,23 @@ export function useFinanceMutations() {
       mutationFn: (id: string) => categoryRepository.deleteCategory(id),
       onSuccess: invalidate
     }),
+    reorderCategories: useMutation({
+      mutationFn: ({ type, orderedIds }: { type: "expense" | "income"; orderedIds: string[] }) =>
+        categoryRepository.reorderCategories(type, orderedIds),
+      onSuccess: invalidate
+    }),
+    replaceCategory: useMutation({
+      mutationFn: ({
+        sourceId,
+        targetId,
+        deleteSource
+      }: {
+        sourceId: string;
+        targetId: string;
+        deleteSource: boolean;
+      }) => categoryRepository.replaceCategory(sourceId, targetId, deleteSource),
+      onSuccess: invalidate
+    }),
     setBudget: useMutation({
       mutationFn: (input: MonthlyBudgetInput) => budgetRepository.setBudget(input),
       onSuccess: invalidate

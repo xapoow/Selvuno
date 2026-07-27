@@ -40,7 +40,8 @@ const category: Category = {
   name: "Groceries",
   color: "#207a6f",
   icon: "shopping-basket",
-  type: "expense"
+  type: "expense",
+  sortOrder: 0
 };
 
 const budget: MonthlyBudget = {
