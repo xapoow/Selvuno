@@ -537,7 +537,7 @@ export function SettingsView({
                             timeStyle: "short"
                           }).format(new Date(snapshot.createdAt))}
                           {" · "}
-                          {snapshot.backup.transactions.length} {t.nav.history.toLocaleLowerCase(settings.locale)}
+                          {snapshot.backup.transactions.length} {t.settings.backupOperations}
                         </p>
                       </div>
                       <span className="flex gap-1">
