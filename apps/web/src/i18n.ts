@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.4.0";
+export const appVersion = "0.5.0";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -790,12 +790,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "See your month at a glance and make every wallet feel like yours.",
+      intro: "Faster daily tracking with safer local data and more flexible organization.",
       gotIt: "Explore the update",
       notes: [
-        "Financial calendar with daily income, expenses, and balance",
-        "Operations for the selected day with the same history filters",
-        "Custom wallet colors and icons, plus reversible archiving"
+        "Drag, search, replace, and merge categories without losing linked data",
+        "Quick transaction templates and a built-in amount calculator",
+        "Automatic local backups, offline status, and detailed notifications"
       ]
     },
     categories: {
@@ -1286,12 +1286,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Весь месяц перед глазами, а каждый кошелёк выглядит по-своему.",
+      intro: "Быстрее ежедневный учёт, надёжнее локальные данные и удобнее организация.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Финансовый календарь с доходами, расходами и балансом по дням",
-        "Операции выбранного дня с теми же фильтрами истории",
-        "Свои цвета и иконки кошельков, а также восстановление из архива"
+        "Перетаскивание, поиск, замена и объединение категорий без потери связанных данных",
+        "Быстрые шаблоны операций и встроенный калькулятор суммы",
+        "Автоматические локальные бэкапы, статус офлайн и подробные уведомления"
       ]
     },
     categories: {
