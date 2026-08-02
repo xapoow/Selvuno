@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "categories" | "backup" | "sync";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.4.0";
+export const appVersion = "0.5.0";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -171,6 +171,11 @@ export interface Dictionary {
     editTitle: string;
     amount: string;
     quickHint: string;
+    quickTemplates: string;
+    quickTemplatesHint: string;
+    calculate: string;
+    calculatorOperator: string;
+    calculatorError: string;
     tags: string;
     tagsPlaceholder: string;
     chooseCategory: string;
@@ -217,12 +222,29 @@ export interface Dictionary {
     body: string;
     accept: string;
   };
+  connectivity: {
+    offline: string;
+    online: string;
+  };
   notifications: {
     title: string;
     open: string;
     unread: string;
     markAllRead: string;
     empty: string;
+    detailsTitle: string;
+    backToNotifications: string;
+    detailVersion: string;
+    detailChanges: string;
+    detailCategory: string;
+    detailUsage: string;
+    detailPeriod: string;
+    detailDate: string;
+    detailGoal: string;
+    detailStatus: string;
+    statusCompleted: string;
+    statusOverdue: string;
+    statusUpcoming: string;
     updateTitle: string;
     updateBody: string;
     budgetNearTitle: string;
@@ -349,6 +371,19 @@ export interface Dictionary {
   categories: {
     title: string;
     icon: string;
+    iconSearch: string;
+    iconSearchEmpty: string;
+    recentColors: string;
+    organize: string;
+    reorderHint: string;
+    actionReplace: string;
+    actionMerge: string;
+    source: string;
+    target: string;
+    replaceDescription: string;
+    mergeDescription: string;
+    applyAction: string;
+    chooseDifferent: string;
     newTitle: string;
     editTitle: string;
     create: string;
@@ -376,6 +411,17 @@ export interface Dictionary {
     importJson: string;
     importError: string;
     replaceBackup: string;
+    automaticBackup: string;
+    automaticBackupHint: string;
+    backupHistory: string;
+    backupHistoryEmpty: string;
+    backupOperations: string;
+    backupReasonAutomatic: string;
+    backupReasonRestore: string;
+    restoreBackup: string;
+    restoreBackupConfirm: string;
+    deleteBackup: string;
+    deleteBackupConfirm: string;
     sync: string;
     comingSoon: string;
     syncTitle: string;
@@ -545,6 +591,11 @@ export const dictionaries: Record<Language, Dictionary> = {
       editTitle: "Edit transaction",
       amount: "Amount",
       quickHint: "Amount and category are enough — the rest is optional.",
+      quickTemplates: "Quick templates",
+      quickTemplatesHint: "Repeat a recent transaction in one tap.",
+      calculate: "Calculate",
+      calculatorOperator: "Calculator operator",
+      calculatorError: "Enter a positive amount or a valid calculation.",
       tags: "Tags",
       tagsPlaceholder: "coffee, travel, work",
       chooseCategory: "Choose a category.",
@@ -692,12 +743,29 @@ export const dictionaries: Record<Language, Dictionary> = {
       body: "MyFinances stores your settings and finance data only on this device. We do not use advertising cookies.",
       accept: "Got it"
     },
+    connectivity: {
+      offline: "Offline — changes stay safely on this device",
+      online: "Connection restored"
+    },
     notifications: {
       title: "Notifications",
       open: "Open notifications",
       unread: "unread",
       markAllRead: "Mark all as read",
       empty: "You are all caught up.",
+      detailsTitle: "Notification details",
+      backToNotifications: "Back to notifications",
+      detailVersion: "Version",
+      detailChanges: "Changes",
+      detailCategory: "Category",
+      detailUsage: "Limit used",
+      detailPeriod: "Period",
+      detailDate: "Date",
+      detailGoal: "Goal",
+      detailStatus: "Status",
+      statusCompleted: "Completed",
+      statusOverdue: "Overdue",
+      statusUpcoming: "Upcoming",
       updateTitle: "MyFinances {version} is ready",
       updateBody: "See the latest improvements in this update.",
       budgetNearTitle: "Budget is running low",
@@ -716,17 +784,30 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "See your month at a glance and make every wallet feel like yours.",
+      intro: "Faster daily tracking with safer local data and more flexible organization.",
       gotIt: "Explore the update",
       notes: [
-        "Financial calendar with daily income, expenses, and balance",
-        "Operations for the selected day with the same history filters",
-        "Custom wallet colors and icons, plus reversible archiving"
+        "Drag, search, replace, and merge categories without losing linked data",
+        "Quick transaction templates and a built-in amount calculator",
+        "Automatic local backups, offline status, and detailed notifications"
       ]
     },
     categories: {
       title: "Categories",
       icon: "Icon",
+      iconSearch: "Search icons",
+      iconSearchEmpty: "No icons match this search.",
+      recentColors: "Recently used",
+      organize: "Organize",
+      reorderHint: "Drag categories to change their order.",
+      actionReplace: "Replace",
+      actionMerge: "Merge",
+      source: "Category to replace",
+      target: "New category",
+      replaceDescription: "Move all transactions, schedules, and budgets to another category.",
+      mergeDescription: "Move everything to another category and remove the old category.",
+      applyAction: "Apply changes",
+      chooseDifferent: "Choose two different categories.",
       newTitle: "New category",
       editTitle: "Edit category",
       create: "Create category",
@@ -773,6 +854,17 @@ export const dictionaries: Record<Language, Dictionary> = {
       importJson: "Import JSON",
       importError: "Unable to import backup.",
       replaceBackup: "Replace local data with this backup?",
+      automaticBackup: "Automatic local backups",
+      automaticBackupHint: "MyFinances saves recent versions on this device as your data changes.",
+      backupHistory: "Restore history",
+      backupHistoryEmpty: "Automatic backups will appear here after your next change.",
+      backupOperations: "transactions",
+      backupReasonAutomatic: "Automatic backup",
+      backupReasonRestore: "Before restoration",
+      restoreBackup: "Restore",
+      restoreBackupConfirm: "Replace current local data with this saved version?",
+      deleteBackup: "Delete backup",
+      deleteBackupConfirm: "Delete this saved version?",
       sync: "Sync",
       comingSoon: "Coming soon",
       syncTitle: "Cloud sync is planned",
@@ -988,6 +1080,11 @@ export const dictionaries: Record<Language, Dictionary> = {
       editTitle: "Редактировать операцию",
       amount: "Сумма",
       quickHint: "Достаточно суммы и категории — остальное необязательно.",
+      quickTemplates: "Быстрые шаблоны",
+      quickTemplatesHint: "Повтори недавнюю операцию одним нажатием.",
+      calculate: "Посчитать",
+      calculatorOperator: "Оператор калькулятора",
+      calculatorError: "Введи положительную сумму или корректное вычисление.",
       tags: "Теги",
       tagsPlaceholder: "кофе, поездка, работа",
       chooseCategory: "Выбери категорию.",
@@ -1135,12 +1232,29 @@ export const dictionaries: Record<Language, Dictionary> = {
       body: "MyFinances хранит настройки и финансовые данные только на этом устройстве. Рекламные cookies не используются.",
       accept: "Понятно"
     },
+    connectivity: {
+      offline: "Нет сети — изменения сохраняются на устройстве",
+      online: "Соединение восстановлено"
+    },
     notifications: {
       title: "Уведомления",
       open: "Открыть уведомления",
       unread: "непрочитанных",
       markAllRead: "Прочитать все",
       empty: "Новых уведомлений нет.",
+      detailsTitle: "Подробнее об уведомлении",
+      backToNotifications: "Назад к уведомлениям",
+      detailVersion: "Версия",
+      detailChanges: "Изменения",
+      detailCategory: "Категория",
+      detailUsage: "Использовано лимита",
+      detailPeriod: "Период",
+      detailDate: "Дата",
+      detailGoal: "Цель",
+      detailStatus: "Статус",
+      statusCompleted: "Выполнено",
+      statusOverdue: "Просрочено",
+      statusUpcoming: "Скоро",
       updateTitle: "MyFinances {version} уже здесь",
       updateBody: "Посмотри, что изменилось в новой версии.",
       budgetNearTitle: "Бюджет подходит к лимиту",
@@ -1159,17 +1273,30 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Весь месяц перед глазами, а каждый кошелёк выглядит по-своему.",
+      intro: "Быстрее ежедневный учёт, надёжнее локальные данные и удобнее организация.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Финансовый календарь с доходами, расходами и балансом по дням",
-        "Операции выбранного дня с теми же фильтрами истории",
-        "Свои цвета и иконки кошельков, а также восстановление из архива"
+        "Перетаскивание, поиск, замена и объединение категорий без потери связанных данных",
+        "Быстрые шаблоны операций и встроенный калькулятор суммы",
+        "Автоматические локальные бэкапы, статус офлайн и подробные уведомления"
       ]
     },
     categories: {
       title: "Категории",
       icon: "Иконка",
+      iconSearch: "Поиск иконок",
+      iconSearchEmpty: "Подходящих иконок не найдено.",
+      recentColors: "Недавние цвета",
+      organize: "Управление",
+      reorderHint: "Перетаскивай категории, чтобы изменить порядок.",
+      actionReplace: "Заменить",
+      actionMerge: "Объединить",
+      source: "Категория для замены",
+      target: "Новая категория",
+      replaceDescription: "Перенести все операции, расписания и бюджеты в другую категорию.",
+      mergeDescription: "Перенести всё в другую категорию и удалить старую.",
+      applyAction: "Применить",
+      chooseDifferent: "Выбери две разные категории.",
       newTitle: "Новая категория",
       editTitle: "Редактировать категорию",
       create: "Создать категорию",
@@ -1216,6 +1343,17 @@ export const dictionaries: Record<Language, Dictionary> = {
       importJson: "Импорт JSON",
       importError: "Не удалось импортировать бэкап.",
       replaceBackup: "Заменить локальные данные этим бэкапом?",
+      automaticBackup: "Автоматические локальные бэкапы",
+      automaticBackupHint: "MyFinances сохраняет недавние версии на этом устройстве при изменении данных.",
+      backupHistory: "История восстановления",
+      backupHistoryEmpty: "Автоматические бэкапы появятся здесь после следующего изменения.",
+      backupOperations: "операций",
+      backupReasonAutomatic: "Автоматический бэкап",
+      backupReasonRestore: "Перед восстановлением",
+      restoreBackup: "Восстановить",
+      restoreBackupConfirm: "Заменить текущие локальные данные этой сохранённой версией?",
+      deleteBackup: "Удалить бэкап",
+      deleteBackupConfirm: "Удалить эту сохранённую версию?",
       sync: "Синхронизация",
       comingSoon: "Скоро",
       syncTitle: "Облачная синхронизация запланирована",

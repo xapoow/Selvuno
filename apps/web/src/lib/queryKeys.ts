@@ -4,6 +4,7 @@ export const queryKeys = {
   wallets: ["wallets"] as const,
   archivedWallets: ["archived-wallets"] as const,
   categories: ["categories"] as const,
+  backupSnapshots: ["backup-snapshots"] as const,
   transactions: ["transactions"] as const,
   budgets: ["budgets"] as const,
   recurringTransactions: ["recurring-transactions"] as const,

@@ -40,7 +40,8 @@ const category: Category = {
   name: "Groceries",
   color: "#207a6f",
   icon: "shopping-basket",
-  type: "expense"
+  type: "expense",
+  sortOrder: 0
 };
 
 const budget: MonthlyBudget = {
@@ -118,7 +119,11 @@ describe("app notifications", () => {
     expect(near).toContainEqual(
       expect.objectContaining({
         id: `budget:2026-07:${category.id}:near`,
-        tone: "warning"
+        tone: "warning",
+        details: expect.arrayContaining([
+          expect.objectContaining({ value: "Продукты" }),
+          expect.objectContaining({ value: "85%" })
+        ])
       })
     );
 

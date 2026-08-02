@@ -8,12 +8,14 @@ import type {
   Wallet,
   WalletView
 } from "@myfinances/types";
-import { minorToDecimal, parseAmountToMinor } from "@myfinances/utils";
-import { CalendarDays, ChevronDown, Hash, StickyNote } from "lucide-react";
-import { type Dictionary } from "../i18n";
+import { decimalToMinor, formatMoney, minorToDecimal } from "@myfinances/utils";
+import { CalendarDays, ChevronDown, Equal, Hash, StickyNote } from "lucide-react";
+import { getCategoryName, type Dictionary } from "../i18n";
+import { evaluateAmountExpression } from "../lib/amountExpression";
 import { cn } from "../lib/cn";
 import { fromDateInputValue, toDateInputValue } from "../lib/dates";
 import { formatTagsInput, parseTagsInput } from "../lib/tags";
+import { CategoryIcon } from "../lib/icons";
 import { TransactionCategoryPicker } from "./TransactionCategoryPicker";
 import { Button } from "./ui/Button";
 import { DatePicker } from "./ui/DatePicker";
@@ -27,6 +29,7 @@ interface TransactionFormProps {
   settings: Settings;
   t: Dictionary;
   initial?: Transaction;
+  recentTransactions?: Transaction[];
   activeWalletId: WalletView;
   lockWalletToActive?: boolean;
   submitLabel: string;
@@ -39,6 +42,7 @@ export function TransactionForm({
   settings,
   t,
   initial,
+  recentTransactions = [],
   activeWalletId,
   lockWalletToActive = false,
   submitLabel,
@@ -65,6 +69,47 @@ export function TransactionForm({
     () => categories.filter((category) => category.type === type),
     [categories, type]
   );
+  const quickTemplates = useMemo(() => {
+    const seen = new Set<string>();
+    return [...recentTransactions]
+      .filter(
+        (transaction) =>
+          !transaction.deletedAt &&
+          wallets.some((wallet) => wallet.id === transaction.walletId) &&
+          categories.some((category) => category.id === transaction.categoryId)
+      )
+      .sort(
+        (left, right) =>
+          Date.parse(right.transactionDate) - Date.parse(left.transactionDate)
+      )
+      .filter((transaction) => {
+        const key = [
+          transaction.walletId,
+          transaction.type,
+          transaction.categoryId,
+          transaction.amountMinor,
+          transaction.note ?? "",
+          transaction.tags.join(",")
+        ].join(":");
+        if (seen.has(key)) {
+          return false;
+        }
+        seen.add(key);
+        return true;
+      })
+      .slice(0, 5);
+  }, [categories, recentTransactions, wallets]);
+  const calculatedAmount = useMemo(() => {
+    if (!amount.trim()) {
+      return null;
+    }
+    try {
+      return evaluateAmountExpression(amount);
+    } catch {
+      return null;
+    }
+  }, [amount]);
+  const amountContainsExpression = /[+\-*/()]/.test(amount.replace(/^\s+/, ""));
   const today = toDateInputValue(new Date().toISOString());
   const formattedDate = useMemo(
     () =>
@@ -101,11 +146,21 @@ export function TransactionForm({
       if (!walletId || !categoryId) {
         throw new Error(walletId ? t.transaction.chooseCategory : t.transaction.chooseWalletAndCategory);
       }
+      let evaluatedAmount: number;
+      try {
+        evaluatedAmount = evaluateAmountExpression(amount);
+      } catch {
+        throw new Error(t.transaction.calculatorError);
+      }
+      const amountMinor = decimalToMinor(evaluatedAmount, currency);
+      if (amountMinor <= 0) {
+        throw new Error(t.transaction.calculatorError);
+      }
       await onSubmit({
         walletId,
         categoryId,
         type,
-        amountMinor: parseAmountToMinor(amount, currency),
+        amountMinor,
         currency,
         transactionDate: fromDateInputValue(date),
         note: note.trim() || undefined,
@@ -125,6 +180,50 @@ export function TransactionForm({
 
   return (
     <form className="grid gap-5" onSubmit={handleSubmit}>
+      {!initial && quickTemplates.length ? (
+        <section className="grid gap-2">
+          <div>
+            <p className="text-sm font-semibold text-foreground">{t.transaction.quickTemplates}</p>
+            <p className="mt-0.5 text-xs text-muted">{t.transaction.quickTemplatesHint}</p>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {quickTemplates.map((template) => {
+              const category = categories.find((item) => item.id === template.categoryId);
+              return (
+                <button
+                  key={template.id}
+                  type="button"
+                  className="app-focus app-control flex shrink-0 items-center gap-2 rounded-app p-2 pr-3 text-left active:scale-[0.98]"
+                  onClick={() => {
+                    setType(template.type);
+                    setWalletId(template.walletId);
+                    setCategoryId(template.categoryId);
+                    setAmount(String(minorToDecimal(template.amountMinor, template.currency)));
+                    setNote(template.note ?? "");
+                    setTagsInput(formatTagsInput(template.tags));
+                    setSaved(false);
+                  }}
+                >
+                  <span
+                    className="grid h-9 w-9 place-items-center rounded-app text-white"
+                    style={{ backgroundColor: category?.color ?? "#676761" }}
+                  >
+                    <CategoryIcon name={category?.icon ?? "sparkles"} className="h-4 w-4" />
+                  </span>
+                  <span>
+                    <span className="block max-w-28 truncate text-xs font-semibold text-foreground">
+                      {getCategoryName(category?.name, t)}
+                    </span>
+                    <span className="block text-[11px] text-muted">
+                      {formatMoney(template.amountMinor, template.currency, settings.locale)}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
       <SegmentedControl
         value={type}
         onChange={(nextType) => {
@@ -148,7 +247,7 @@ export function TransactionForm({
         <span className="flex min-w-0 items-baseline gap-2">
           <input
             aria-label={`${t.transaction.amount} (${currency})`}
-            inputMode="decimal"
+            inputMode="text"
             placeholder="0"
             value={amount}
             onChange={(event) => {
@@ -158,6 +257,42 @@ export function TransactionForm({
             className="app-focus min-w-0 flex-1 bg-transparent text-4xl font-semibold tracking-tight text-foreground outline-none placeholder:text-muted/45 sm:text-5xl"
           />
           <span className="text-lg font-semibold text-muted">{currency}</span>
+        </span>
+        <span className="flex flex-wrap items-center gap-1.5">
+          {[
+            { label: "+", value: "+" },
+            { label: "−", value: "-" },
+            { label: "×", value: "*" },
+            { label: "÷", value: "/" }
+          ].map((operator) => (
+            <button
+              key={operator.value}
+              type="button"
+              aria-label={`${t.transaction.calculatorOperator} ${operator.label}`}
+              className="app-focus app-field grid h-8 min-w-9 place-items-center rounded-[6px] px-2 text-sm font-semibold text-muted hover:text-foreground"
+              onClick={() => {
+                setAmount((current) => `${current.trimEnd()} ${operator.value} `);
+                setSaved(false);
+              }}
+            >
+              {operator.label}
+            </button>
+          ))}
+          {amountContainsExpression && calculatedAmount !== null ? (
+            <>
+              <button
+                type="button"
+                className="app-focus app-field ml-auto inline-flex h-8 items-center gap-1 rounded-[6px] px-2 text-xs font-semibold text-accent"
+                onClick={() => setAmount(String(Math.round(calculatedAmount * 100_000_000) / 100_000_000))}
+              >
+                <Equal className="h-3.5 w-3.5" />
+                {t.transaction.calculate}
+              </button>
+              <span className="w-full text-xs font-semibold text-income">
+                = {formatMoney(decimalToMinor(calculatedAmount, currency), currency, settings.locale)}
+              </span>
+            </>
+          ) : null}
         </span>
       </label>
 

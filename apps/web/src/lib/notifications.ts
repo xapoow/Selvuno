@@ -18,6 +18,10 @@ export interface AppNotification {
   tone: AppNotificationTone;
   title: string;
   body: string;
+  details: Array<{
+    label: string;
+    value: string;
+  }>;
 }
 
 interface NotificationInput {
@@ -69,7 +73,11 @@ export function buildAppNotifications({
       id: `update:${appVersion}`,
       tone: "update",
       title: fillTemplate(t.notifications.updateTitle, { version: appVersion }),
-      body: t.notifications.updateBody
+      body: t.notifications.updateBody,
+      details: [
+        { label: t.notifications.detailVersion, value: appVersion },
+        { label: t.notifications.detailChanges, value: t.updates.notes.join(" • ") }
+      ]
     }
   ];
   const today = toCalendarDate(now);
@@ -96,7 +104,12 @@ export function buildAppNotifications({
       body: fillTemplate(
         exceeded ? t.notifications.budgetExceededBody : t.notifications.budgetNearBody,
         { category, percentage: item.percentage }
-      )
+      ),
+      details: [
+        { label: t.notifications.detailCategory, value: category },
+        { label: t.notifications.detailUsage, value: `${item.percentage}%` },
+        { label: t.notifications.detailPeriod, value: currentMonth }
+      ]
     });
   }
 
@@ -119,7 +132,14 @@ export function buildAppNotifications({
       body: fillTemplate(t.notifications.recurringBody, {
         category,
         date: formatCalendarDate(recurring.nextRunDate, settings.locale)
-      })
+      }),
+      details: [
+        { label: t.notifications.detailCategory, value: category },
+        {
+          label: t.notifications.detailDate,
+          value: formatCalendarDate(recurring.nextRunDate, settings.locale)
+        }
+      ]
     });
   }
 
@@ -142,7 +162,11 @@ export function buildAppNotifications({
         id: `goal:${goal.id}:completed`,
         tone: "success",
         title: t.notifications.goalCompletedTitle,
-        body: fillTemplate(t.notifications.goalCompletedBody, { goal: goal.name })
+        body: fillTemplate(t.notifications.goalCompletedBody, { goal: goal.name }),
+        details: [
+          { label: t.notifications.detailGoal, value: goal.name },
+          { label: t.notifications.detailStatus, value: t.notifications.statusCompleted }
+        ]
       });
       continue;
     }
@@ -164,7 +188,18 @@ export function buildAppNotifications({
           goal: goal.name,
           date: formatCalendarDate(goal.targetDate, settings.locale)
         }
-      )
+      ),
+      details: [
+        { label: t.notifications.detailGoal, value: goal.name },
+        {
+          label: t.notifications.detailDate,
+          value: formatCalendarDate(goal.targetDate, settings.locale)
+        },
+        {
+          label: t.notifications.detailStatus,
+          value: overdue ? t.notifications.statusOverdue : t.notifications.statusUpcoming
+        }
+      ]
     });
   }
 

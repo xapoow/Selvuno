@@ -86,6 +86,11 @@ export function useFinanceData() {
     queryFn: () => walletTransferRepository.listTransfers(),
     enabled
   });
+  const backupSnapshots = useQuery({
+    queryKey: queryKeys.backupSnapshots,
+    queryFn: () => backupRepository.listSnapshots(),
+    enabled
+  });
 
   return {
     bootstrap,
@@ -98,7 +103,8 @@ export function useFinanceData() {
     recurringTransactions,
     savingsGoals,
     savingsGoalContributions,
-    walletTransfers
+    walletTransfers,
+    backupSnapshots
   };
 }
 
@@ -113,7 +119,8 @@ function invalidateFinance(queryClient: ReturnType<typeof useQueryClient>) {
     queryClient.invalidateQueries({ queryKey: queryKeys.recurringTransactions }),
     queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals }),
     queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoalContributions }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.walletTransfers })
+    queryClient.invalidateQueries({ queryKey: queryKeys.walletTransfers }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.backupSnapshots })
   ]);
 }
 
@@ -174,6 +181,23 @@ export function useFinanceMutations() {
     }),
     deleteCategory: useMutation({
       mutationFn: (id: string) => categoryRepository.deleteCategory(id),
+      onSuccess: invalidate
+    }),
+    reorderCategories: useMutation({
+      mutationFn: ({ type, orderedIds }: { type: "expense" | "income"; orderedIds: string[] }) =>
+        categoryRepository.reorderCategories(type, orderedIds),
+      onSuccess: invalidate
+    }),
+    replaceCategory: useMutation({
+      mutationFn: ({
+        sourceId,
+        targetId,
+        deleteSource
+      }: {
+        sourceId: string;
+        targetId: string;
+        deleteSource: boolean;
+      }) => categoryRepository.replaceCategory(sourceId, targetId, deleteSource),
       onSuccess: invalidate
     }),
     setBudget: useMutation({
@@ -241,6 +265,18 @@ export function useFinanceMutations() {
     }),
     importBackup: useMutation({
       mutationFn: (backup: unknown) => backupRepository.importBackup(backup),
+      onSuccess: invalidate
+    }),
+    createBackupSnapshot: useMutation({
+      mutationFn: () => backupRepository.createSnapshot("automatic"),
+      onSuccess: invalidate
+    }),
+    restoreBackupSnapshot: useMutation({
+      mutationFn: (id: string) => backupRepository.restoreSnapshot(id),
+      onSuccess: invalidate
+    }),
+    deleteBackupSnapshot: useMutation({
+      mutationFn: (id: string) => backupRepository.deleteSnapshot(id),
       onSuccess: invalidate
     })
   };

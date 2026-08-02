@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { WalletView } from "@myfinances/types";
 import { BottomNavigation } from "./components/BottomNavigation";
@@ -7,6 +7,7 @@ import { HeaderNavigation } from "./components/HeaderNavigation";
 import { MobileWalletDashboardPager } from "./components/MobileWalletDashboardPager";
 import { MobileWalletHistoryPager } from "./components/MobileWalletHistoryPager";
 import { NotificationCenter } from "./components/NotificationCenter";
+import { OfflineIndicator } from "./components/OfflineIndicator";
 import { UpdateAnnouncement } from "./components/UpdateAnnouncement";
 import { WalletSwitcher } from "./components/WalletSwitcher";
 import { ErrorScreen } from "./components/ErrorScreen";
@@ -40,6 +41,7 @@ export function App() {
   const savingsGoals = data.savingsGoals.data ?? [];
   const savingsGoalContributions = data.savingsGoalContributions.data ?? [];
   const walletTransfers = data.walletTransfers.data ?? [];
+  const backupSnapshots = data.backupSnapshots.data ?? [];
   const isLoading =
     data.bootstrap.isLoading ||
     data.settings.isLoading ||
@@ -51,7 +53,8 @@ export function App() {
     data.recurringTransactions.isLoading ||
     data.savingsGoals.isLoading ||
     data.savingsGoalContributions.isLoading ||
-    data.walletTransfers.isLoading;
+    data.walletTransfers.isLoading ||
+    data.backupSnapshots.isLoading;
   const isError =
     data.bootstrap.isError ||
     data.settings.isError ||
@@ -63,8 +66,24 @@ export function App() {
     data.recurringTransactions.isError ||
     data.savingsGoals.isError ||
     data.savingsGoalContributions.isError ||
-    data.walletTransfers.isError;
+    data.walletTransfers.isError ||
+    data.backupSnapshots.isError;
   const fallbackT = getDictionary(settings?.locale ?? (typeof navigator === "undefined" ? "en-US" : navigator.language));
+  const lastBackupRevision = useRef("");
+  const backupRevision = [
+    wallets,
+    archivedWallets,
+    categories,
+    transactions,
+    budgets,
+    recurringTransactions,
+    savingsGoals,
+    savingsGoalContributions,
+    walletTransfers
+  ]
+    .flatMap((items) => items.map((item) => `${item.id}:${item.updatedAt}`))
+    .sort()
+    .join("|");
 
   useEffect(() => {
     if (!settings) {
@@ -82,6 +101,24 @@ export function App() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activeView]);
+
+  useEffect(() => {
+    if (
+      isLoading ||
+      !settings?.onboardingCompleted ||
+      !backupRevision ||
+      lastBackupRevision.current === backupRevision
+    ) {
+      return;
+    }
+    lastBackupRevision.current = backupRevision;
+    const timer = window.setTimeout(() => {
+      void mutations.createBackupSnapshot.mutateAsync().catch(() => {
+        lastBackupRevision.current = "";
+      });
+    }, 2200);
+    return () => window.clearTimeout(timer);
+  }, [backupRevision, isLoading, settings?.onboardingCompleted]);
 
   const activeWalletId: WalletView =
     settings && (settings.activeWalletId === "all" || wallets.some((wallet) => wallet.id === settings.activeWalletId))
@@ -139,7 +176,8 @@ export function App() {
           data.savingsGoalContributions.error instanceof Error
             ? data.savingsGoalContributions.error.message
             : null,
-          data.walletTransfers.error instanceof Error ? data.walletTransfers.error.message : null
+          data.walletTransfers.error instanceof Error ? data.walletTransfers.error.message : null,
+          data.backupSnapshots.error instanceof Error ? data.backupSnapshots.error.message : null
         ]
           .filter(Boolean)
           .join("\n")}
@@ -178,6 +216,7 @@ export function App() {
           onUpdateWallet={(id, input) => mutations.updateWallet.mutateAsync({ id, input })}
         />
         <CookieNotice />
+        <OfflineIndicator t={fallbackT} />
       </>
     );
   }
@@ -275,6 +314,7 @@ export function App() {
               wallets={wallets}
               categories={categories}
               recurringTransactions={recurringTransactions}
+              transactions={transactions}
               settings={{ ...settings, activeWalletId: addWalletId }}
               t={t}
               onSubmit={async (input) => {
@@ -380,6 +420,7 @@ export function App() {
             <SettingsView
               settings={settings}
               categories={categories}
+              backupSnapshots={backupSnapshots}
               t={t}
               onUpdateSettings={async (input) => {
                 await mutations.updateSettings.mutateAsync(input);
@@ -391,10 +432,22 @@ export function App() {
                 await mutations.updateCategory.mutateAsync({ id, input });
               }}
               onDeleteCategory={(id) => mutations.deleteCategory.mutateAsync(id)}
+              onReorderCategories={(type, orderedIds) =>
+                mutations.reorderCategories.mutateAsync({ type, orderedIds })
+              }
+              onReplaceCategory={(sourceId, targetId, deleteSource) =>
+                mutations.replaceCategory.mutateAsync({ sourceId, targetId, deleteSource })
+              }
               onExportBackup={() => mutations.exportBackup.mutateAsync()}
               onImportBackup={async (backup) => {
                 await mutations.importBackup.mutateAsync(backup);
               }}
+              onRestoreBackupSnapshot={async (id) => {
+                await mutations.restoreBackupSnapshot.mutateAsync(id);
+              }}
+              onDeleteBackupSnapshot={(id) =>
+                mutations.deleteBackupSnapshot.mutateAsync(id)
+              }
             />
           ) : null}
         </motion.div>
@@ -403,6 +456,7 @@ export function App() {
       <BottomNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
       <UpdateAnnouncement t={t} />
       <CookieNotice />
+      <OfflineIndicator t={t} />
     </div>
   );
 }
