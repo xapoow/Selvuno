@@ -31,6 +31,7 @@ import { resetLocalApplicationData } from "../lib/resetLocalData";
 import { ColorThemePicker } from "../components/ColorThemePicker";
 import { CategoryForm } from "../components/CategoryForm";
 import { AutomationSettingsPanel } from "../components/AutomationSettingsPanel";
+import { FeatureSettingsPanel } from "../components/FeatureSettingsPanel";
 import { PrivacySettingsPanel } from "../components/PrivacySettingsPanel";
 import { BottomSheet } from "../components/ui/BottomSheet";
 import { Button } from "../components/ui/Button";
@@ -75,6 +76,7 @@ const settingsTabs: Array<{ value: SettingsTab }> = [
   { value: "general" },
   { value: "appearance" },
   { value: "automation" },
+  { value: "features" },
   { value: "privacy" },
   { value: "categories" },
   { value: "backup" },
@@ -414,6 +416,16 @@ export function SettingsView({
       {activeTab === "automation" ? (
         <Section title={t.settings.automation}>
           <AutomationSettingsPanel
+            settings={settings}
+            t={t}
+            onUpdateSettings={onUpdateSettings}
+          />
+        </Section>
+      ) : null}
+
+      {activeTab === "features" ? (
+        <Section title={t.settings.features}>
+          <FeatureSettingsPanel
             settings={settings}
             t={t}
             onUpdateSettings={onUpdateSettings}

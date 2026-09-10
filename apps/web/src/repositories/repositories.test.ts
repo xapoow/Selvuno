@@ -79,6 +79,10 @@ describe("finance repositories", () => {
       name: "Savings",
       currency: "eur",
       initialBalanceMinor: 12500,
+      kind: "credit",
+      creditLimitMinor: 100000,
+      excludeFromTotals: true,
+      hideBalance: true,
       color: "#7b61ff",
       icon: "piggy-bank"
     });
@@ -88,6 +92,10 @@ describe("finance repositories", () => {
       name: "Reserve",
       currency: "EUR",
       initialBalanceMinor: 12500,
+      kind: "credit",
+      creditLimitMinor: 100000,
+      excludeFromTotals: true,
+      hideBalance: true,
       color: "#7b61ff",
       icon: "piggy-bank"
     });
@@ -194,6 +202,10 @@ describe("finance repositories", () => {
     await financeDb.wallets.put({
       ...wallet,
       currency: undefined,
+      kind: undefined,
+      creditLimitMinor: undefined,
+      excludeFromTotals: undefined,
+      hideBalance: undefined,
       color: undefined,
       icon: undefined
     } as never);
@@ -207,7 +219,11 @@ describe("finance repositories", () => {
     expect((await walletRepository.listWallets())[0].initialBalanceMinor).toBe(0);
     expect((await walletRepository.listWallets())[0]).toMatchObject({
       color: "#207a6f",
-      icon: "wallet-cards"
+      icon: "wallet-cards",
+      kind: "cash",
+      creditLimitMinor: 0,
+      excludeFromTotals: false,
+      hideBalance: false
     });
     expect((await transactionRepository.listTransactions({ includeDeleted: true }))[0].currency).toBeTruthy();
     expect((await transactionRepository.listTransactions({ includeDeleted: true }))[0].tags).toEqual([]);

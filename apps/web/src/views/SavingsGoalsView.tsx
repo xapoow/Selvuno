@@ -16,6 +16,7 @@ import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
 import type { Dictionary } from "../i18n";
 import { toCalendarDate } from "../lib/dates";
+import { shouldHideWalletAmounts } from "../lib/walletFeatures";
 
 interface SavingsGoalsViewProps {
   wallets: Wallet[];
@@ -98,6 +99,7 @@ export function SavingsGoalsView({
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {goals.map((goal) => {
             const wallet = walletById.get(goal.walletId);
+            const hideGoalAmounts = shouldHideWalletAmounts(settings, wallet);
             const goalContributions = contributionsByGoal.get(goal.id) ?? [];
             const savedMinor = goalContributions.reduce(
               (sum, contribution) => sum + contribution.amountMinor,
@@ -171,7 +173,7 @@ export function SavingsGoalsView({
                       {t.goals.saved}
                     </p>
                     <p className="mt-1 text-sm font-semibold text-foreground">
-                      {formatMoney(savedMinor, goal.currency, settings.locale, settings.hideAmounts)}
+                      {formatMoney(savedMinor, goal.currency, settings.locale, hideGoalAmounts)}
                     </p>
                   </div>
                   <div>
@@ -179,7 +181,7 @@ export function SavingsGoalsView({
                       {t.goals.remaining}
                     </p>
                     <p className="mt-1 text-sm font-semibold text-foreground">
-                      {formatMoney(remainingMinor, goal.currency, settings.locale, settings.hideAmounts)}
+                      {formatMoney(remainingMinor, goal.currency, settings.locale, hideGoalAmounts)}
                     </p>
                   </div>
                 </div>
@@ -280,7 +282,10 @@ export function SavingsGoalsView({
               >
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-foreground">
-                    {settings.hideAmounts
+                    {shouldHideWalletAmounts(
+                      settings,
+                      wallets.find((wallet) => wallet.id === historyGoal?.walletId)
+                    )
                       ? "••••"
                       : `+${formatMoney(
                           contribution.amountMinor,

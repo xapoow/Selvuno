@@ -175,6 +175,40 @@ export class FinanceDatabase extends Dexie {
         "id, fromWalletId, toWalletId, transferDate, deletedAt, updatedAt",
       backupSnapshots: "id, createdAt, reason"
     });
+    this.version(10)
+      .stores({
+        wallets: "id, name, currency, kind, excludeFromTotals, archivedAt, deletedAt, updatedAt",
+        categories: "id, sortOrder, name, type, deletedAt, updatedAt",
+        transactions:
+          "id, walletId, categoryId, type, transactionDate, recurringTransactionId, &[recurringTransactionId+recurrenceDate], deletedAt, updatedAt",
+        transactionTemplates: "id, walletId, categoryId, type, sortOrder, deletedAt, updatedAt",
+        settings: "id",
+        budgets: "id, month, categoryId, [categoryId+month], deletedAt, updatedAt",
+        recurringTransactions:
+          "id, walletId, categoryId, type, frequency, nextRunDate, paused, deletedAt, updatedAt",
+        savingsGoals: "id, walletId, targetDate, deletedAt, updatedAt",
+        savingsGoalContributions: "id, goalId, contributionDate, deletedAt, updatedAt",
+        walletTransfers:
+          "id, fromWalletId, toWalletId, transferDate, deletedAt, updatedAt",
+        backupSnapshots: "id, createdAt, reason"
+      })
+      .upgrade((transaction) =>
+        transaction
+          .table("wallets")
+          .toCollection()
+          .modify((wallet: Partial<Wallet>) => {
+            wallet.kind ||= "cash";
+            if (!Number.isInteger(wallet.creditLimitMinor)) {
+              wallet.creditLimitMinor = 0;
+            }
+            if (typeof wallet.excludeFromTotals !== "boolean") {
+              wallet.excludeFromTotals = false;
+            }
+            if (typeof wallet.hideBalance !== "boolean") {
+              wallet.hideBalance = false;
+            }
+          })
+      );
   }
 }
 
@@ -243,6 +277,7 @@ export async function seedLocalData(db = financeDb): Promise<void> {
       quickTemplatesEnabled: true,
       categorySuggestionsEnabled: false,
       addAnotherEnabled: true,
+      advancedWalletsEnabled: false,
       onboardingCompleted: false,
       defaultsVersion: 2,
       createdAt: now,
@@ -287,6 +322,9 @@ export async function seedLocalData(db = financeDb): Promise<void> {
     if (typeof settings.addAnotherEnabled !== "boolean") {
       repairedSettings.addAnotherEnabled = true;
     }
+    if (typeof settings.advancedWalletsEnabled !== "boolean") {
+      repairedSettings.advancedWalletsEnabled = false;
+    }
     if (typeof settings.onboardingCompleted !== "boolean") {
       repairedSettings.onboardingCompleted = true;
     }
@@ -308,6 +346,10 @@ export async function seedLocalData(db = financeDb): Promise<void> {
       name: "Everyday",
       currency: DEFAULT_CURRENCY,
       initialBalanceMinor: 0,
+      kind: "cash",
+      creditLimitMinor: 0,
+      excludeFromTotals: false,
+      hideBalance: false,
       color: "#207a6f",
       icon: "wallet-cards",
       archivedAt: null
@@ -321,6 +363,10 @@ export async function seedLocalData(db = financeDb): Promise<void> {
         (wallet) =>
           !wallet.currency ||
           !Number.isInteger(wallet.initialBalanceMinor) ||
+          !wallet.kind ||
+          !Number.isInteger(wallet.creditLimitMinor) ||
+          typeof wallet.excludeFromTotals !== "boolean" ||
+          typeof wallet.hideBalance !== "boolean" ||
           !wallet.color ||
           !wallet.icon ||
           (shouldMigrateDefaultCurrency &&
@@ -339,6 +385,13 @@ export async function seedLocalData(db = financeDb): Promise<void> {
           initialBalanceMinor: Number.isInteger(wallet.initialBalanceMinor)
             ? wallet.initialBalanceMinor
             : 0,
+          kind: wallet.kind || "cash",
+          creditLimitMinor: Number.isInteger(wallet.creditLimitMinor)
+            ? wallet.creditLimitMinor
+            : 0,
+          excludeFromTotals:
+            typeof wallet.excludeFromTotals === "boolean" ? wallet.excludeFromTotals : false,
+          hideBalance: typeof wallet.hideBalance === "boolean" ? wallet.hideBalance : false,
           color: wallet.color || "#207a6f",
           icon: wallet.icon || "wallet-cards",
           updatedAt: now

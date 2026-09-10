@@ -20,6 +20,7 @@ import { buildAppNotifications } from "./lib/notifications";
 import { useAppStore } from "./state/appStore";
 import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
 import { usePrivacyLock } from "./state/usePrivacyLock";
+import { getIncludedWalletIds, shouldHideWalletAmounts } from "./lib/walletFeatures";
 import { AddTransactionView } from "./views/AddTransactionView";
 import { DashboardView } from "./views/DashboardView";
 import { HistoryView } from "./views/HistoryView";
@@ -134,27 +135,33 @@ export function App() {
       : "all";
   const activeWallet = activeWalletId === "all" ? undefined : wallets.find((wallet) => wallet.id === activeWalletId);
   const displayCurrency = settings ? activeWallet?.currency ?? settings.currency : "USD";
+  const includedWalletIds = getIncludedWalletIds(
+    wallets,
+    settings?.advancedWalletsEnabled ?? false
+  );
+  const walletIsInCurrentStatistics = (walletId: string) =>
+    activeWalletId === "all" ? includedWalletIds.has(walletId) : walletId === activeWalletId;
   const conversionNeeded = Boolean(
     settings &&
       (transactions.some(
         (transaction) =>
           !transaction.deletedAt &&
-          (activeWalletId === "all" || transaction.walletId === activeWalletId) &&
+          walletIsInCurrentStatistics(transaction.walletId) &&
           transaction.currency.toUpperCase() !== displayCurrency
       ) ||
         wallets.some(
           (wallet) =>
             !wallet.deletedAt &&
-            (activeWalletId === "all" || wallet.id === activeWalletId) &&
+            walletIsInCurrentStatistics(wallet.id) &&
             wallet.currency.toUpperCase() !== displayCurrency &&
             wallet.initialBalanceMinor !== 0
         ) ||
         walletTransfers.some(
           (transfer) =>
             !transfer.deletedAt &&
-            (((activeWalletId === "all" || transfer.fromWalletId === activeWalletId) &&
+            ((walletIsInCurrentStatistics(transfer.fromWalletId) &&
               transfer.fromCurrency.toUpperCase() !== displayCurrency) ||
-              ((activeWalletId === "all" || transfer.toWalletId === activeWalletId) &&
+              (walletIsInCurrentStatistics(transfer.toWalletId) &&
                 transfer.toCurrency.toUpperCase() !== displayCurrency))
         ))
   );
@@ -164,6 +171,7 @@ export function App() {
     void mutations.updateSettings.mutateAsync({ activeWalletId: nextWalletId });
   };
   const addWalletId: WalletView = activeWalletId === "all" ? wallets[0]?.id ?? "all" : activeWalletId;
+  const addWallet = wallets.find((wallet) => wallet.id === addWalletId);
   const showsWalletContext = activeView === "dashboard" || activeView === "history" || activeView === "add";
 
   if (isError) {
@@ -354,7 +362,11 @@ export function App() {
               recurringTransactions={recurringTransactions}
               transactions={transactions}
               templates={transactionTemplates}
-              settings={{ ...settings, activeWalletId: addWalletId }}
+              settings={{
+                ...settings,
+                activeWalletId: addWalletId,
+                hideAmounts: shouldHideWalletAmounts(settings, addWallet)
+              }}
               t={t}
               onSubmit={async (input) => {
                 await mutations.addTransaction.mutateAsync(input);

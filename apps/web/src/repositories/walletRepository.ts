@@ -20,6 +20,10 @@ export const walletRepository: WalletRepository = {
       ...createEntityBase(),
       ...parsed,
       initialBalanceMinor: parsed.initialBalanceMinor ?? 0,
+      kind: parsed.kind ?? "cash",
+      creditLimitMinor: parsed.creditLimitMinor ?? 0,
+      excludeFromTotals: parsed.excludeFromTotals ?? false,
+      hideBalance: parsed.hideBalance ?? false,
       color: parsed.color ?? "#207a6f",
       icon: parsed.icon ?? "wallet-cards",
       archivedAt: null
@@ -44,6 +48,10 @@ export const walletRepository: WalletRepository = {
       name: next.name,
       currency: next.currency,
       initialBalanceMinor: next.initialBalanceMinor,
+      kind: next.kind,
+      creditLimitMinor: next.creditLimitMinor,
+      excludeFromTotals: next.excludeFromTotals,
+      hideBalance: next.hideBalance,
       color: next.color,
       icon: next.icon
     });
@@ -52,6 +60,7 @@ export const walletRepository: WalletRepository = {
       [
         financeDb.wallets,
         financeDb.transactions,
+        financeDb.transactionTemplates,
         financeDb.recurringTransactions,
         financeDb.savingsGoals,
         financeDb.walletTransfers
@@ -61,6 +70,10 @@ export const walletRepository: WalletRepository = {
         if (next.currency !== current.currency) {
           const transactions = await financeDb.transactions.where("walletId").equals(id).toArray();
           const recurringTransactions = await financeDb.recurringTransactions
+            .where("walletId")
+            .equals(id)
+            .toArray();
+          const transactionTemplates = await financeDb.transactionTemplates
             .where("walletId")
             .equals(id)
             .toArray();
@@ -81,6 +94,14 @@ export const walletRepository: WalletRepository = {
             ...recurringTransactions.map((schedule) =>
               financeDb.recurringTransactions.put({
                 ...schedule,
+                currency: next.currency,
+                updatedAt: next.updatedAt,
+                syncStatus: "pending"
+              })
+            ),
+            ...transactionTemplates.map((template) =>
+              financeDb.transactionTemplates.put({
+                ...template,
                 currency: next.currency,
                 updatedAt: next.updatedAt,
                 syncStatus: "pending"

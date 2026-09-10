@@ -15,6 +15,7 @@ import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
 import type { Dictionary } from "../i18n";
 import { WalletIcon } from "../lib/icons";
+import { shouldHideWalletAmounts } from "../lib/walletFeatures";
 
 interface WalletsViewProps {
   wallets: Wallet[];
@@ -87,6 +88,13 @@ export function WalletsView({
         <div className="grid gap-2">
           {visibleWallets.map((wallet) => {
             const totals = calculateWalletTotals(wallet, transactions, transfers);
+            const advanced = settings.advancedWalletsEnabled;
+            const hideWalletAmounts = shouldHideWalletAmounts(settings, wallet);
+            const creditUsedMinor = wallet.kind === "credit" ? Math.max(-totals.balanceMinor, 0) : 0;
+            const creditAvailableMinor = Math.max(wallet.creditLimitMinor - creditUsedMinor, 0);
+            const creditUsage = wallet.creditLimitMinor
+              ? Math.min(100, Math.round((creditUsedMinor / wallet.creditLimitMinor) * 100))
+              : 0;
             return (
               <article key={wallet.id} className="app-surface grid gap-3 rounded-app p-4">
                 <div className="flex items-start justify-between gap-3">
@@ -99,7 +107,19 @@ export function WalletsView({
                     </span>
                     <div className="min-w-0">
                       <h3 className="text-base font-semibold text-foreground">{wallet.name}</h3>
-                      <p className="text-sm text-muted">{wallet.currency}</p>
+                      <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted">
+                        <span>{wallet.currency}</span>
+                        {advanced && wallet.kind === "credit" ? (
+                          <span className="app-control rounded-full px-2 py-0.5 font-semibold">
+                            {t.wallets.kindCredit}
+                          </span>
+                        ) : null}
+                        {advanced && wallet.excludeFromTotals ? (
+                          <span className="app-control rounded-full px-2 py-0.5 font-semibold">
+                            {t.wallets.excludedBadge}
+                          </span>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                   <div className="flex gap-1">
@@ -112,22 +132,44 @@ export function WalletsView({
                   <div>
                     <p className="text-xs uppercase text-muted">{t.common.balance}</p>
                     <p className="font-semibold text-foreground">
-                      {formatMoney(totals.balanceMinor, wallet.currency, settings.locale, settings.hideAmounts)}
+                      {formatMoney(totals.balanceMinor, wallet.currency, settings.locale, hideWalletAmounts)}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs uppercase text-muted">{t.common.income}</p>
                     <p className="font-semibold text-income">
-                      {formatMoney(totals.incomeMinor, wallet.currency, settings.locale, settings.hideAmounts)}
+                      {formatMoney(totals.incomeMinor, wallet.currency, settings.locale, hideWalletAmounts)}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs uppercase text-muted">{t.common.expenses}</p>
                     <p className="font-semibold text-expense">
-                      {formatMoney(totals.expenseMinor, wallet.currency, settings.locale, settings.hideAmounts)}
+                      {formatMoney(totals.expenseMinor, wallet.currency, settings.locale, hideWalletAmounts)}
                     </p>
                   </div>
                 </div>
+                {advanced && wallet.kind === "credit" ? (
+                  <div className="app-control grid gap-2 rounded-app p-3">
+                    <div className="flex items-center justify-between gap-3 text-xs">
+                      <span className="text-muted">{t.wallets.creditUsed}</span>
+                      <span className="font-semibold text-foreground">
+                        {formatMoney(creditUsedMinor, wallet.currency, settings.locale, hideWalletAmounts)}
+                      </span>
+                    </div>
+                    <span className="h-1.5 overflow-hidden rounded-full bg-elevated">
+                      <span
+                        className="block h-full rounded-full bg-accent transition-[width]"
+                        style={{ width: `${creditUsage}%` }}
+                      />
+                    </span>
+                    <div className="flex items-center justify-between gap-3 text-xs">
+                      <span className="text-muted">{t.wallets.creditAvailable}</span>
+                      <span className="font-semibold text-foreground">
+                        {formatMoney(creditAvailableMinor, wallet.currency, settings.locale, hideWalletAmounts)}
+                      </span>
+                    </div>
+                  </div>
+                ) : null}
                 <Button
                   variant="secondary"
                   size="small"
@@ -159,6 +201,7 @@ export function WalletsView({
       <BottomSheet open={creating} title={t.wallets.newTitle} onClose={() => setCreating(false)}>
         <WalletForm
           defaultCurrency={settings.currency}
+          advancedWalletsEnabled={settings.advancedWalletsEnabled}
           t={t}
           submitLabel={t.wallets.create}
           onSubmit={async (input) => {
@@ -173,6 +216,7 @@ export function WalletsView({
           <WalletForm
             initial={editing}
             defaultCurrency={settings.currency}
+            advancedWalletsEnabled={settings.advancedWalletsEnabled}
             t={t}
             submitLabel={t.wallets.update}
             onSubmit={async (input) => {

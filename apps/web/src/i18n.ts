@@ -2,7 +2,7 @@ import type { ColorThemePreference } from "@myfinances/types";
 import type { AppView } from "./state/appStore";
 
 export type Language = "en" | "ru";
-export type SettingsTab = "general" | "appearance" | "automation" | "privacy" | "categories" | "backup" | "sync" | "debug";
+export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
 export const appVersion = "0.5.0";
@@ -347,6 +347,19 @@ export interface Dictionary {
     archiveError: string;
     restoreError: string;
     cannotArchiveLast: string;
+    kind: string;
+    kindCash: string;
+    kindCredit: string;
+    creditLimit: string;
+    creditLimitHint: string;
+    creditLimitError: string;
+    creditAvailable: string;
+    creditUsed: string;
+    excludeFromTotals: string;
+    excludeFromTotalsHint: string;
+    excludedBadge: string;
+    hideWalletBalance: string;
+    hideWalletBalanceHint: string;
   };
   goals: {
     tabWallets: string;
@@ -421,6 +434,9 @@ export interface Dictionary {
     categorySuggestionsSettingHint: string;
     addAnotherSetting: string;
     addAnotherSettingHint: string;
+    features: string;
+    advancedWalletsSetting: string;
+    advancedWalletsSettingHint: string;
     privacy: string;
     pinProtection: string;
     pinProtectionHint: string;
@@ -774,7 +790,20 @@ export const dictionaries: Record<Language, Dictionary> = {
       restore: "Restore",
       archiveError: "Unable to archive the wallet.",
       restoreError: "Unable to restore the wallet.",
-      cannotArchiveLast: "Create another wallet before archiving this one."
+      cannotArchiveLast: "Create another wallet before archiving this one.",
+      kind: "Wallet type",
+      kindCash: "Regular",
+      kindCredit: "Credit",
+      creditLimit: "Credit limit",
+      creditLimitHint: "Available credit is calculated from the limit and the current balance.",
+      creditLimitError: "Enter a valid credit limit.",
+      creditAvailable: "Available",
+      creditUsed: "Credit used",
+      excludeFromTotals: "Exclude from totals",
+      excludeFromTotalsHint: "Keep this wallet accessible, but omit it from the combined balance and analytics.",
+      excludedBadge: "Excluded from totals",
+      hideWalletBalance: "Hide this wallet's balance",
+      hideWalletBalanceHint: "Mask amounts only when this wallet is open or shown in the wallet list."
     },
     goals: {
       tabWallets: "Wallets",
@@ -897,6 +926,7 @@ export const dictionaries: Record<Language, Dictionary> = {
         general: "General",
         appearance: "Appearance",
         automation: "Quick entry",
+        features: "Features",
         privacy: "Privacy",
         categories: "Categories",
         backup: "Backup",
@@ -912,6 +942,9 @@ export const dictionaries: Record<Language, Dictionary> = {
       categorySuggestionsSettingHint: "Suggest a category from similar notes and tags saved on this device.",
       addAnotherSetting: "Add another after saving",
       addAnotherSettingHint: "Show a shortcut to enter the next transaction without leaving the form.",
+      features: "Features",
+      advancedWalletsSetting: "Advanced wallet options",
+      advancedWalletsSettingHint: "Enable credit limits, per-wallet privacy, and exclusion from combined statistics.",
       privacy: "Privacy",
       pinProtection: "PIN protection",
       pinProtectionHint: "Lock access to the app on this device. The feature is optional and can be removed at any time.",
@@ -1324,7 +1357,20 @@ export const dictionaries: Record<Language, Dictionary> = {
       restore: "Восстановить",
       archiveError: "Не удалось архивировать кошелек.",
       restoreError: "Не удалось восстановить кошелек.",
-      cannotArchiveLast: "Сначала создай другой кошелек, затем архивируй этот."
+      cannotArchiveLast: "Сначала создай другой кошелек, затем архивируй этот.",
+      kind: "Тип кошелька",
+      kindCash: "Обычный",
+      kindCredit: "Кредитный",
+      creditLimit: "Кредитный лимит",
+      creditLimitHint: "Доступная сумма рассчитывается из лимита и текущего баланса.",
+      creditLimitError: "Укажи корректный кредитный лимит.",
+      creditAvailable: "Доступно",
+      creditUsed: "Использовано кредита",
+      excludeFromTotals: "Не учитывать в общем итоге",
+      excludeFromTotalsHint: "Кошелек останется доступным, но не попадёт в общий баланс и аналитику.",
+      excludedBadge: "Не входит в итог",
+      hideWalletBalance: "Скрывать баланс этого кошелька",
+      hideWalletBalanceHint: "Маскировать суммы только для этого кошелька в списке и при его открытии."
     },
     goals: {
       tabWallets: "Кошельки",
@@ -1447,6 +1493,7 @@ export const dictionaries: Record<Language, Dictionary> = {
         general: "Общее",
         appearance: "Вид",
         automation: "Быстрый ввод",
+        features: "Функции",
         privacy: "Приватность",
         categories: "Категории",
         backup: "Бэкап",
@@ -1462,6 +1509,9 @@ export const dictionaries: Record<Language, Dictionary> = {
       categorySuggestionsSettingHint: "Предлагать категорию по похожим заметкам и тегам, сохранённым на этом устройстве.",
       addAnotherSetting: "Добавить ещё после сохранения",
       addAnotherSettingHint: "Показывать кнопку для следующей операции, не закрывая форму.",
+      features: "Функции",
+      advancedWalletsSetting: "Расширенные настройки кошельков",
+      advancedWalletsSettingHint: "Включает кредитные лимиты, приватность отдельного кошелька и исключение из общей статистики.",
       privacy: "Приватность",
       pinProtection: "Защита PIN-кодом",
       pinProtectionHint: "Блокирует доступ к приложению на этом устройстве. Функция необязательная, её можно отключить в любой момент.",

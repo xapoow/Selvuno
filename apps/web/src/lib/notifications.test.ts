@@ -32,6 +32,7 @@ const settings: Settings = {
   quickTemplatesEnabled: true,
   categorySuggestionsEnabled: false,
   addAnotherEnabled: true,
+  advancedWalletsEnabled: false,
   onboardingCompleted: true,
   defaultsVersion: 2,
   createdAt: entityBase.createdAt,
