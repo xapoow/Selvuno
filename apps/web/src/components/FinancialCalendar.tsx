@@ -174,13 +174,13 @@ export function FinancialCalendar({
           <div className="app-control rounded-app p-2">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">{t.common.income}</p>
             <p className="mt-1 truncate text-xs font-semibold text-income sm:text-sm">
-              {formatMoney(monthSummary.incomeMinor, displayCurrency, settings.locale)}
+              {formatMoney(monthSummary.incomeMinor, displayCurrency, settings.locale, settings.hideAmounts)}
             </p>
           </div>
           <div className="app-control rounded-app p-2">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">{t.common.expenses}</p>
             <p className="mt-1 truncate text-xs font-semibold text-expense sm:text-sm">
-              {formatMoney(monthSummary.expenseMinor, displayCurrency, settings.locale)}
+              {formatMoney(monthSummary.expenseMinor, displayCurrency, settings.locale, settings.hideAmounts)}
             </p>
           </div>
           <div className="app-control rounded-app p-2">
@@ -189,7 +189,8 @@ export function FinancialCalendar({
               {formatMoney(
                 monthSummary.incomeMinor - monthSummary.expenseMinor,
                 displayCurrency,
-                settings.locale
+                settings.locale,
+                settings.hideAmounts
               )}
             </p>
           </div>
@@ -253,7 +254,9 @@ export function FinancialCalendar({
                       )}
                     >
                       {netMinor > 0 ? "+" : netMinor < 0 ? "−" : ""}
-                      {compactAmount.format(Math.abs(minorToDecimal(netMinor, displayCurrency)))}
+                      {settings.hideAmounts
+                        ? "••••"
+                        : compactAmount.format(Math.abs(minorToDecimal(netMinor, displayCurrency)))}
                     </span>
                   </>
                 ) : null}
@@ -282,12 +285,16 @@ export function FinancialCalendar({
             <div className="text-right text-xs text-muted">
               {selectedSummary.incomeMinor ? (
                 <span className="mr-2 font-semibold text-income">
-                  +{formatMoney(selectedSummary.incomeMinor, displayCurrency, settings.locale)}
+                  {settings.hideAmounts
+                    ? "••••"
+                    : `+${formatMoney(selectedSummary.incomeMinor, displayCurrency, settings.locale)}`}
                 </span>
               ) : null}
               {selectedSummary.expenseMinor ? (
                 <span className="font-semibold text-expense">
-                  −{formatMoney(selectedSummary.expenseMinor, displayCurrency, settings.locale)}
+                  {settings.hideAmounts
+                    ? "••••"
+                    : `−${formatMoney(selectedSummary.expenseMinor, displayCurrency, settings.locale)}`}
                 </span>
               ) : null}
             </div>

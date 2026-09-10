@@ -130,7 +130,8 @@ export function RecurringTransactionsPanel({
                       schedule.amountMinor,
                       schedule.currency,
                       settings.locale,
-                      schedule.type
+                      schedule.type,
+                      settings.hideAmounts
                     )}
                   </p>
                   <div className="flex gap-1">

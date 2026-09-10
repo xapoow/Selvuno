@@ -280,15 +280,15 @@ export function DashboardView({
       </div>
       <section className="grid gap-3">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <StatPanel label={t.common.balance} value={formatMoney(totals.balanceMinor, displayCurrency, settings.locale)} />
+          <StatPanel label={t.common.balance} value={formatMoney(totals.balanceMinor, displayCurrency, settings.locale, settings.hideAmounts)} />
           <StatPanel
             label={t.common.income}
-            value={formatMoney(totals.incomeMinor, displayCurrency, settings.locale)}
+            value={formatMoney(totals.incomeMinor, displayCurrency, settings.locale, settings.hideAmounts)}
             tone="income"
           />
           <StatPanel
             label={t.common.expenses}
-            value={formatMoney(totals.expenseMinor, displayCurrency, settings.locale)}
+            value={formatMoney(totals.expenseMinor, displayCurrency, settings.locale, settings.hideAmounts)}
             tone="expense"
           />
         </div>
@@ -297,6 +297,7 @@ export function DashboardView({
       <BudgetOverviewCard
         currency={settings.currency}
         locale={settings.locale}
+        hideAmounts={settings.hideAmounts}
         monthLabel={formatBudgetMonth(currentBudgetMonth, settings.locale)}
         progress={budgetProgress}
         t={t}
@@ -344,7 +345,7 @@ export function DashboardView({
                         {chartType === "expense" ? t.common.expenses : t.common.income}
                       </span>
                       <span className="mt-1 text-lg font-semibold text-foreground">
-                        {formatMoney(chartTotal, displayCurrency, settings.locale)}
+                        {formatMoney(chartTotal, displayCurrency, settings.locale, settings.hideAmounts)}
                       </span>
                     </span>
                   </span>

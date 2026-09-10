@@ -215,7 +215,7 @@ export function TransactionForm({
                       {getCategoryName(category?.name, t)}
                     </span>
                     <span className="block text-[11px] text-muted">
-                      {formatMoney(template.amountMinor, template.currency, settings.locale)}
+                      {formatMoney(template.amountMinor, template.currency, settings.locale, settings.hideAmounts)}
                     </span>
                   </span>
                 </button>
@@ -289,7 +289,7 @@ export function TransactionForm({
                 {t.transaction.calculate}
               </button>
               <span className="w-full text-xs font-semibold text-income">
-                = {formatMoney(decimalToMinor(calculatedAmount, currency), currency, settings.locale)}
+                = {formatMoney(decimalToMinor(calculatedAmount, currency), currency, settings.locale, settings.hideAmounts)}
               </span>
             </>
           ) : null}

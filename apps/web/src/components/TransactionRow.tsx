@@ -71,7 +71,8 @@ export function TransactionRow({
             amountMinor,
             currency,
             settings.locale,
-            transaction.type
+            transaction.type,
+            settings.hideAmounts
           )}
           {conversionMissing ? " *" : ""}
         </p>
