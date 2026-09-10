@@ -42,6 +42,7 @@ import {
 } from "../lib/analytics";
 import { cn } from "../lib/cn";
 import { convertMinorToBaseCurrency, useExchangeRates } from "../lib/exchangeRates";
+import { getIncludedWalletIds, shouldHideWalletAmounts } from "../lib/walletFeatures";
 import { DatePicker } from "./ui/DatePicker";
 import { SegmentedControl } from "./ui/SegmentedControl";
 import { SelectField } from "./ui/SelectField";
@@ -106,6 +107,11 @@ export function AnalyticsView({
   const selectedWallet =
     walletId === "all" ? undefined : wallets.find((wallet) => wallet.id === walletId);
   const currency = selectedWallet?.currency ?? settings.currency;
+  const includedWalletIds = useMemo(
+    () => getIncludedWalletIds(wallets, settings.advancedWalletsEnabled),
+    [settings.advancedWalletsEnabled, wallets]
+  );
+  const hideAmounts = shouldHideWalletAmounts(settings, selectedWallet);
   const typeCategories = useMemo(
     () => categories.filter((category) => !category.deletedAt && category.type === type),
     [categories, type]
@@ -125,9 +131,11 @@ export function AnalyticsView({
       transactions.filter(
         (transaction) =>
           !transaction.deletedAt &&
-          (walletId === "all" || transaction.walletId === walletId)
+          (walletId === "all"
+            ? includedWalletIds.has(transaction.walletId)
+            : transaction.walletId === walletId)
       ),
-    [transactions, walletId]
+    [includedWalletIds, transactions, walletId]
   );
   const conversionNeeded = walletTransactions.some(
     (transaction) => transaction.currency.toUpperCase() !== currency
@@ -404,14 +412,14 @@ export function AnalyticsView({
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatPanel
           label={t.analytics.currentPeriod}
-          value={formatMoney(currentTotal, currency, settings.locale, settings.hideAmounts)}
+          value={formatMoney(currentTotal, currency, settings.locale, hideAmounts)}
           tone={type}
           caption={rangeLabel}
           icon={TrendingUp}
         />
         <StatPanel
           label={t.analytics.previousPeriod}
-          value={formatMoney(previousTotal, currency, settings.locale, settings.hideAmounts)}
+          value={formatMoney(previousTotal, currency, settings.locale, hideAmounts)}
           caption={previousRangeLabel}
           icon={CalendarRange}
         />
@@ -430,7 +438,7 @@ export function AnalyticsView({
         />
         <StatPanel
           label={t.dashboard.averageTransaction}
-          value={formatMoney(average, currency, settings.locale, settings.hideAmounts)}
+          value={formatMoney(average, currency, settings.locale, hideAmounts)}
           caption={
             topCategory
               ? `${t.dashboard.topCategory}: ${topCategory.name}`
@@ -482,11 +490,11 @@ export function AnalyticsView({
                     width={54}
                     tick={{ fill: "rgb(var(--color-muted))", fontSize: 11 }}
                     tickFormatter={(value) =>
-                      settings.hideAmounts ? "••••" : compactMoney.format(Number(value) / 100)
+                      hideAmounts ? "••••" : compactMoney.format(Number(value) / 100)
                     }
                   />
                   <Tooltip
-                    formatter={(value) => formatMoney(Number(value), currency, settings.locale, settings.hideAmounts)}
+                    formatter={(value) => formatMoney(Number(value), currency, settings.locale, hideAmounts)}
                     contentStyle={{
                       borderRadius: 10,
                       border: "1px solid rgb(var(--color-line))",
@@ -542,7 +550,7 @@ export function AnalyticsView({
                   />
                   <Tooltip
                     cursor={{ fill: "rgb(var(--color-elevated) / 0.6)" }}
-                    formatter={(value) => formatMoney(Number(value), currency, settings.locale, settings.hideAmounts)}
+                    formatter={(value) => formatMoney(Number(value), currency, settings.locale, hideAmounts)}
                     contentStyle={{
                       borderRadius: 10,
                       border: "1px solid rgb(var(--color-line))",

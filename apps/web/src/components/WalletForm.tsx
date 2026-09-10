@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Wallet, WalletInput } from "@myfinances/types";
+import type { Wallet, WalletInput, WalletKind } from "@myfinances/types";
 import {
   decimalToMinor,
   getCurrencyMinorUnits,
@@ -9,6 +9,7 @@ import { currencyOptions, getCurrencyLabel } from "../lib/currencies";
 import { WalletIcon, walletIconNames } from "../lib/icons";
 import { Button } from "./ui/Button";
 import { SelectField } from "./ui/SelectField";
+import { SegmentedControl } from "./ui/SegmentedControl";
 import { TextField } from "./ui/TextField";
 import type { Dictionary } from "../i18n";
 
@@ -26,10 +27,18 @@ interface WalletFormProps {
   defaultCurrency: string;
   t: Dictionary;
   submitLabel: string;
+  advancedWalletsEnabled?: boolean;
   onSubmit: (input: WalletInput) => Promise<void>;
 }
 
-export function WalletForm({ initial, defaultCurrency, t, submitLabel, onSubmit }: WalletFormProps) {
+export function WalletForm({
+  initial,
+  defaultCurrency,
+  t,
+  submitLabel,
+  advancedWalletsEnabled = false,
+  onSubmit
+}: WalletFormProps) {
   const [name, setName] = useState(initial?.name ?? "");
   const [currency, setCurrency] = useState(initial?.currency ?? defaultCurrency);
   const [color, setColor] = useState(initial?.color ?? walletSwatches[0]);
@@ -37,6 +46,12 @@ export function WalletForm({ initial, defaultCurrency, t, submitLabel, onSubmit 
   const [initialBalance, setInitialBalance] = useState(
     String(minorToDecimal(initial?.initialBalanceMinor ?? 0, initial?.currency ?? defaultCurrency))
   );
+  const [kind, setKind] = useState<WalletKind>(initial?.kind ?? "cash");
+  const [creditLimit, setCreditLimit] = useState(
+    String(minorToDecimal(initial?.creditLimitMinor ?? 0, initial?.currency ?? defaultCurrency))
+  );
+  const [excludeFromTotals, setExcludeFromTotals] = useState(initial?.excludeFromTotals ?? false);
+  const [hideBalance, setHideBalance] = useState(initial?.hideBalance ?? false);
   const [error, setError] = useState("");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -51,10 +66,25 @@ export function WalletForm({ initial, defaultCurrency, t, submitLabel, onSubmit 
       if (fractionLength > getCurrencyMinorUnits(currency)) {
         throw new Error(t.wallets.initialBalanceError);
       }
+      const normalizedCreditLimit = creditLimit.trim().replace(/\s/g, "").replace(",", ".");
+      if (kind === "credit" && !/^\d+(\.\d+)?$/.test(normalizedCreditLimit)) {
+        throw new Error(t.wallets.creditLimitError);
+      }
+      if (
+        kind === "credit" &&
+        (normalizedCreditLimit.split(".")[1]?.length ?? 0) > getCurrencyMinorUnits(currency)
+      ) {
+        throw new Error(t.wallets.creditLimitError);
+      }
       await onSubmit({
         name: name.trim(),
         currency,
         initialBalanceMinor: decimalToMinor(Number(normalizedBalance), currency),
+        kind,
+        creditLimitMinor:
+          kind === "credit" ? decimalToMinor(Number(normalizedCreditLimit), currency) : 0,
+        excludeFromTotals,
+        hideBalance,
         color,
         icon
       });
@@ -83,6 +113,41 @@ export function WalletForm({ initial, defaultCurrency, t, submitLabel, onSubmit 
         onChange={(event) => setInitialBalance(event.target.value)}
       />
       <p className="-mt-2 text-xs text-muted">{t.wallets.initialBalanceHint}</p>
+      {advancedWalletsEnabled ? (
+        <div className="app-control grid gap-4 rounded-app p-3 sm:p-4">
+          <SegmentedControl
+            value={kind}
+            onChange={setKind}
+            options={[
+              { value: "cash", label: t.wallets.kindCash },
+              { value: "credit", label: t.wallets.kindCredit }
+            ]}
+          />
+          {kind === "credit" ? (
+            <div className="grid gap-2">
+              <TextField
+                label={`${t.wallets.creditLimit} (${currency})`}
+                inputMode="decimal"
+                value={creditLimit}
+                onChange={(event) => setCreditLimit(event.target.value)}
+              />
+              <p className="text-xs leading-5 text-muted">{t.wallets.creditLimitHint}</p>
+            </div>
+          ) : null}
+          <WalletOptionSwitch
+            checked={excludeFromTotals}
+            label={t.wallets.excludeFromTotals}
+            hint={t.wallets.excludeFromTotalsHint}
+            onChange={setExcludeFromTotals}
+          />
+          <WalletOptionSwitch
+            checked={hideBalance}
+            label={t.wallets.hideWalletBalance}
+            hint={t.wallets.hideWalletBalanceHint}
+            onChange={setHideBalance}
+          />
+        </div>
+      ) : null}
       <fieldset className="grid gap-2">
         <legend className="text-sm font-medium text-foreground">{t.wallets.icon}</legend>
         <div className="app-field grid grid-cols-5 gap-2 rounded-app p-2 sm:grid-cols-9">
@@ -143,5 +208,42 @@ export function WalletForm({ initial, defaultCurrency, t, submitLabel, onSubmit 
       {error ? <p className="text-sm font-medium text-expense">{error}</p> : null}
       <Button type="submit">{submitLabel}</Button>
     </form>
+  );
+}
+
+function WalletOptionSwitch({
+  checked,
+  label,
+  hint,
+  onChange
+}: {
+  checked: boolean;
+  label: string;
+  hint: string;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-foreground">{label}</p>
+        <p className="mt-0.5 text-xs leading-5 text-muted">{hint}</p>
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        aria-label={label}
+        onClick={() => onChange(!checked)}
+        className={`app-focus relative mt-1 h-7 w-12 shrink-0 rounded-full border transition-colors ${
+          checked ? "border-accent bg-accent" : "border-line bg-elevated"
+        }`}
+      >
+        <span
+          className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
+            checked ? "translate-x-5" : "translate-x-0.5"
+          }`}
+        />
+      </button>
+    </div>
   );
 }

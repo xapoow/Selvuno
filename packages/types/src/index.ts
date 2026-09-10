@@ -30,6 +30,9 @@ export type ColorThemePreference = z.infer<typeof colorThemePreferenceSchema>;
 export const walletViewSchema = z.union([z.literal("all"), z.string().uuid()]);
 export type WalletView = z.infer<typeof walletViewSchema>;
 
+export const walletKindSchema = z.enum(["cash", "credit"]);
+export type WalletKind = z.infer<typeof walletKindSchema>;
+
 export const dateFormatPreferenceSchema = z.enum(["short", "medium", "long"]);
 export type DateFormatPreference = z.infer<typeof dateFormatPreferenceSchema>;
 
@@ -46,6 +49,10 @@ export const walletSchema = baseEntitySchema.extend({
   name: z.string().min(1).max(64),
   currency: z.string().length(3),
   initialBalanceMinor: z.number().int().default(0),
+  kind: walletKindSchema.default("cash"),
+  creditLimitMinor: z.number().int().nonnegative().default(0),
+  excludeFromTotals: z.boolean().default(false),
+  hideBalance: z.boolean().default(false),
   color: z.string().min(4).max(32).default("#207a6f"),
   icon: z.string().min(1).max(32).default("wallet-cards"),
   archivedAt: z.string().datetime().nullable()
@@ -56,6 +63,10 @@ export const walletInputSchema = z.object({
   name: z.string().min(1).max(64),
   currency: z.string().length(3),
   initialBalanceMinor: z.number().int().optional(),
+  kind: walletKindSchema.optional(),
+  creditLimitMinor: z.number().int().nonnegative().optional(),
+  excludeFromTotals: z.boolean().optional(),
+  hideBalance: z.boolean().optional(),
   color: z.string().min(4).max(32).optional(),
   icon: z.string().min(1).max(32).optional()
 });
@@ -262,6 +273,7 @@ export const settingsSchema = z.object({
   quickTemplatesEnabled: z.boolean().default(true),
   categorySuggestionsEnabled: z.boolean().default(false),
   addAnotherEnabled: z.boolean().default(true),
+  advancedWalletsEnabled: z.boolean().default(false),
   onboardingCompleted: z.boolean().default(false),
   defaultsVersion: z.number().int().default(2),
   createdAt: z.string().datetime(),
@@ -313,6 +325,10 @@ const backupV7Schema = backupV6Schema.extend({
   transactionTemplates: z.array(transactionTemplateSchema)
 });
 
+const backupV8Schema = backupV7Schema.extend({
+  version: z.literal(8)
+});
+
 export const backupSchema = z.discriminatedUnion("version", [
   backupV1Schema,
   backupV2Schema,
@@ -320,7 +336,8 @@ export const backupSchema = z.discriminatedUnion("version", [
   backupV4Schema,
   backupV5Schema,
   backupV6Schema,
-  backupV7Schema
+  backupV7Schema,
+  backupV8Schema
 ]);
 export type FinanceBackup = z.infer<typeof backupSchema>;
 export type FinanceBackupV2 = z.infer<typeof backupV2Schema>;
@@ -329,6 +346,7 @@ export type FinanceBackupV4 = z.infer<typeof backupV4Schema>;
 export type FinanceBackupV5 = z.infer<typeof backupV5Schema>;
 export type FinanceBackupV6 = z.infer<typeof backupV6Schema>;
 export type FinanceBackupV7 = z.infer<typeof backupV7Schema>;
+export type FinanceBackupV8 = z.infer<typeof backupV8Schema>;
 
 export const backupSnapshotReasonSchema = z.enum(["automatic", "before-restore"]);
 export type BackupSnapshotReason = z.infer<typeof backupSnapshotReasonSchema>;

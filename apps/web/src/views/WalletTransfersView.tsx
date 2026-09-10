@@ -8,6 +8,7 @@ import type {
 import { formatDate, formatMoney } from "@myfinances/utils";
 import { ArrowRight, Plus, Repeat2, Trash2 } from "lucide-react";
 import { WalletTransferForm } from "../components/WalletTransferForm";
+import { shouldHideWalletAmounts } from "../lib/walletFeatures";
 import { BottomSheet } from "../components/ui/BottomSheet";
 import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -57,6 +58,9 @@ export function WalletTransfersView({
           {transfers.map((transfer) => {
             const fromWallet = wallets.find((wallet) => wallet.id === transfer.fromWalletId);
             const toWallet = wallets.find((wallet) => wallet.id === transfer.toWalletId);
+            const hideTransferAmounts =
+              shouldHideWalletAmounts(settings, fromWallet) ||
+              shouldHideWalletAmounts(settings, toWallet);
             return (
               <article
                 key={transfer.id}
@@ -85,7 +89,7 @@ export function WalletTransfersView({
                         transfer.fromAmountMinor,
                         transfer.fromCurrency,
                         settings.locale,
-                        settings.hideAmounts
+                        hideTransferAmounts
                       )}
                     </p>
                     {transfer.fromCurrency !== transfer.toCurrency ||
@@ -96,7 +100,7 @@ export function WalletTransfersView({
                           transfer.toAmountMinor,
                           transfer.toCurrency,
                           settings.locale,
-                          settings.hideAmounts
+                          hideTransferAmounts
                         )}
                       </p>
                     ) : null}

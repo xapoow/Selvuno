@@ -19,6 +19,7 @@ import { SelectField } from "../components/ui/SelectField";
 import { TextField } from "../components/ui/TextField";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { convertMinorToBaseCurrency, type ExchangeRateTable } from "../lib/exchangeRates";
+import { shouldHideWalletAmounts } from "../lib/walletFeatures";
 
 interface HistoryViewProps {
   wallets: Wallet[];
@@ -64,6 +65,17 @@ export function HistoryView({
   const [sortBy, setSortBy] = useState<HistorySort>("date-desc");
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const [editing, setEditing] = useState<Transaction | null>(null);
+  const activeWallet =
+    activeWalletId === "all" ? undefined : wallets.find((wallet) => wallet.id === activeWalletId);
+  const calendarContainsHiddenWallet =
+    settings.advancedWalletsEnabled &&
+    (activeWalletId === "all"
+      ? wallets.some((wallet) => wallet.hideBalance)
+      : Boolean(activeWallet?.hideBalance));
+  const calendarSettings = {
+    ...settings,
+    hideAmounts: settings.hideAmounts || calendarContainsHiddenWallet
+  };
 
   const visibleTransactions = useMemo(
     () => {
@@ -246,7 +258,7 @@ export function HistoryView({
           wallets={wallets}
           categories={categories}
           items={convertedTransactions}
-          settings={settings}
+          settings={calendarSettings}
           displayCurrency={displayCurrency}
           t={t}
           onEdit={setEditing}
@@ -279,7 +291,13 @@ export function HistoryView({
           <TransactionForm
             wallets={wallets}
             categories={categories}
-            settings={settings}
+            settings={{
+              ...settings,
+              hideAmounts: shouldHideWalletAmounts(
+                settings,
+                wallets.find((wallet) => wallet.id === editing.walletId)
+              )
+            }}
             t={t}
             activeWalletId={activeWalletId}
             initial={editing}
