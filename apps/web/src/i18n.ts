@@ -124,6 +124,17 @@ export interface Dictionary {
     categoriesBreakdown: string;
     categoryComparison: string;
   };
+  insights: {
+    title: string;
+    hint: string;
+    empty: string;
+    spendingUp: string;
+    spendingDown: string;
+    largestCategory: string;
+    recurringShare: string;
+    expenseCount: string;
+    noSpendStreak: string;
+  };
   analytics: {
     period: string;
     week: string;
@@ -437,6 +448,8 @@ export interface Dictionary {
     features: string;
     advancedWalletsSetting: string;
     advancedWalletsSettingHint: string;
+    smartInsightsSetting: string;
+    smartInsightsSettingHint: string;
     privacy: string;
     pinProtection: string;
     pinProtectionHint: string;
@@ -617,6 +630,17 @@ export const dictionaries: Record<Language, Dictionary> = {
       operations: "operations",
       categoriesBreakdown: "Category breakdown",
       categoryComparison: "Your largest categories"
+    },
+    insights: {
+      title: "Money observations",
+      hint: "Calculated locally from your transactions. No data leaves this device.",
+      empty: "Add a few transactions and useful patterns will appear here.",
+      spendingUp: "Spending is up {percentage}% from the same part of last month.",
+      spendingDown: "Spending is down {percentage}% from the same part of last month.",
+      largestCategory: "{category} is the largest expense category this month at {percentage}%.",
+      recurringShare: "Recurring expenses use {percentage}% of this month's income.",
+      expenseCount: "You recorded {count} expenses over the last seven days.",
+      noSpendStreak: "No expenses recorded for {days} days in a row."
     },
     analytics: {
       period: "Period",
@@ -945,6 +969,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       features: "Features",
       advancedWalletsSetting: "Advanced wallet options",
       advancedWalletsSettingHint: "Enable credit limits, per-wallet privacy, and exclusion from combined statistics.",
+      smartInsightsSetting: "Money observations",
+      smartInsightsSettingHint: "Show optional local summaries and patterns on the home screen. No notifications or cloud analysis.",
       privacy: "Privacy",
       pinProtection: "PIN protection",
       pinProtectionHint: "Lock access to the app on this device. The feature is optional and can be removed at any time.",
@@ -1184,6 +1210,17 @@ export const dictionaries: Record<Language, Dictionary> = {
       operations: "операций",
       categoriesBreakdown: "По категориям",
       categoryComparison: "Самые крупные категории"
+    },
+    insights: {
+      title: "Наблюдения о деньгах",
+      hint: "Рассчитываются локально по операциям. Данные не покидают устройство.",
+      empty: "Добавь несколько операций — здесь появятся полезные закономерности.",
+      spendingUp: "Расходы выросли на {percentage}% относительно той же части прошлого месяца.",
+      spendingDown: "Расходы снизились на {percentage}% относительно той же части прошлого месяца.",
+      largestCategory: "{category} — крупнейшая категория месяца: {percentage}% расходов.",
+      recurringShare: "Регулярные расходы занимают {percentage}% дохода этого месяца.",
+      expenseCount: "За последние семь дней добавлено расходов: {count}.",
+      noSpendStreak: "Дней подряд без расходов: {days}."
     },
     analytics: {
       period: "Период",
@@ -1512,6 +1549,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       features: "Функции",
       advancedWalletsSetting: "Расширенные настройки кошельков",
       advancedWalletsSettingHint: "Включает кредитные лимиты, приватность отдельного кошелька и исключение из общей статистики.",
+      smartInsightsSetting: "Наблюдения о деньгах",
+      smartInsightsSettingHint: "Показывать на главной необязательные локальные выводы. Без уведомлений и облачного анализа.",
       privacy: "Приватность",
       pinProtection: "Защита PIN-кодом",
       pinProtectionHint: "Блокирует доступ к приложению на этом устройстве. Функция необязательная, её можно отключить в любой момент.",

@@ -278,6 +278,7 @@ export async function seedLocalData(db = financeDb): Promise<void> {
       categorySuggestionsEnabled: false,
       addAnotherEnabled: true,
       advancedWalletsEnabled: false,
+      smartInsightsEnabled: false,
       onboardingCompleted: false,
       defaultsVersion: 2,
       createdAt: now,
@@ -324,6 +325,9 @@ export async function seedLocalData(db = financeDb): Promise<void> {
     }
     if (typeof settings.advancedWalletsEnabled !== "boolean") {
       repairedSettings.advancedWalletsEnabled = false;
+    }
+    if (typeof settings.smartInsightsEnabled !== "boolean") {
+      repairedSettings.smartInsightsEnabled = false;
     }
     if (typeof settings.onboardingCompleted !== "boolean") {
       repairedSettings.onboardingCompleted = true;

@@ -274,6 +274,7 @@ export const settingsSchema = z.object({
   categorySuggestionsEnabled: z.boolean().default(false),
   addAnotherEnabled: z.boolean().default(true),
   advancedWalletsEnabled: z.boolean().default(false),
+  smartInsightsEnabled: z.boolean().default(false),
   onboardingCompleted: z.boolean().default(false),
   defaultsVersion: z.number().int().default(2),
   createdAt: z.string().datetime(),
