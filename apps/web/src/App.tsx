@@ -40,6 +40,7 @@ export function App() {
   const archivedWallets = data.archivedWallets.data ?? [];
   const categories = data.categories.data ?? [];
   const transactions = data.transactions.data ?? [];
+  const transactionTemplates = data.transactionTemplates.data ?? [];
   const budgets = data.budgets.data ?? [];
   const recurringTransactions = data.recurringTransactions.data ?? [];
   const savingsGoals = data.savingsGoals.data ?? [];
@@ -53,6 +54,7 @@ export function App() {
     data.archivedWallets.isLoading ||
     data.categories.isLoading ||
     data.transactions.isLoading ||
+    data.transactionTemplates.isLoading ||
     data.budgets.isLoading ||
     data.recurringTransactions.isLoading ||
     data.savingsGoals.isLoading ||
@@ -66,6 +68,7 @@ export function App() {
     data.archivedWallets.isError ||
     data.categories.isError ||
     data.transactions.isError ||
+    data.transactionTemplates.isError ||
     data.budgets.isError ||
     data.recurringTransactions.isError ||
     data.savingsGoals.isError ||
@@ -79,6 +82,7 @@ export function App() {
     archivedWallets,
     categories,
     transactions,
+    transactionTemplates,
     budgets,
     recurringTransactions,
     savingsGoals,
@@ -174,6 +178,9 @@ export function App() {
           data.archivedWallets.error instanceof Error ? data.archivedWallets.error.message : null,
           data.categories.error instanceof Error ? data.categories.error.message : null,
           data.transactions.error instanceof Error ? data.transactions.error.message : null,
+          data.transactionTemplates.error instanceof Error
+            ? data.transactionTemplates.error.message
+            : null,
           data.budgets.error instanceof Error ? data.budgets.error.message : null,
           data.recurringTransactions.error instanceof Error ? data.recurringTransactions.error.message : null,
           data.savingsGoals.error instanceof Error ? data.savingsGoals.error.message : null,
@@ -346,10 +353,17 @@ export function App() {
               categories={categories}
               recurringTransactions={recurringTransactions}
               transactions={transactions}
+              templates={transactionTemplates}
               settings={{ ...settings, activeWalletId: addWalletId }}
               t={t}
               onSubmit={async (input) => {
                 await mutations.addTransaction.mutateAsync(input);
+              }}
+              onCreateTemplate={async (input) => {
+                await mutations.createTransactionTemplate.mutateAsync(input);
+              }}
+              onDeleteTemplate={async (id) => {
+                await mutations.deleteTransactionTemplate.mutateAsync(id);
               }}
               onCreateRecurring={async (input) => {
                 await mutations.createRecurringTransaction.mutateAsync(input);

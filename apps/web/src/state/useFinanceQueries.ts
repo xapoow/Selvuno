@@ -7,6 +7,7 @@ import type {
   SavingsGoalInput,
   SettingsUpdate,
   TransactionInput,
+  TransactionTemplateInput,
   WalletInput,
   WalletTransferInput
 } from "@myfinances/types";
@@ -18,6 +19,7 @@ import { recurringTransactionRepository } from "../repositories/recurringTransac
 import { savingsGoalRepository } from "../repositories/savingsGoalRepository";
 import { settingsRepository } from "../repositories/settingsRepository";
 import { transactionRepository } from "../repositories/transactionRepository";
+import { transactionTemplateRepository } from "../repositories/transactionTemplateRepository";
 import { walletRepository } from "../repositories/walletRepository";
 import { walletTransferRepository } from "../repositories/walletTransferRepository";
 import { queryKeys } from "../lib/queryKeys";
@@ -61,6 +63,11 @@ export function useFinanceData() {
     queryFn: () => transactionRepository.listTransactions({ walletId: "all" }),
     enabled
   });
+  const transactionTemplates = useQuery({
+    queryKey: queryKeys.transactionTemplates,
+    queryFn: () => transactionTemplateRepository.listTemplates(),
+    enabled
+  });
   const budgets = useQuery({
     queryKey: queryKeys.budgets,
     queryFn: () => budgetRepository.listBudgets(),
@@ -99,6 +106,7 @@ export function useFinanceData() {
     archivedWallets,
     categories,
     transactions,
+    transactionTemplates,
     budgets,
     recurringTransactions,
     savingsGoals,
@@ -115,6 +123,7 @@ function invalidateFinance(queryClient: ReturnType<typeof useQueryClient>) {
     queryClient.invalidateQueries({ queryKey: queryKeys.archivedWallets }),
     queryClient.invalidateQueries({ queryKey: queryKeys.categories }),
     queryClient.invalidateQueries({ queryKey: queryKeys.transactions }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.transactionTemplates }),
     queryClient.invalidateQueries({ queryKey: queryKeys.budgets }),
     queryClient.invalidateQueries({ queryKey: queryKeys.recurringTransactions }),
     queryClient.invalidateQueries({ queryKey: queryKeys.savingsGoals }),
@@ -142,6 +151,15 @@ export function useFinanceMutations() {
     }),
     deleteTransaction: useMutation({
       mutationFn: (id: string) => transactionRepository.deleteTransaction(id),
+      onSuccess: invalidate
+    }),
+    createTransactionTemplate: useMutation({
+      mutationFn: (input: TransactionTemplateInput) =>
+        transactionTemplateRepository.createTemplate(input),
+      onSuccess: invalidate
+    }),
+    deleteTransactionTemplate: useMutation({
+      mutationFn: (id: string) => transactionTemplateRepository.deleteTemplate(id),
       onSuccess: invalidate
     }),
     createWallet: useMutation({

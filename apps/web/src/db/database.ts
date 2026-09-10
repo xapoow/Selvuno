@@ -8,6 +8,7 @@ import type {
   SavingsGoalContribution,
   Settings,
   Transaction,
+  TransactionTemplate,
   Wallet,
   WalletTransfer
 } from "@myfinances/types";
@@ -19,6 +20,7 @@ export class FinanceDatabase extends Dexie {
   wallets!: Table<Wallet, string>;
   categories!: Table<Category, string>;
   transactions!: Table<Transaction, string>;
+  transactionTemplates!: Table<TransactionTemplate, string>;
   settings!: Table<Settings, string>;
   budgets!: Table<MonthlyBudget, string>;
   recurringTransactions!: Table<RecurringTransaction, string>;
@@ -157,6 +159,22 @@ export class FinanceDatabase extends Dexie {
         "id, fromWalletId, toWalletId, transferDate, deletedAt, updatedAt",
       backupSnapshots: "id, createdAt, reason"
     });
+    this.version(9).stores({
+      wallets: "id, name, currency, archivedAt, deletedAt, updatedAt",
+      categories: "id, sortOrder, name, type, deletedAt, updatedAt",
+      transactions:
+        "id, walletId, categoryId, type, transactionDate, recurringTransactionId, &[recurringTransactionId+recurrenceDate], deletedAt, updatedAt",
+      transactionTemplates: "id, walletId, categoryId, type, sortOrder, deletedAt, updatedAt",
+      settings: "id",
+      budgets: "id, month, categoryId, [categoryId+month], deletedAt, updatedAt",
+      recurringTransactions:
+        "id, walletId, categoryId, type, frequency, nextRunDate, paused, deletedAt, updatedAt",
+      savingsGoals: "id, walletId, targetDate, deletedAt, updatedAt",
+      savingsGoalContributions: "id, goalId, contributionDate, deletedAt, updatedAt",
+      walletTransfers:
+        "id, fromWalletId, toWalletId, transferDate, deletedAt, updatedAt",
+      backupSnapshots: "id, createdAt, reason"
+    });
   }
 }
 
@@ -222,6 +240,9 @@ export async function seedLocalData(db = financeDb): Promise<void> {
       colorTheme: "sage",
       activeWalletId: "all",
       hideAmounts: false,
+      quickTemplatesEnabled: true,
+      categorySuggestionsEnabled: false,
+      addAnotherEnabled: true,
       onboardingCompleted: false,
       defaultsVersion: 2,
       createdAt: now,
@@ -256,6 +277,15 @@ export async function seedLocalData(db = financeDb): Promise<void> {
     }
     if (typeof settings.hideAmounts !== "boolean") {
       repairedSettings.hideAmounts = false;
+    }
+    if (typeof settings.quickTemplatesEnabled !== "boolean") {
+      repairedSettings.quickTemplatesEnabled = true;
+    }
+    if (typeof settings.categorySuggestionsEnabled !== "boolean") {
+      repairedSettings.categorySuggestionsEnabled = false;
+    }
+    if (typeof settings.addAnotherEnabled !== "boolean") {
+      repairedSettings.addAnotherEnabled = true;
     }
     if (typeof settings.onboardingCompleted !== "boolean") {
       repairedSettings.onboardingCompleted = true;

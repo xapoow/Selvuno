@@ -43,7 +43,7 @@ export const categoryRepository: CategoryRepository = {
     });
     await financeDb.transaction(
       "rw",
-      [financeDb.categories, financeDb.recurringTransactions],
+      [financeDb.categories, financeDb.recurringTransactions, financeDb.transactionTemplates],
       async () => {
         await financeDb.categories.put(next);
         if (next.type !== current.type) {
@@ -58,6 +58,10 @@ export const categoryRepository: CategoryRepository = {
               })
             )
           );
+          await financeDb.transactionTemplates
+            .where("categoryId")
+            .equals(id)
+            .modify({ type: next.type, updatedAt: next.updatedAt, syncStatus: "pending" });
         }
       }
     );
@@ -72,7 +76,7 @@ export const categoryRepository: CategoryRepository = {
     const now = nowIso();
     await financeDb.transaction(
       "rw",
-      [financeDb.categories, financeDb.recurringTransactions],
+      [financeDb.categories, financeDb.recurringTransactions, financeDb.transactionTemplates],
       async () => {
         await financeDb.categories.put({
           ...current,
@@ -91,6 +95,10 @@ export const categoryRepository: CategoryRepository = {
             })
           )
         );
+        await financeDb.transactionTemplates
+          .where("categoryId")
+          .equals(id)
+          .modify({ deletedAt: now, updatedAt: now, syncStatus: "pending" });
       }
     );
   },
@@ -148,7 +156,8 @@ export const categoryRepository: CategoryRepository = {
         financeDb.categories,
         financeDb.transactions,
         financeDb.recurringTransactions,
-        financeDb.budgets
+        financeDb.budgets,
+        financeDb.transactionTemplates
       ],
       async () => {
         await financeDb.transactions
@@ -156,6 +165,10 @@ export const categoryRepository: CategoryRepository = {
           .equals(sourceId)
           .modify({ categoryId: targetId, updatedAt: now, syncStatus: "pending" });
         await financeDb.recurringTransactions
+          .where("categoryId")
+          .equals(sourceId)
+          .modify({ categoryId: targetId, updatedAt: now, syncStatus: "pending" });
+        await financeDb.transactionTemplates
           .where("categoryId")
           .equals(sourceId)
           .modify({ categoryId: targetId, updatedAt: now, syncStatus: "pending" });
