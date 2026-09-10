@@ -112,19 +112,19 @@ export function WalletsView({
                   <div>
                     <p className="text-xs uppercase text-muted">{t.common.balance}</p>
                     <p className="font-semibold text-foreground">
-                      {formatMoney(totals.balanceMinor, wallet.currency, settings.locale)}
+                      {formatMoney(totals.balanceMinor, wallet.currency, settings.locale, settings.hideAmounts)}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs uppercase text-muted">{t.common.income}</p>
                     <p className="font-semibold text-income">
-                      {formatMoney(totals.incomeMinor, wallet.currency, settings.locale)}
+                      {formatMoney(totals.incomeMinor, wallet.currency, settings.locale, settings.hideAmounts)}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs uppercase text-muted">{t.common.expenses}</p>
                     <p className="font-semibold text-expense">
-                      {formatMoney(totals.expenseMinor, wallet.currency, settings.locale)}
+                      {formatMoney(totals.expenseMinor, wallet.currency, settings.locale, settings.hideAmounts)}
                     </p>
                   </div>
                 </div>

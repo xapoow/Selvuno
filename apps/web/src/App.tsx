@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { WalletView } from "@myfinances/types";
+import { Eye, EyeOff, LockKeyhole } from "lucide-react";
 import { BottomNavigation } from "./components/BottomNavigation";
 import { CookieNotice } from "./components/CookieNotice";
 import { HeaderNavigation } from "./components/HeaderNavigation";
@@ -8,6 +9,7 @@ import { MobileWalletDashboardPager } from "./components/MobileWalletDashboardPa
 import { MobileWalletHistoryPager } from "./components/MobileWalletHistoryPager";
 import { NotificationCenter } from "./components/NotificationCenter";
 import { OfflineIndicator } from "./components/OfflineIndicator";
+import { LockScreen } from "./components/LockScreen";
 import { UpdateAnnouncement } from "./components/UpdateAnnouncement";
 import { WalletSwitcher } from "./components/WalletSwitcher";
 import { ErrorScreen } from "./components/ErrorScreen";
@@ -17,6 +19,7 @@ import { useExchangeRates } from "./lib/exchangeRates";
 import { buildAppNotifications } from "./lib/notifications";
 import { useAppStore } from "./state/appStore";
 import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
+import { usePrivacyLock } from "./state/usePrivacyLock";
 import { AddTransactionView } from "./views/AddTransactionView";
 import { DashboardView } from "./views/DashboardView";
 import { HistoryView } from "./views/HistoryView";
@@ -28,6 +31,7 @@ export function App() {
   const activeView = useAppStore((state) => state.activeView);
   const setActiveView = useAppStore((state) => state.setActiveView);
   const [walletTransitionDirection, setWalletTransitionDirection] = useState(1);
+  const privacy = usePrivacyLock();
   const data = useFinanceData();
   const mutations = useFinanceMutations();
 
@@ -194,6 +198,11 @@ export function App() {
   }
 
   const t = getDictionary(settings.locale);
+
+  if (privacy.locked) {
+    return <LockScreen t={t} onUnlock={privacy.unlock} />;
+  }
+
   const notifications = buildAppNotifications({
     settings,
     categories,
@@ -241,7 +250,29 @@ export function App() {
       </aside>
 
       <main className="mx-auto w-full max-w-[1180px] px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:px-8 md:pb-10 md:pt-7 lg:px-10">
-        <div className="mb-3 flex justify-end">
+        <div className="mb-3 flex justify-end gap-1">
+          <button
+            type="button"
+            onClick={() =>
+              void mutations.updateSettings.mutateAsync({ hideAmounts: !settings.hideAmounts })
+            }
+            className="app-focus grid h-10 w-10 place-items-center rounded-app text-muted transition hover:bg-elevated/70 hover:text-foreground"
+            aria-label={settings.hideAmounts ? t.settings.showAmounts : t.settings.hideAmounts}
+            title={settings.hideAmounts ? t.settings.showAmounts : t.settings.hideAmounts}
+          >
+            {settings.hideAmounts ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </button>
+          {privacy.pinEnabled ? (
+            <button
+              type="button"
+              onClick={privacy.lockNow}
+              className="app-focus grid h-10 w-10 place-items-center rounded-app text-muted transition hover:bg-elevated/70 hover:text-foreground"
+              aria-label={t.settings.lockNow}
+              title={t.settings.lockNow}
+            >
+              <LockKeyhole className="h-5 w-5" />
+            </button>
+          ) : null}
           <NotificationCenter notifications={notifications} t={t} />
         </div>
         {showsWalletContext ? (
@@ -421,6 +452,7 @@ export function App() {
               settings={settings}
               categories={categories}
               backupSnapshots={backupSnapshots}
+              privacy={privacy}
               t={t}
               onUpdateSettings={async (input) => {
                 await mutations.updateSettings.mutateAsync(input);

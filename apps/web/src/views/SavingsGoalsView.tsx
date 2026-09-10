@@ -171,7 +171,7 @@ export function SavingsGoalsView({
                       {t.goals.saved}
                     </p>
                     <p className="mt-1 text-sm font-semibold text-foreground">
-                      {formatMoney(savedMinor, goal.currency, settings.locale)}
+                      {formatMoney(savedMinor, goal.currency, settings.locale, settings.hideAmounts)}
                     </p>
                   </div>
                   <div>
@@ -179,7 +179,7 @@ export function SavingsGoalsView({
                       {t.goals.remaining}
                     </p>
                     <p className="mt-1 text-sm font-semibold text-foreground">
-                      {formatMoney(remainingMinor, goal.currency, settings.locale)}
+                      {formatMoney(remainingMinor, goal.currency, settings.locale, settings.hideAmounts)}
                     </p>
                   </div>
                 </div>
@@ -280,11 +280,13 @@ export function SavingsGoalsView({
               >
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-foreground">
-                    +{formatMoney(
-                      contribution.amountMinor,
-                      historyGoal?.currency ?? settings.currency,
-                      settings.locale
-                    )}
+                    {settings.hideAmounts
+                      ? "••••"
+                      : `+${formatMoney(
+                          contribution.amountMinor,
+                          historyGoal?.currency ?? settings.currency,
+                          settings.locale
+                        )}`}
                   </p>
                   <p className="mt-0.5 truncate text-xs text-muted">
                     {new Intl.DateTimeFormat(settings.locale, { dateStyle: "medium" }).format(

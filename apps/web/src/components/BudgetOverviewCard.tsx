@@ -6,6 +6,7 @@ import type { MonthlyBudgetProgress } from "../lib/budgets";
 interface BudgetOverviewCardProps {
   currency: string;
   locale: string;
+  hideAmounts: boolean;
   monthLabel: string;
   progress: MonthlyBudgetProgress;
   t: Dictionary;
@@ -15,6 +16,7 @@ interface BudgetOverviewCardProps {
 export function BudgetOverviewCard({
   currency,
   locale,
+  hideAmounts,
   monthLabel,
   progress,
   t,
@@ -47,7 +49,7 @@ export function BudgetOverviewCard({
           </span>
           <span className="mt-1 block text-sm text-muted">
             {configured
-              ? `${t.budget.spent}: ${formatMoney(progress.spentMinor, currency, locale)}`
+              ? `${t.budget.spent}: ${formatMoney(progress.spentMinor, currency, locale, hideAmounts)}`
               : t.budget.description}
           </span>
         </span>
@@ -59,7 +61,7 @@ export function BudgetOverviewCard({
             <span>
               <span className="block text-xs font-medium text-muted">{t.budget.remaining}</span>
               <span className="mt-0.5 block text-lg font-semibold text-foreground">
-                {formatMoney(Math.max(progress.remainingMinor, 0), currency, locale)}
+                {formatMoney(Math.max(progress.remainingMinor, 0), currency, locale, hideAmounts)}
               </span>
             </span>
             <span className="text-sm font-semibold" style={{ color: tone }}>

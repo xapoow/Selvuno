@@ -221,6 +221,7 @@ export async function seedLocalData(db = financeDb): Promise<void> {
       theme: "system",
       colorTheme: "sage",
       activeWalletId: "all",
+      hideAmounts: false,
       onboardingCompleted: false,
       defaultsVersion: 2,
       createdAt: now,
@@ -252,6 +253,9 @@ export async function seedLocalData(db = financeDb): Promise<void> {
     }
     if (!settings.activeWalletId) {
       repairedSettings.activeWalletId = "all";
+    }
+    if (typeof settings.hideAmounts !== "boolean") {
+      repairedSettings.hideAmounts = false;
     }
     if (typeof settings.onboardingCompleted !== "boolean") {
       repairedSettings.onboardingCompleted = true;

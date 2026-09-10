@@ -233,6 +233,7 @@ export const settingsSchema = z.object({
   theme: themePreferenceSchema,
   colorTheme: colorThemePreferenceSchema.default("sage"),
   activeWalletId: walletViewSchema,
+  hideAmounts: z.boolean().default(false),
   onboardingCompleted: z.boolean().default(false),
   defaultsVersion: z.number().int().default(2),
   createdAt: z.string().datetime(),

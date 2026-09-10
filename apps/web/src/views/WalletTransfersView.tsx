@@ -84,7 +84,8 @@ export function WalletTransfersView({
                       {formatMoney(
                         transfer.fromAmountMinor,
                         transfer.fromCurrency,
-                        settings.locale
+                        settings.locale,
+                        settings.hideAmounts
                       )}
                     </p>
                     {transfer.fromCurrency !== transfer.toCurrency ||
@@ -94,7 +95,8 @@ export function WalletTransfersView({
                         {formatMoney(
                           transfer.toAmountMinor,
                           transfer.toCurrency,
-                          settings.locale
+                          settings.locale,
+                          settings.hideAmounts
                         )}
                       </p>
                     ) : null}

@@ -28,6 +28,7 @@ const settings: Settings = {
   theme: "dark",
   colorTheme: "sage",
   activeWalletId: "all",
+  hideAmounts: false,
   onboardingCompleted: true,
   defaultsVersion: 2,
   createdAt: entityBase.createdAt,

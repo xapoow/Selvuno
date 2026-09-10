@@ -2,7 +2,7 @@ import type { ColorThemePreference } from "@myfinances/types";
 import type { AppView } from "./state/appStore";
 
 export type Language = "en" | "ru";
-export type SettingsTab = "general" | "appearance" | "categories" | "backup" | "sync" | "debug";
+export type SettingsTab = "general" | "appearance" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
 export const appVersion = "0.5.0";
@@ -398,6 +398,35 @@ export interface Dictionary {
     tabs: Record<SettingsTab, string>;
     general: string;
     appearance: string;
+    privacy: string;
+    pinProtection: string;
+    pinProtectionHint: string;
+    enabled: string;
+    disabled: string;
+    enablePin: string;
+    changePin: string;
+    disablePin: string;
+    disablePinHint: string;
+    currentPin: string;
+    newPin: string;
+    confirmPin: string;
+    pinRequirements: string;
+    pinMismatch: string;
+    pinIncorrect: string;
+    pinSaveError: string;
+    autoLock: string;
+    autoLockNever: string;
+    autoLockMinutes: string;
+    lockNow: string;
+    hideAmounts: string;
+    showAmounts: string;
+    hideAmountsHint: string;
+    localPrivacyNote: string;
+    appLocked: string;
+    appLockedHint: string;
+    enterPin: string;
+    checkingPin: string;
+    unlock: string;
     globalCurrency: string;
     dateFormat: string;
     dateFormats: Record<DateFormatLabel, string>;
@@ -828,6 +857,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       tabs: {
         general: "General",
         appearance: "Appearance",
+        privacy: "Privacy",
         categories: "Categories",
         backup: "Backup",
         sync: "Sync",
@@ -835,6 +865,35 @@ export const dictionaries: Record<Language, Dictionary> = {
       },
       general: "General",
       appearance: "Appearance",
+      privacy: "Privacy",
+      pinProtection: "PIN protection",
+      pinProtectionHint: "Lock access to the app on this device. The feature is optional and can be removed at any time.",
+      enabled: "Enabled",
+      disabled: "Disabled",
+      enablePin: "Enable PIN",
+      changePin: "Change PIN",
+      disablePin: "Disable PIN",
+      disablePinHint: "Enter your current PIN to remove protection from this device.",
+      currentPin: "Current PIN",
+      newPin: "New PIN",
+      confirmPin: "Confirm PIN",
+      pinRequirements: "Use 4 to 12 digits. The PIN cannot be recovered if you forget it.",
+      pinMismatch: "The PIN values do not match.",
+      pinIncorrect: "Incorrect PIN. Try again.",
+      pinSaveError: "Unable to update PIN protection.",
+      autoLock: "Automatic lock",
+      autoLockNever: "Never",
+      autoLockMinutes: "After {minutes} min",
+      lockNow: "Lock now",
+      hideAmounts: "Hide amounts",
+      showAmounts: "Show amounts",
+      hideAmountsHint: "Replace financial values with dots throughout the app. Use the eye button to switch quickly.",
+      localPrivacyNote: "PIN protection is stored only on this device and is intended to prevent casual access. It does not encrypt browser storage.",
+      appLocked: "App locked",
+      appLockedHint: "Enter your PIN to return to your finances.",
+      enterPin: "PIN",
+      checkingPin: "Checking…",
+      unlock: "Unlock",
       globalCurrency: "Global currency",
       dateFormat: "Date format",
       dateFormats: {
@@ -1324,6 +1383,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       tabs: {
         general: "Общее",
         appearance: "Вид",
+        privacy: "Приватность",
         categories: "Категории",
         backup: "Бэкап",
         sync: "Синхронизация",
@@ -1331,6 +1391,35 @@ export const dictionaries: Record<Language, Dictionary> = {
       },
       general: "Общее",
       appearance: "Внешний вид",
+      privacy: "Приватность",
+      pinProtection: "Защита PIN-кодом",
+      pinProtectionHint: "Блокирует доступ к приложению на этом устройстве. Функция необязательная, её можно отключить в любой момент.",
+      enabled: "Включена",
+      disabled: "Выключена",
+      enablePin: "Включить PIN",
+      changePin: "Изменить PIN",
+      disablePin: "Отключить PIN",
+      disablePinHint: "Введи текущий PIN, чтобы убрать защиту с этого устройства.",
+      currentPin: "Текущий PIN",
+      newPin: "Новый PIN",
+      confirmPin: "Повтори PIN",
+      pinRequirements: "От 4 до 12 цифр. Забытый PIN восстановить нельзя.",
+      pinMismatch: "Введённые PIN-коды не совпадают.",
+      pinIncorrect: "Неверный PIN. Попробуй ещё раз.",
+      pinSaveError: "Не удалось изменить защиту PIN-кодом.",
+      autoLock: "Автоматическая блокировка",
+      autoLockNever: "Никогда",
+      autoLockMinutes: "Через {minutes} мин",
+      lockNow: "Заблокировать",
+      hideAmounts: "Скрывать суммы",
+      showAmounts: "Показывать суммы",
+      hideAmountsHint: "Заменяет денежные значения точками во всём приложении. Быстро переключается кнопкой с глазом.",
+      localPrivacyNote: "PIN хранится только на этом устройстве и защищает от случайного доступа. Данные браузера он не шифрует.",
+      appLocked: "Приложение заблокировано",
+      appLockedHint: "Введи PIN, чтобы вернуться к своим финансам.",
+      enterPin: "PIN-код",
+      checkingPin: "Проверяем…",
+      unlock: "Разблокировать",
       globalCurrency: "Общая валюта",
       dateFormat: "Формат даты",
       dateFormats: {
