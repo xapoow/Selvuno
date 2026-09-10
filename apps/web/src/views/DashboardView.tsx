@@ -16,6 +16,7 @@ import {
   type AnalyticsCategoryItem
 } from "../components/AnalyticsView";
 import { BudgetOverviewCard } from "../components/BudgetOverviewCard";
+import { SmartInsightsCard } from "../components/SmartInsightsCard";
 import { BudgetPlanView } from "../components/BudgetPlanView";
 import { TransactionRow } from "../components/TransactionRow";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -26,6 +27,7 @@ import { cn } from "../lib/cn";
 import { calculateMonthlyBudgetProgress, formatBudgetMonth, getBudgetMonth } from "../lib/budgets";
 import { convertMinorToBaseCurrency, type ExchangeRateTable, useExchangeRates } from "../lib/exchangeRates";
 import { getTimeGreeting } from "../lib/greetings";
+import { buildSmartInsights } from "../lib/insights";
 import {
   filterTransactionsForTotals,
   getIncludedWalletIds,
@@ -214,6 +216,21 @@ export function DashboardView({
     }
   });
   const recentTransactions = displayTransactions.slice(0, 4);
+  const smartInsights = settings.smartInsightsEnabled
+    ? buildSmartInsights({
+        transactions: displayTransactions
+          .filter((item) => !item.conversionMissing)
+          .map((item) => ({
+            type: item.transaction.type,
+            amountMinor: item.amountMinor,
+            categoryId: item.transaction.categoryId,
+            transactionDate: item.transaction.transactionDate,
+            recurringTransactionId: item.transaction.recurringTransactionId
+          })),
+        now: new Date(),
+        timeZone: settings.timeZone
+      })
+    : [];
   const greeting = getTimeGreeting(new Date(), settings.timeZone, t);
   const hasCurrencyConversion =
     displayTransactions.some(
@@ -324,6 +341,10 @@ export function DashboardView({
         t={t}
         onOpen={() => setBudgetOpen(true)}
       />
+
+      {settings.smartInsightsEnabled ? (
+        <SmartInsightsCard insights={smartInsights} categories={categories} t={t} />
+      ) : null}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(330px,0.85fr)]">
         <Section title={t.dashboard.cashFlow}>

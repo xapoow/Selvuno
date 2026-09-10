@@ -33,6 +33,7 @@ const settings: Settings = {
   categorySuggestionsEnabled: false,
   addAnotherEnabled: true,
   advancedWalletsEnabled: false,
+  smartInsightsEnabled: false,
   onboardingCompleted: true,
   defaultsVersion: 2,
   createdAt: entityBase.createdAt,
