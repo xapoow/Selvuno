@@ -30,6 +30,7 @@ import { applyRootVisualTheme } from "../lib/colorThemes";
 import { resetLocalApplicationData } from "../lib/resetLocalData";
 import { ColorThemePicker } from "../components/ColorThemePicker";
 import { CategoryForm } from "../components/CategoryForm";
+import { AutomationSettingsPanel } from "../components/AutomationSettingsPanel";
 import { PrivacySettingsPanel } from "../components/PrivacySettingsPanel";
 import { BottomSheet } from "../components/ui/BottomSheet";
 import { Button } from "../components/ui/Button";
@@ -73,6 +74,7 @@ const debugErrorKinds: ErrorScreenKind[] = [
 const settingsTabs: Array<{ value: SettingsTab }> = [
   { value: "general" },
   { value: "appearance" },
+  { value: "automation" },
   { value: "privacy" },
   { value: "categories" },
   { value: "backup" },
@@ -403,6 +405,16 @@ export function SettingsView({
           <PrivacySettingsPanel
             settings={settings}
             privacy={privacy}
+            t={t}
+            onUpdateSettings={onUpdateSettings}
+          />
+        </Section>
+      ) : null}
+
+      {activeTab === "automation" ? (
+        <Section title={t.settings.automation}>
+          <AutomationSettingsPanel
+            settings={settings}
             t={t}
             onUpdateSettings={onUpdateSettings}
           />

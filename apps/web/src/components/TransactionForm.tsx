@@ -1,17 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   Category,
   Settings,
   Transaction,
   TransactionInput,
+  TransactionTemplate,
   TransactionType,
   Wallet,
   WalletView
 } from "@myfinances/types";
 import { decimalToMinor, formatMoney, minorToDecimal } from "@myfinances/utils";
-import { CalendarDays, ChevronDown, Equal, Hash, StickyNote } from "lucide-react";
+import { CalendarDays, ChevronDown, Equal, Hash, RotateCcw, Sparkles, StickyNote } from "lucide-react";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { evaluateAmountExpression } from "../lib/amountExpression";
+import { suggestCategoryId } from "../lib/categorySuggestions";
 import { cn } from "../lib/cn";
 import { fromDateInputValue, toDateInputValue } from "../lib/dates";
 import { formatTagsInput, parseTagsInput } from "../lib/tags";
@@ -30,6 +32,7 @@ interface TransactionFormProps {
   t: Dictionary;
   initial?: Transaction;
   recentTransactions?: Transaction[];
+  templates?: TransactionTemplate[];
   activeWalletId: WalletView;
   lockWalletToActive?: boolean;
   submitLabel: string;
@@ -43,6 +46,7 @@ export function TransactionForm({
   t,
   initial,
   recentTransactions = [],
+  templates = [],
   activeWalletId,
   lockWalletToActive = false,
   submitLabel,
@@ -62,6 +66,7 @@ export function TransactionForm({
   const [detailsOpen, setDetailsOpen] = useState(Boolean(initial));
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const amountInputRef = useRef<HTMLInputElement | null>(null);
   const selectedWallet = wallets.find((wallet) => wallet.id === walletId);
   const currency = selectedWallet?.currency ?? initial?.currency ?? settings.currency;
 
@@ -99,6 +104,15 @@ export function TransactionForm({
       })
       .slice(0, 5);
   }, [categories, recentTransactions, wallets]);
+  const suggestion = useMemo(() => {
+    if (!settings.categorySuggestionsEnabled || !note.trim()) {
+      return null;
+    }
+    const suggestedId = suggestCategoryId(note, type, recentTransactions);
+    return typeCategories.find(
+      (category) => category.id === suggestedId && category.id !== categoryId
+    ) ?? null;
+  }, [categoryId, note, recentTransactions, settings.categorySuggestionsEnabled, type, typeCategories]);
   const calculatedAmount = useMemo(() => {
     if (!amount.trim()) {
       return null;
@@ -178,31 +192,61 @@ export function TransactionForm({
     }
   }
 
+  function applyTemplate(template: {
+    walletId: string;
+    categoryId: string;
+    type: TransactionType;
+    amountMinor?: number;
+    currency: string;
+    note?: string;
+    tags: string[];
+  }) {
+    setType(template.type);
+    setWalletId(lockWalletToActive ? defaultWalletId : template.walletId);
+    setCategoryId(template.categoryId);
+    setAmount(
+      template.amountMinor === undefined
+        ? ""
+        : String(minorToDecimal(template.amountMinor, template.currency))
+    );
+    setNote(template.note ?? "");
+    setTagsInput(formatTagsInput(template.tags));
+    setSaved(false);
+    amountInputRef.current?.focus();
+  }
+
   return (
     <form className="grid gap-5" onSubmit={handleSubmit}>
-      {!initial && quickTemplates.length ? (
+      {!initial && settings.quickTemplatesEnabled && (templates.length || quickTemplates.length) ? (
         <section className="grid gap-2">
-          <div>
-            <p className="text-sm font-semibold text-foreground">{t.transaction.quickTemplates}</p>
-            <p className="mt-0.5 text-xs text-muted">{t.transaction.quickTemplatesHint}</p>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-foreground">{t.transaction.quickTemplates}</p>
+              <p className="mt-0.5 text-xs text-muted">{t.transaction.quickTemplatesHint}</p>
+            </div>
+            {quickTemplates[0] ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="small"
+                className="shrink-0"
+                onClick={() => applyTemplate(quickTemplates[0])}
+              >
+                <RotateCcw className="h-4 w-4" />
+                {t.transaction.repeatLast}
+              </Button>
+            ) : null}
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {quickTemplates.map((template) => {
+            {[...templates, ...quickTemplates].map((template, index) => {
               const category = categories.find((item) => item.id === template.categoryId);
+              const isCustom = "name" in template;
               return (
                 <button
-                  key={template.id}
+                  key={`${isCustom ? "custom" : "recent"}-${template.id}-${index}`}
                   type="button"
                   className="app-focus app-control flex shrink-0 items-center gap-2 rounded-app p-2 pr-3 text-left active:scale-[0.98]"
-                  onClick={() => {
-                    setType(template.type);
-                    setWalletId(template.walletId);
-                    setCategoryId(template.categoryId);
-                    setAmount(String(minorToDecimal(template.amountMinor, template.currency)));
-                    setNote(template.note ?? "");
-                    setTagsInput(formatTagsInput(template.tags));
-                    setSaved(false);
-                  }}
+                  onClick={() => applyTemplate(template)}
                 >
                   <span
                     className="grid h-9 w-9 place-items-center rounded-app text-white"
@@ -212,10 +256,17 @@ export function TransactionForm({
                   </span>
                   <span>
                     <span className="block max-w-28 truncate text-xs font-semibold text-foreground">
-                      {getCategoryName(category?.name, t)}
+                      {isCustom ? template.name : getCategoryName(category?.name, t)}
                     </span>
                     <span className="block text-[11px] text-muted">
-                      {formatMoney(template.amountMinor, template.currency, settings.locale, settings.hideAmounts)}
+                      {template.amountMinor === undefined
+                        ? t.transaction.amountNotSet
+                        : formatMoney(
+                            template.amountMinor,
+                            template.currency,
+                            settings.locale,
+                            settings.hideAmounts
+                          )}
                     </span>
                   </span>
                 </button>
@@ -246,6 +297,7 @@ export function TransactionForm({
         </span>
         <span className="flex min-w-0 items-baseline gap-2">
           <input
+            ref={amountInputRef}
             aria-label={`${t.transaction.amount} (${currency})`}
             inputMode="text"
             placeholder="0"
@@ -361,6 +413,22 @@ export function TransactionForm({
                 maxLength={240}
               />
             </div>
+            {suggestion ? (
+              <button
+                type="button"
+                className="app-focus app-field flex items-center gap-2 rounded-app px-3 py-2 text-left text-xs font-medium text-muted hover:text-foreground"
+                onClick={() => {
+                  setCategoryId(suggestion.id);
+                  setSaved(false);
+                }}
+              >
+                <Sparkles className="h-4 w-4 text-accent" />
+                {t.transaction.suggestedCategory.replace(
+                  "{category}",
+                  getCategoryName(suggestion.name, t)
+                )}
+              </button>
+            ) : null}
             <TextField
               label={t.transaction.tags}
               value={tagsInput}
@@ -382,7 +450,24 @@ export function TransactionForm({
         ) : null}
       </div>
       {error ? <p className="text-sm font-medium text-expense">{error}</p> : null}
-      {saved ? <p className="text-sm font-medium text-income">{t.common.saved}</p> : null}
+      {saved ? (
+        <div className="app-control flex items-center justify-between gap-3 rounded-app px-3 py-2">
+          <p className="text-sm font-medium text-income">{t.common.saved}</p>
+          {settings.addAnotherEnabled ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="small"
+              onClick={() => {
+                setSaved(false);
+                amountInputRef.current?.focus();
+              }}
+            >
+              {t.transaction.addAnother}
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
       <Button
         type="submit"
         className="h-12 text-base"

@@ -2,7 +2,7 @@ import type { ColorThemePreference } from "@myfinances/types";
 import type { AppView } from "./state/appStore";
 
 export type Language = "en" | "ru";
-export type SettingsTab = "general" | "appearance" | "privacy" | "categories" | "backup" | "sync" | "debug";
+export type SettingsTab = "general" | "appearance" | "automation" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
 export const appVersion = "0.5.0";
@@ -173,6 +173,22 @@ export interface Dictionary {
     quickHint: string;
     quickTemplates: string;
     quickTemplatesHint: string;
+    manageTemplates: string;
+    repeatLast: string;
+    newTemplate: string;
+    templateManagerHint: string;
+    templateName: string;
+    templateNamePlaceholder: string;
+    templateAmount: string;
+    templateAmountPlaceholder: string;
+    saveTemplate: string;
+    templateRequired: string;
+    templateSaveError: string;
+    confirmDeleteTemplate: string;
+    templateEmpty: string;
+    amountNotSet: string;
+    suggestedCategory: string;
+    addAnother: string;
     calculate: string;
     calculatorOperator: string;
     calculatorError: string;
@@ -398,6 +414,13 @@ export interface Dictionary {
     tabs: Record<SettingsTab, string>;
     general: string;
     appearance: string;
+    automation: string;
+    quickTemplatesSetting: string;
+    quickTemplatesSettingHint: string;
+    categorySuggestionsSetting: string;
+    categorySuggestionsSettingHint: string;
+    addAnotherSetting: string;
+    addAnotherSettingHint: string;
     privacy: string;
     pinProtection: string;
     pinProtectionHint: string;
@@ -628,6 +651,22 @@ export const dictionaries: Record<Language, Dictionary> = {
       quickHint: "Amount and category are enough — the rest is optional.",
       quickTemplates: "Quick templates",
       quickTemplatesHint: "Repeat a recent transaction in one tap.",
+      manageTemplates: "Manage templates",
+      repeatLast: "Repeat last",
+      newTemplate: "New template",
+      templateManagerHint: "Save the transactions you use most often. An amount is optional.",
+      templateName: "Template name",
+      templateNamePlaceholder: "Coffee, groceries, taxi",
+      templateAmount: "Default amount",
+      templateAmountPlaceholder: "Optional, calculations work too",
+      saveTemplate: "Save template",
+      templateRequired: "Choose a name and category.",
+      templateSaveError: "Unable to save the template.",
+      confirmDeleteTemplate: "Delete this template?",
+      templateEmpty: "No custom templates yet.",
+      amountNotSet: "Any amount",
+      suggestedCategory: "Suggested category: {category}",
+      addAnother: "Add another",
       calculate: "Calculate",
       calculatorOperator: "Calculator operator",
       calculatorError: "Enter a positive amount or a valid calculation.",
@@ -857,6 +896,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       tabs: {
         general: "General",
         appearance: "Appearance",
+        automation: "Quick entry",
         privacy: "Privacy",
         categories: "Categories",
         backup: "Backup",
@@ -865,6 +905,13 @@ export const dictionaries: Record<Language, Dictionary> = {
       },
       general: "General",
       appearance: "Appearance",
+      automation: "Quick entry",
+      quickTemplatesSetting: "Quick templates",
+      quickTemplatesSettingHint: "Show recent and saved transaction shortcuts above the entry form.",
+      categorySuggestionsSetting: "Category suggestions",
+      categorySuggestionsSettingHint: "Suggest a category from similar notes and tags saved on this device.",
+      addAnotherSetting: "Add another after saving",
+      addAnotherSettingHint: "Show a shortcut to enter the next transaction without leaving the form.",
       privacy: "Privacy",
       pinProtection: "PIN protection",
       pinProtectionHint: "Lock access to the app on this device. The feature is optional and can be removed at any time.",
@@ -1154,6 +1201,22 @@ export const dictionaries: Record<Language, Dictionary> = {
       quickHint: "Достаточно суммы и категории — остальное необязательно.",
       quickTemplates: "Быстрые шаблоны",
       quickTemplatesHint: "Повтори недавнюю операцию одним нажатием.",
+      manageTemplates: "Управление шаблонами",
+      repeatLast: "Повторить последнюю",
+      newTemplate: "Новый шаблон",
+      templateManagerHint: "Сохраняй частые операции. Сумму можно не указывать.",
+      templateName: "Название шаблона",
+      templateNamePlaceholder: "Кофе, продукты, такси",
+      templateAmount: "Сумма по умолчанию",
+      templateAmountPlaceholder: "Необязательно, можно с вычислением",
+      saveTemplate: "Сохранить шаблон",
+      templateRequired: "Выбери название и категорию.",
+      templateSaveError: "Не удалось сохранить шаблон.",
+      confirmDeleteTemplate: "Удалить этот шаблон?",
+      templateEmpty: "Пользовательских шаблонов пока нет.",
+      amountNotSet: "Любая сумма",
+      suggestedCategory: "Предлагаемая категория: {category}",
+      addAnother: "Добавить ещё",
       calculate: "Посчитать",
       calculatorOperator: "Оператор калькулятора",
       calculatorError: "Введи положительную сумму или корректное вычисление.",
@@ -1383,6 +1446,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       tabs: {
         general: "Общее",
         appearance: "Вид",
+        automation: "Быстрый ввод",
         privacy: "Приватность",
         categories: "Категории",
         backup: "Бэкап",
@@ -1391,6 +1455,13 @@ export const dictionaries: Record<Language, Dictionary> = {
       },
       general: "Общее",
       appearance: "Внешний вид",
+      automation: "Быстрый ввод",
+      quickTemplatesSetting: "Быстрые шаблоны",
+      quickTemplatesSettingHint: "Показывать недавние и сохранённые операции над формой добавления.",
+      categorySuggestionsSetting: "Подсказки категорий",
+      categorySuggestionsSettingHint: "Предлагать категорию по похожим заметкам и тегам, сохранённым на этом устройстве.",
+      addAnotherSetting: "Добавить ещё после сохранения",
+      addAnotherSettingHint: "Показывать кнопку для следующей операции, не закрывая форму.",
       privacy: "Приватность",
       pinProtection: "Защита PIN-кодом",
       pinProtectionHint: "Блокирует доступ к приложению на этом устройстве. Функция необязательная, её можно отключить в любой момент.",

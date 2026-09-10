@@ -150,6 +150,31 @@ export const transactionInputSchema = z.object({
 });
 export type TransactionInput = z.infer<typeof transactionInputSchema>;
 
+export const transactionTemplateSchema = baseEntitySchema.extend({
+  name: z.string().trim().min(1).max(48),
+  walletId: z.string().uuid(),
+  categoryId: z.string().uuid(),
+  amountMinor: z.number().int().positive().optional(),
+  currency: z.string().length(3),
+  type: transactionTypeSchema,
+  note: z.string().max(240).optional(),
+  tags: z.array(transactionTagSchema).max(12).default([]),
+  sortOrder: z.number().int().nonnegative().default(0)
+});
+export type TransactionTemplate = z.infer<typeof transactionTemplateSchema>;
+
+export const transactionTemplateInputSchema = z.object({
+  name: z.string().trim().min(1).max(48),
+  walletId: z.string().uuid(),
+  categoryId: z.string().uuid(),
+  amountMinor: z.number().int().positive().optional(),
+  currency: z.string().length(3),
+  type: transactionTypeSchema,
+  note: z.string().max(240).optional(),
+  tags: z.array(transactionTagSchema).max(12).optional()
+});
+export type TransactionTemplateInput = z.infer<typeof transactionTemplateInputSchema>;
+
 export const recurringTransactionSchema = baseEntitySchema.extend({
   walletId: z.string().uuid(),
   categoryId: z.string().uuid(),
@@ -234,6 +259,9 @@ export const settingsSchema = z.object({
   colorTheme: colorThemePreferenceSchema.default("sage"),
   activeWalletId: walletViewSchema,
   hideAmounts: z.boolean().default(false),
+  quickTemplatesEnabled: z.boolean().default(true),
+  categorySuggestionsEnabled: z.boolean().default(false),
+  addAnotherEnabled: z.boolean().default(true),
   onboardingCompleted: z.boolean().default(false),
   defaultsVersion: z.number().int().default(2),
   createdAt: z.string().datetime(),
@@ -280,13 +308,19 @@ const backupV6Schema = backupV5Schema.extend({
   version: z.literal(6)
 });
 
+const backupV7Schema = backupV6Schema.extend({
+  version: z.literal(7),
+  transactionTemplates: z.array(transactionTemplateSchema)
+});
+
 export const backupSchema = z.discriminatedUnion("version", [
   backupV1Schema,
   backupV2Schema,
   backupV3Schema,
   backupV4Schema,
   backupV5Schema,
-  backupV6Schema
+  backupV6Schema,
+  backupV7Schema
 ]);
 export type FinanceBackup = z.infer<typeof backupSchema>;
 export type FinanceBackupV2 = z.infer<typeof backupV2Schema>;
@@ -294,6 +328,7 @@ export type FinanceBackupV3 = z.infer<typeof backupV3Schema>;
 export type FinanceBackupV4 = z.infer<typeof backupV4Schema>;
 export type FinanceBackupV5 = z.infer<typeof backupV5Schema>;
 export type FinanceBackupV6 = z.infer<typeof backupV6Schema>;
+export type FinanceBackupV7 = z.infer<typeof backupV7Schema>;
 
 export const backupSnapshotReasonSchema = z.enum(["automatic", "before-restore"]);
 export type BackupSnapshotReason = z.infer<typeof backupSnapshotReasonSchema>;
