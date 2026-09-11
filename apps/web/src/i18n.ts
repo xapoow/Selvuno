@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.5.0";
+export const appVersion = "0.6.0";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -959,12 +959,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "Faster daily tracking with safer local data and more flexible organization.",
+      intro: "More control on every device, with privacy and productivity features that stay optional.",
       gotIt: "Explore the update",
       notes: [
-        "Drag, search, replace, and merge categories without losing linked data",
-        "Quick transaction templates and a built-in amount calculator",
-        "Automatic local backups, offline status, and detailed notifications"
+        "Optional PIN, auto-lock, and private balance visibility controls",
+        "Faster transactions, advanced wallets, and local smart insights",
+        "Desktop shortcuts, table history, bulk actions, and filtered CSV export"
       ]
     },
     categories: {
@@ -1563,12 +1563,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Быстрее ежедневный учёт, надёжнее локальные данные и удобнее организация.",
+      intro: "Больше контроля на любом устройстве — приватность и дополнительные возможности остаются опциональными.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Перетаскивание, поиск, замена и объединение категорий без потери связанных данных",
-        "Быстрые шаблоны операций и встроенный калькулятор суммы",
-        "Автоматические локальные бэкапы, статус офлайн и подробные уведомления"
+        "Опциональные PIN-код, автоблокировка и скрытие сумм",
+        "Быстрый ввод операций, расширенные кошельки и локальные умные наблюдения",
+        "Горячие клавиши, табличная история, массовые действия и экспорт CSV на ПК"
       ]
     },
     categories: {
