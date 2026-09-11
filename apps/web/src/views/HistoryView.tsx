@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   Category,
   Settings,
@@ -8,17 +8,21 @@ import type {
   Wallet,
   WalletView
 } from "@myfinances/types";
-import { ReceiptText } from "lucide-react";
+import { minorToDecimal } from "@myfinances/utils";
+import { Download, ReceiptText, Tags, Trash2 } from "lucide-react";
 import { FinancialCalendar } from "../components/FinancialCalendar";
 import { TransactionForm } from "../components/TransactionForm";
 import { TransactionRow } from "../components/TransactionRow";
+import { TransactionTable } from "../components/TransactionTable";
 import { BottomSheet } from "../components/ui/BottomSheet";
+import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
 import { SegmentedControl } from "../components/ui/SegmentedControl";
 import { SelectField } from "../components/ui/SelectField";
 import { TextField } from "../components/ui/TextField";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { convertMinorToBaseCurrency, type ExchangeRateTable } from "../lib/exchangeRates";
+import { createCsv, downloadCsv } from "../lib/csv";
 import { shouldHideWalletAmounts } from "../lib/walletFeatures";
 
 interface HistoryViewProps {
@@ -31,6 +35,8 @@ interface HistoryViewProps {
   exchangeRates?: ExchangeRateTable;
   t: Dictionary;
   showTitle?: boolean;
+  desktopTools?: boolean;
+  searchFocusRequest?: number;
   onUpdate: (id: string, input: Partial<TransactionInput>) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 }
@@ -56,6 +62,8 @@ export function HistoryView({
   exchangeRates,
   t,
   showTitle = true,
+  desktopTools = false,
+  searchFocusRequest = 0,
   onUpdate,
   onDelete
 }: HistoryViewProps) {
@@ -63,8 +71,12 @@ export function HistoryView({
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<HistorySort>("date-desc");
-  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [viewMode, setViewMode] = useState<"list" | "table" | "calendar">("list");
   const [editing, setEditing] = useState<Transaction | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkCategoryId, setBulkCategoryId] = useState("");
+  const [bulkActionError, setBulkActionError] = useState("");
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const activeWallet =
     activeWalletId === "all" ? undefined : wallets.find((wallet) => wallet.id === activeWalletId);
   const calendarContainsHiddenWallet =
@@ -188,10 +200,118 @@ export function HistoryView({
         );
       });
   }, [categories, convertedTransactions, settings.locale, sortBy, t, wallets]);
+  const selectedTransactions = useMemo(
+    () =>
+      displayTransactions
+        .map((item) => item.transaction)
+        .filter((transaction) => selectedIds.has(transaction.id)),
+    [displayTransactions, selectedIds]
+  );
+  const selectedTypes = new Set(selectedTransactions.map((transaction) => transaction.type));
+  const selectedType = selectedTypes.size === 1 ? selectedTransactions[0]?.type : undefined;
+  const selectedSignature = selectedTransactions
+    .map((transaction) => transaction.id)
+    .sort()
+    .join("|");
+  const bulkCategories = useMemo(
+    () =>
+      selectedType
+        ? categories.filter((category) => !category.deletedAt && category.type === selectedType)
+        : [],
+    [categories, selectedType]
+  );
+
+  useEffect(() => {
+    if (searchFocusRequest <= 0 || !showTitle) {
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      searchInputRef.current?.focus();
+      searchInputRef.current?.select();
+    });
+  }, [searchFocusRequest, showTitle]);
+
+  useEffect(() => {
+    const displayedIds = new Set(displayTransactions.map((item) => item.transaction.id));
+    setSelectedIds((current) => {
+      const next = new Set([...current].filter((id) => displayedIds.has(id)));
+      return next.size === current.size ? current : next;
+    });
+  }, [displayTransactions]);
+
+  useEffect(() => {
+    setBulkCategoryId("");
+  }, [selectedSignature]);
 
   async function handleDelete(transaction: Transaction) {
     if (window.confirm(t.history.confirmDelete)) {
       await onDelete(transaction.id);
+    }
+  }
+
+  function exportVisibleTransactions() {
+    const rows: Array<Array<string | number>> = [
+      [
+        t.history.csvDate,
+        t.history.csvType,
+        t.history.csvAmount,
+        t.history.csvCurrency,
+        t.history.csvCategory,
+        t.history.csvWallet,
+        t.history.csvNote,
+        t.history.csvTags
+      ],
+      ...displayTransactions.map(({ transaction }) => [
+        transaction.transactionDate,
+        transaction.type === "expense" ? t.common.expense : t.common.income,
+        minorToDecimal(transaction.amountMinor, transaction.currency),
+        transaction.currency,
+        getCategoryName(
+          categories.find((category) => category.id === transaction.categoryId)?.name,
+          t
+        ),
+        wallets.find((wallet) => wallet.id === transaction.walletId)?.name ?? "",
+        transaction.note ?? "",
+        transaction.tags.join(", ")
+      ])
+    ];
+    downloadCsv(`myfinances-${new Date().toISOString().slice(0, 10)}.csv`, createCsv(rows));
+  }
+
+  async function applyBulkCategory() {
+    if (!bulkCategoryId || !selectedTransactions.length || !selectedType) {
+      return;
+    }
+    setBulkActionError("");
+    try {
+      await Promise.all(
+        selectedTransactions.map((transaction) =>
+          onUpdate(transaction.id, { categoryId: bulkCategoryId })
+        )
+      );
+      setSelectedIds(new Set());
+    } catch {
+      setBulkActionError(t.transaction.saveError);
+    }
+  }
+
+  async function deleteSelectedTransactions() {
+    if (!selectedTransactions.length) {
+      return;
+    }
+    if (
+      !window.confirm(
+        t.history.confirmDeleteSelected.replace("{count}", String(selectedTransactions.length))
+      )
+    ) {
+      return;
+    }
+    setBulkActionError("");
+    try {
+      await Promise.all(selectedTransactions.map((transaction) => onDelete(transaction.id)));
+      setSelectedIds(new Set());
+    } catch {
+      setBulkActionError(t.transaction.saveError);
     }
   }
 
@@ -203,15 +323,29 @@ export function HistoryView({
         ) : (
           <span />
         )}
-        <div className="min-w-[190px]">
-          <SegmentedControl
-            value={viewMode}
-            onChange={setViewMode}
-            options={[
-              { value: "list", label: t.history.viewList },
-              { value: "calendar", label: t.history.viewCalendar }
-            ]}
-          />
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="small"
+            className={desktopTools ? "hidden md:inline-flex" : "hidden"}
+            disabled={!displayTransactions.length}
+            onClick={exportVisibleTransactions}
+          >
+            <Download className="h-4 w-4" />
+            {t.history.exportCsv}
+          </Button>
+          <div className={desktopTools ? "w-full md:min-w-[270px]" : "w-full"}>
+            <SegmentedControl
+              value={viewMode}
+              onChange={setViewMode}
+              options={[
+                { value: "list", label: t.history.viewList },
+                ...(desktopTools ? [{ value: "table" as const, label: t.history.viewTable }] : []),
+                { value: "calendar", label: t.history.viewCalendar }
+              ]}
+            />
+          </div>
         </div>
       </div>
       <div className="app-surface grid gap-3 rounded-app p-3">
@@ -225,12 +359,13 @@ export function HistoryView({
           ]}
         />
         <TextField
+          ref={searchInputRef}
           label={t.history.search}
           value={searchQuery}
           placeholder={t.history.searchPlaceholder}
           onChange={(event) => setSearchQuery(event.target.value)}
         />
-        <div className={viewMode === "list" ? "grid grid-cols-1 gap-3 sm:grid-cols-2" : "grid gap-3"}>
+        <div className={viewMode !== "calendar" ? "grid grid-cols-1 gap-3 sm:grid-cols-2" : "grid gap-3"}>
           <SelectField label={t.common.category} value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
             <option value="all">{t.history.allCategories}</option>
             {categories.map((category) => (
@@ -239,7 +374,7 @@ export function HistoryView({
               </option>
             ))}
           </SelectField>
-          {viewMode === "list" ? (
+          {viewMode !== "calendar" ? (
             <SelectField label={t.history.sort} value={sortBy} onChange={(event) => setSortBy(event.target.value as HistorySort)}>
               <option value="date-desc">{t.history.sortOptions.dateDesc}</option>
               <option value="date-asc">{t.history.sortOptions.dateAsc}</option>
@@ -253,6 +388,51 @@ export function HistoryView({
           ) : null}
         </div>
       </div>
+      {viewMode === "table" && selectedTransactions.length ? (
+        <div className="app-surface grid gap-3 rounded-app p-3 lg:grid-cols-[auto_minmax(220px,1fr)_auto_auto] lg:items-end">
+          <p className="self-center text-sm font-semibold text-foreground">
+            {t.history.selected.replace("{count}", String(selectedTransactions.length))}
+          </p>
+          {selectedType ? (
+            <SelectField
+              label={t.history.bulkCategory}
+              value={bulkCategoryId}
+              onChange={(event) => setBulkCategoryId(event.target.value)}
+            >
+              <option value="">{t.history.chooseBulkCategory}</option>
+              {bulkCategories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {getCategoryName(category.name, t)}
+                </option>
+              ))}
+            </SelectField>
+          ) : (
+            <p className="self-center text-xs leading-5 text-muted">{t.history.mixedTypesHint}</p>
+          )}
+          <Button
+            type="button"
+            variant="secondary"
+            size="small"
+            disabled={!selectedType || !bulkCategoryId}
+            onClick={() => void applyBulkCategory()}
+          >
+            <Tags className="h-4 w-4" />
+            {t.history.applyCategory}
+          </Button>
+          <Button
+            type="button"
+            variant="danger"
+            size="small"
+            onClick={() => void deleteSelectedTransactions()}
+          >
+            <Trash2 className="h-4 w-4" />
+            {t.history.deleteSelected}
+          </Button>
+          {bulkActionError ? (
+            <p className="text-sm font-medium text-expense lg:col-span-4">{bulkActionError}</p>
+          ) : null}
+        </div>
+      ) : null}
       {viewMode === "calendar" ? (
         <FinancialCalendar
           wallets={wallets}
@@ -263,6 +443,37 @@ export function HistoryView({
           t={t}
           onEdit={setEditing}
           onDelete={handleDelete}
+        />
+      ) : viewMode === "table" && displayTransactions.length ? (
+        <TransactionTable
+          items={displayTransactions}
+          categories={categories}
+          wallets={wallets}
+          settings={settings}
+          t={t}
+          selectedIds={selectedIds}
+          onToggle={(id) =>
+            setSelectedIds((current) => {
+              const next = new Set(current);
+              if (next.has(id)) {
+                next.delete(id);
+              } else {
+                next.add(id);
+              }
+              return next;
+            })
+          }
+          onToggleAll={() =>
+            setSelectedIds((current) => {
+              const allSelected = displayTransactions.every((item) =>
+                current.has(item.transaction.id)
+              );
+              return allSelected
+                ? new Set()
+                : new Set(displayTransactions.map((item) => item.transaction.id));
+            })
+          }
+          onEdit={setEditing}
         />
       ) : displayTransactions.length ? (
         <div className="grid gap-2">

@@ -20,6 +20,13 @@ export function HeaderNavigation({ activeView, labels, onChange }: HeaderNavigat
             type="button"
             onClick={() => onChange(item.view)}
             aria-current={isActive ? "page" : undefined}
+            aria-keyshortcuts={
+              item.view === "add"
+                ? "Control+N Meta+N"
+                : item.view === "history"
+                  ? "Control+K Meta+K"
+                  : undefined
+            }
             className={cn(
               "app-focus inline-flex h-11 items-center justify-start gap-3 rounded-app px-3 text-sm font-medium text-muted outline-none active:scale-[0.98]",
               isActive && "app-navigation-active"
