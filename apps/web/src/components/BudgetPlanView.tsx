@@ -155,17 +155,17 @@ export function BudgetPlanView({
       <div className="grid gap-3 sm:grid-cols-3">
         <StatPanel
           label={t.budget.planned}
-          value={formatMoney(progress.limitMinor, settings.currency, settings.locale)}
+          value={formatMoney(progress.limitMinor, settings.currency, settings.locale, settings.hideAmounts)}
           icon={PiggyBank}
         />
         <StatPanel
           label={t.budget.spent}
-          value={formatMoney(progress.spentMinor, settings.currency, settings.locale)}
+          value={formatMoney(progress.spentMinor, settings.currency, settings.locale, settings.hideAmounts)}
           tone="expense"
         />
         <StatPanel
           label={progress.remainingMinor < 0 ? t.budget.overBy : t.budget.remaining}
-          value={formatMoney(Math.abs(progress.remainingMinor), settings.currency, settings.locale)}
+          value={formatMoney(Math.abs(progress.remainingMinor), settings.currency, settings.locale, settings.hideAmounts)}
           tone={progress.remainingMinor < 0 ? "expense" : "default"}
         />
       </div>
@@ -224,7 +224,7 @@ export function BudgetPlanView({
                           {getCategoryName(item.category.name, t)}
                         </span>
                         <span className="text-xs font-medium text-muted">
-                          {formatMoney(item.spentMinor, settings.currency, settings.locale)}
+                          {formatMoney(item.spentMinor, settings.currency, settings.locale, settings.hideAmounts)}
                         </span>
                       </div>
                       <span className="mt-2 block h-1.5 overflow-hidden rounded-full bg-elevated">

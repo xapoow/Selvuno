@@ -2,10 +2,18 @@ import type { ColorThemePreference } from "@myfinances/types";
 import type { AppView } from "./state/appStore";
 
 export type Language = "en" | "ru";
-export type SettingsTab = "general" | "appearance" | "categories" | "backup" | "sync";
+export type SettingsTab =
+  | "general"
+  | "appearance"
+  | "automation"
+  | "features"
+  | "privacy"
+  | "categories"
+  | "backup"
+  | "sync";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.5.0";
+export const appVersion = "0.6.0";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -46,6 +54,11 @@ export interface Dictionary {
   appName: string;
   brand: string;
   nav: Record<AppView, string>;
+  shortcuts: {
+    title: string;
+    newTransaction: string;
+    search: string;
+  };
   common: {
     add: string;
     all: string;
@@ -124,6 +137,17 @@ export interface Dictionary {
     categoriesBreakdown: string;
     categoryComparison: string;
   };
+  insights: {
+    title: string;
+    hint: string;
+    empty: string;
+    spendingUp: string;
+    spendingDown: string;
+    largestCategory: string;
+    recurringShare: string;
+    expenseCount: string;
+    noSpendStreak: string;
+  };
   analytics: {
     period: string;
     week: string;
@@ -173,6 +197,22 @@ export interface Dictionary {
     quickHint: string;
     quickTemplates: string;
     quickTemplatesHint: string;
+    manageTemplates: string;
+    repeatLast: string;
+    newTemplate: string;
+    templateManagerHint: string;
+    templateName: string;
+    templateNamePlaceholder: string;
+    templateAmount: string;
+    templateAmountPlaceholder: string;
+    saveTemplate: string;
+    templateRequired: string;
+    templateSaveError: string;
+    confirmDeleteTemplate: string;
+    templateEmpty: string;
+    amountNotSet: string;
+    suggestedCategory: string;
+    addAnother: string;
     calculate: string;
     calculatorOperator: string;
     calculatorError: string;
@@ -270,7 +310,26 @@ export interface Dictionary {
   history: {
     title: string;
     viewList: string;
+    viewTable: string;
     viewCalendar: string;
+    exportCsv: string;
+    selectAll: string;
+    selectTransaction: string;
+    selected: string;
+    bulkCategory: string;
+    chooseBulkCategory: string;
+    mixedTypesHint: string;
+    applyCategory: string;
+    deleteSelected: string;
+    confirmDeleteSelected: string;
+    csvDate: string;
+    csvType: string;
+    csvAmount: string;
+    csvCurrency: string;
+    csvCategory: string;
+    csvWallet: string;
+    csvNote: string;
+    csvTags: string;
     calendarSelectedDay: string;
     calendarEmptyDay: string;
     calendarMissingRates: string;
@@ -331,6 +390,19 @@ export interface Dictionary {
     archiveError: string;
     restoreError: string;
     cannotArchiveLast: string;
+    kind: string;
+    kindCash: string;
+    kindCredit: string;
+    creditLimit: string;
+    creditLimitHint: string;
+    creditLimitError: string;
+    creditAvailable: string;
+    creditUsed: string;
+    excludeFromTotals: string;
+    excludeFromTotalsHint: string;
+    excludedBadge: string;
+    hideWalletBalance: string;
+    hideWalletBalanceHint: string;
   };
   goals: {
     tabWallets: string;
@@ -398,6 +470,47 @@ export interface Dictionary {
     tabs: Record<SettingsTab, string>;
     general: string;
     appearance: string;
+    automation: string;
+    quickTemplatesSetting: string;
+    quickTemplatesSettingHint: string;
+    categorySuggestionsSetting: string;
+    categorySuggestionsSettingHint: string;
+    addAnotherSetting: string;
+    addAnotherSettingHint: string;
+    features: string;
+    advancedWalletsSetting: string;
+    advancedWalletsSettingHint: string;
+    smartInsightsSetting: string;
+    smartInsightsSettingHint: string;
+    privacy: string;
+    pinProtection: string;
+    pinProtectionHint: string;
+    enabled: string;
+    disabled: string;
+    enablePin: string;
+    changePin: string;
+    disablePin: string;
+    disablePinHint: string;
+    currentPin: string;
+    newPin: string;
+    confirmPin: string;
+    pinRequirements: string;
+    pinMismatch: string;
+    pinIncorrect: string;
+    pinSaveError: string;
+    autoLock: string;
+    autoLockNever: string;
+    autoLockMinutes: string;
+    lockNow: string;
+    hideAmounts: string;
+    showAmounts: string;
+    hideAmountsHint: string;
+    localPrivacyNote: string;
+    appLocked: string;
+    appLockedHint: string;
+    enterPin: string;
+    checkingPin: string;
+    unlock: string;
     globalCurrency: string;
     dateFormat: string;
     dateFormats: Record<DateFormatLabel, string>;
@@ -456,6 +569,11 @@ export const dictionaries: Record<Language, Dictionary> = {
       add: "Add",
       wallets: "Wallets",
       settings: "Settings"
+    },
+    shortcuts: {
+      title: "Shortcuts",
+      newTransaction: "New transaction",
+      search: "Search history"
     },
     common: {
       add: "Add",
@@ -544,6 +662,17 @@ export const dictionaries: Record<Language, Dictionary> = {
       categoriesBreakdown: "Category breakdown",
       categoryComparison: "Your largest categories"
     },
+    insights: {
+      title: "Money observations",
+      hint: "Calculated locally from your transactions. No data leaves this device.",
+      empty: "Add a few transactions and useful patterns will appear here.",
+      spendingUp: "Spending is up {percentage}% from the same part of last month.",
+      spendingDown: "Spending is down {percentage}% from the same part of last month.",
+      largestCategory: "{category} is the largest expense category this month at {percentage}%.",
+      recurringShare: "Recurring expenses use {percentage}% of this month's income.",
+      expenseCount: "You recorded {count} expenses over the last seven days.",
+      noSpendStreak: "No expenses recorded for {days} days in a row."
+    },
     analytics: {
       period: "Period",
       week: "Week",
@@ -593,6 +722,22 @@ export const dictionaries: Record<Language, Dictionary> = {
       quickHint: "Amount and category are enough — the rest is optional.",
       quickTemplates: "Quick templates",
       quickTemplatesHint: "Repeat a recent transaction in one tap.",
+      manageTemplates: "Manage templates",
+      repeatLast: "Repeat last",
+      newTemplate: "New template",
+      templateManagerHint: "Save the transactions you use most often. An amount is optional.",
+      templateName: "Template name",
+      templateNamePlaceholder: "Coffee, groceries, taxi",
+      templateAmount: "Default amount",
+      templateAmountPlaceholder: "Optional, calculations work too",
+      saveTemplate: "Save template",
+      templateRequired: "Choose a name and category.",
+      templateSaveError: "Unable to save the template.",
+      confirmDeleteTemplate: "Delete this template?",
+      templateEmpty: "No custom templates yet.",
+      amountNotSet: "Any amount",
+      suggestedCategory: "Suggested category: {category}",
+      addAnother: "Add another",
       calculate: "Calculate",
       calculatorOperator: "Calculator operator",
       calculatorError: "Enter a positive amount or a valid calculation.",
@@ -640,7 +785,26 @@ export const dictionaries: Record<Language, Dictionary> = {
     history: {
       title: "History",
       viewList: "List",
+      viewTable: "Table",
       viewCalendar: "Calendar",
+      exportCsv: "Export CSV",
+      selectAll: "Select all visible transactions",
+      selectTransaction: "Select {category}",
+      selected: "Selected: {count}",
+      bulkCategory: "Change category",
+      chooseBulkCategory: "Choose a category",
+      mixedTypesHint: "Choose transactions of one type to change their category.",
+      applyCategory: "Apply category",
+      deleteSelected: "Delete",
+      confirmDeleteSelected: "Delete {count} selected transactions?",
+      csvDate: "Date",
+      csvType: "Type",
+      csvAmount: "Amount",
+      csvCurrency: "Currency",
+      csvCategory: "Category",
+      csvWallet: "Wallet",
+      csvNote: "Note",
+      csvTags: "Tags",
       calendarSelectedDay: "Selected day",
       calendarEmptyDay: "No transactions on this day.",
       calendarMissingRates: "Some totals exclude transactions without an exchange rate.",
@@ -700,7 +864,20 @@ export const dictionaries: Record<Language, Dictionary> = {
       restore: "Restore",
       archiveError: "Unable to archive the wallet.",
       restoreError: "Unable to restore the wallet.",
-      cannotArchiveLast: "Create another wallet before archiving this one."
+      cannotArchiveLast: "Create another wallet before archiving this one.",
+      kind: "Wallet type",
+      kindCash: "Regular",
+      kindCredit: "Credit",
+      creditLimit: "Credit limit",
+      creditLimitHint: "Available credit is calculated from the limit and the current balance.",
+      creditLimitError: "Enter a valid credit limit.",
+      creditAvailable: "Available",
+      creditUsed: "Credit used",
+      excludeFromTotals: "Exclude from totals",
+      excludeFromTotalsHint: "Keep this wallet accessible, but omit it from the combined balance and analytics.",
+      excludedBadge: "Excluded from totals",
+      hideWalletBalance: "Hide this wallet's balance",
+      hideWalletBalanceHint: "Mask amounts only when this wallet is open or shown in the wallet list."
     },
     goals: {
       tabWallets: "Wallets",
@@ -784,12 +961,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "Faster daily tracking with safer local data and more flexible organization.",
+      intro: "More control on every device, with privacy and productivity features that stay optional.",
       gotIt: "Explore the update",
       notes: [
-        "Drag, search, replace, and merge categories without losing linked data",
-        "Quick transaction templates and a built-in amount calculator",
-        "Automatic local backups, offline status, and detailed notifications"
+        "Optional PIN, auto-lock, and private balance visibility controls",
+        "Faster transactions, advanced wallets, and local smart insights",
+        "Desktop shortcuts, table history, bulk actions, and filtered CSV export"
       ]
     },
     categories: {
@@ -822,12 +999,56 @@ export const dictionaries: Record<Language, Dictionary> = {
       tabs: {
         general: "General",
         appearance: "Appearance",
+        automation: "Quick entry",
+        features: "Features",
+        privacy: "Privacy",
         categories: "Categories",
         backup: "Backup",
         sync: "Sync"
       },
       general: "General",
       appearance: "Appearance",
+      automation: "Quick entry",
+      quickTemplatesSetting: "Quick templates",
+      quickTemplatesSettingHint: "Show recent and saved transaction shortcuts above the entry form.",
+      categorySuggestionsSetting: "Category suggestions",
+      categorySuggestionsSettingHint: "Suggest a category from similar notes and tags saved on this device.",
+      addAnotherSetting: "Add another after saving",
+      addAnotherSettingHint: "Show a shortcut to enter the next transaction without leaving the form.",
+      features: "Features",
+      advancedWalletsSetting: "Advanced wallet options",
+      advancedWalletsSettingHint: "Enable credit limits, per-wallet privacy, and exclusion from combined statistics.",
+      smartInsightsSetting: "Money observations",
+      smartInsightsSettingHint: "Show optional local summaries and patterns on the home screen. No notifications or cloud analysis.",
+      privacy: "Privacy",
+      pinProtection: "PIN protection",
+      pinProtectionHint: "Lock access to the app on this device. The feature is optional and can be removed at any time.",
+      enabled: "Enabled",
+      disabled: "Disabled",
+      enablePin: "Enable PIN",
+      changePin: "Change PIN",
+      disablePin: "Disable PIN",
+      disablePinHint: "Enter your current PIN to remove protection from this device.",
+      currentPin: "Current PIN",
+      newPin: "New PIN",
+      confirmPin: "Confirm PIN",
+      pinRequirements: "Use 4 to 12 digits. The PIN cannot be recovered if you forget it.",
+      pinMismatch: "The PIN values do not match.",
+      pinIncorrect: "Incorrect PIN. Try again.",
+      pinSaveError: "Unable to update PIN protection.",
+      autoLock: "Automatic lock",
+      autoLockNever: "Never",
+      autoLockMinutes: "After {minutes} min",
+      lockNow: "Lock now",
+      hideAmounts: "Hide amounts",
+      showAmounts: "Show amounts",
+      hideAmountsHint: "Replace financial values with dots throughout the app. Use the eye button to switch quickly.",
+      localPrivacyNote: "PIN protection is stored only on this device and is intended to prevent casual access. It does not encrypt browser storage.",
+      appLocked: "App locked",
+      appLockedHint: "Enter your PIN to return to your finances.",
+      enterPin: "PIN",
+      checkingPin: "Checking…",
+      unlock: "Unlock",
       globalCurrency: "Global currency",
       dateFormat: "Date format",
       dateFormats: {
@@ -946,6 +1167,11 @@ export const dictionaries: Record<Language, Dictionary> = {
       wallets: "Кошельки",
       settings: "Настройки"
     },
+    shortcuts: {
+      title: "Быстрые действия",
+      newTransaction: "Новая операция",
+      search: "Поиск в истории"
+    },
     common: {
       add: "Добавить",
       all: "Все",
@@ -1033,6 +1259,17 @@ export const dictionaries: Record<Language, Dictionary> = {
       categoriesBreakdown: "По категориям",
       categoryComparison: "Самые крупные категории"
     },
+    insights: {
+      title: "Наблюдения о деньгах",
+      hint: "Рассчитываются локально по операциям. Данные не покидают устройство.",
+      empty: "Добавь несколько операций — здесь появятся полезные закономерности.",
+      spendingUp: "Расходы выросли на {percentage}% относительно той же части прошлого месяца.",
+      spendingDown: "Расходы снизились на {percentage}% относительно той же части прошлого месяца.",
+      largestCategory: "{category} — крупнейшая категория месяца: {percentage}% расходов.",
+      recurringShare: "Регулярные расходы занимают {percentage}% дохода этого месяца.",
+      expenseCount: "За последние семь дней добавлено расходов: {count}.",
+      noSpendStreak: "Дней подряд без расходов: {days}."
+    },
     analytics: {
       period: "Период",
       week: "Неделя",
@@ -1082,6 +1319,22 @@ export const dictionaries: Record<Language, Dictionary> = {
       quickHint: "Достаточно суммы и категории — остальное необязательно.",
       quickTemplates: "Быстрые шаблоны",
       quickTemplatesHint: "Повтори недавнюю операцию одним нажатием.",
+      manageTemplates: "Управление шаблонами",
+      repeatLast: "Повторить последнюю",
+      newTemplate: "Новый шаблон",
+      templateManagerHint: "Сохраняй частые операции. Сумму можно не указывать.",
+      templateName: "Название шаблона",
+      templateNamePlaceholder: "Кофе, продукты, такси",
+      templateAmount: "Сумма по умолчанию",
+      templateAmountPlaceholder: "Необязательно, можно с вычислением",
+      saveTemplate: "Сохранить шаблон",
+      templateRequired: "Выбери название и категорию.",
+      templateSaveError: "Не удалось сохранить шаблон.",
+      confirmDeleteTemplate: "Удалить этот шаблон?",
+      templateEmpty: "Пользовательских шаблонов пока нет.",
+      amountNotSet: "Любая сумма",
+      suggestedCategory: "Предлагаемая категория: {category}",
+      addAnother: "Добавить ещё",
       calculate: "Посчитать",
       calculatorOperator: "Оператор калькулятора",
       calculatorError: "Введи положительную сумму или корректное вычисление.",
@@ -1129,7 +1382,26 @@ export const dictionaries: Record<Language, Dictionary> = {
     history: {
       title: "История",
       viewList: "Список",
+      viewTable: "Таблица",
       viewCalendar: "Календарь",
+      exportCsv: "Экспорт CSV",
+      selectAll: "Выбрать все видимые операции",
+      selectTransaction: "Выбрать операцию «{category}»",
+      selected: "Выбрано: {count}",
+      bulkCategory: "Изменить категорию",
+      chooseBulkCategory: "Выбери категорию",
+      mixedTypesHint: "Для замены категории выбери операции одного типа.",
+      applyCategory: "Применить категорию",
+      deleteSelected: "Удалить",
+      confirmDeleteSelected: "Удалить выбранные операции ({count})?",
+      csvDate: "Дата",
+      csvType: "Тип",
+      csvAmount: "Сумма",
+      csvCurrency: "Валюта",
+      csvCategory: "Категория",
+      csvWallet: "Кошелек",
+      csvNote: "Заметка",
+      csvTags: "Теги",
       calendarSelectedDay: "Выбранный день",
       calendarEmptyDay: "В этот день операций нет.",
       calendarMissingRates: "Некоторые итоги не включают операции без курса валют.",
@@ -1189,7 +1461,20 @@ export const dictionaries: Record<Language, Dictionary> = {
       restore: "Восстановить",
       archiveError: "Не удалось архивировать кошелек.",
       restoreError: "Не удалось восстановить кошелек.",
-      cannotArchiveLast: "Сначала создай другой кошелек, затем архивируй этот."
+      cannotArchiveLast: "Сначала создай другой кошелек, затем архивируй этот.",
+      kind: "Тип кошелька",
+      kindCash: "Обычный",
+      kindCredit: "Кредитный",
+      creditLimit: "Кредитный лимит",
+      creditLimitHint: "Доступная сумма рассчитывается из лимита и текущего баланса.",
+      creditLimitError: "Укажи корректный кредитный лимит.",
+      creditAvailable: "Доступно",
+      creditUsed: "Использовано кредита",
+      excludeFromTotals: "Не учитывать в общем итоге",
+      excludeFromTotalsHint: "Кошелек останется доступным, но не попадёт в общий баланс и аналитику.",
+      excludedBadge: "Не входит в итог",
+      hideWalletBalance: "Скрывать баланс этого кошелька",
+      hideWalletBalanceHint: "Маскировать суммы только для этого кошелька в списке и при его открытии."
     },
     goals: {
       tabWallets: "Кошельки",
@@ -1273,12 +1558,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Быстрее ежедневный учёт, надёжнее локальные данные и удобнее организация.",
+      intro: "Больше контроля на любом устройстве — приватность и дополнительные возможности остаются опциональными.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Перетаскивание, поиск, замена и объединение категорий без потери связанных данных",
-        "Быстрые шаблоны операций и встроенный калькулятор суммы",
-        "Автоматические локальные бэкапы, статус офлайн и подробные уведомления"
+        "Опциональные PIN-код, автоблокировка и скрытие сумм",
+        "Быстрый ввод операций, расширенные кошельки и локальные умные наблюдения",
+        "Горячие клавиши, табличная история, массовые действия и экспорт CSV на ПК"
       ]
     },
     categories: {
@@ -1311,12 +1596,56 @@ export const dictionaries: Record<Language, Dictionary> = {
       tabs: {
         general: "Общее",
         appearance: "Вид",
+        automation: "Быстрый ввод",
+        features: "Функции",
+        privacy: "Приватность",
         categories: "Категории",
         backup: "Бэкап",
         sync: "Синхронизация"
       },
       general: "Общее",
       appearance: "Внешний вид",
+      automation: "Быстрый ввод",
+      quickTemplatesSetting: "Быстрые шаблоны",
+      quickTemplatesSettingHint: "Показывать недавние и сохранённые операции над формой добавления.",
+      categorySuggestionsSetting: "Подсказки категорий",
+      categorySuggestionsSettingHint: "Предлагать категорию по похожим заметкам и тегам, сохранённым на этом устройстве.",
+      addAnotherSetting: "Добавить ещё после сохранения",
+      addAnotherSettingHint: "Показывать кнопку для следующей операции, не закрывая форму.",
+      features: "Функции",
+      advancedWalletsSetting: "Расширенные настройки кошельков",
+      advancedWalletsSettingHint: "Включает кредитные лимиты, приватность отдельного кошелька и исключение из общей статистики.",
+      smartInsightsSetting: "Наблюдения о деньгах",
+      smartInsightsSettingHint: "Показывать на главной необязательные локальные выводы. Без уведомлений и облачного анализа.",
+      privacy: "Приватность",
+      pinProtection: "Защита PIN-кодом",
+      pinProtectionHint: "Блокирует доступ к приложению на этом устройстве. Функция необязательная, её можно отключить в любой момент.",
+      enabled: "Включена",
+      disabled: "Выключена",
+      enablePin: "Включить PIN",
+      changePin: "Изменить PIN",
+      disablePin: "Отключить PIN",
+      disablePinHint: "Введи текущий PIN, чтобы убрать защиту с этого устройства.",
+      currentPin: "Текущий PIN",
+      newPin: "Новый PIN",
+      confirmPin: "Повтори PIN",
+      pinRequirements: "От 4 до 12 цифр. Забытый PIN восстановить нельзя.",
+      pinMismatch: "Введённые PIN-коды не совпадают.",
+      pinIncorrect: "Неверный PIN. Попробуй ещё раз.",
+      pinSaveError: "Не удалось изменить защиту PIN-кодом.",
+      autoLock: "Автоматическая блокировка",
+      autoLockNever: "Никогда",
+      autoLockMinutes: "Через {minutes} мин",
+      lockNow: "Заблокировать",
+      hideAmounts: "Скрывать суммы",
+      showAmounts: "Показывать суммы",
+      hideAmountsHint: "Заменяет денежные значения точками во всём приложении. Быстро переключается кнопкой с глазом.",
+      localPrivacyNote: "PIN хранится только на этом устройстве и защищает от случайного доступа. Данные браузера он не шифрует.",
+      appLocked: "Приложение заблокировано",
+      appLockedHint: "Введи PIN, чтобы вернуться к своим финансам.",
+      enterPin: "PIN-код",
+      checkingPin: "Проверяем…",
+      unlock: "Разблокировать",
       globalCurrency: "Общая валюта",
       dateFormat: "Формат даты",
       dateFormats: {

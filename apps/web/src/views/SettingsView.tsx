@@ -29,6 +29,9 @@ import { currencyOptions, getCurrencyLabel } from "../lib/currencies";
 import { applyRootVisualTheme } from "../lib/colorThemes";
 import { ColorThemePicker } from "../components/ColorThemePicker";
 import { CategoryForm } from "../components/CategoryForm";
+import { AutomationSettingsPanel } from "../components/AutomationSettingsPanel";
+import { FeatureSettingsPanel } from "../components/FeatureSettingsPanel";
+import { PrivacySettingsPanel } from "../components/PrivacySettingsPanel";
 import { BottomSheet } from "../components/ui/BottomSheet";
 import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -36,11 +39,13 @@ import { Section } from "../components/ui/Section";
 import { SegmentedControl } from "../components/ui/SegmentedControl";
 import { SelectField } from "../components/ui/SelectField";
 import { appVersion, getCategoryName, languageOptions, type Dictionary, type SettingsTab } from "../i18n";
+import type { PrivacyLockController } from "../state/usePrivacyLock";
 
 interface SettingsViewProps {
   settings: Settings;
   categories: Category[];
   backupSnapshots: BackupSnapshot[];
+  privacy: PrivacyLockController;
   t: Dictionary;
   onUpdateSettings: (update: SettingsUpdate) => Promise<void>;
   onCreateCategory: (input: CategoryInput) => Promise<void>;
@@ -58,6 +63,9 @@ const timeZoneOptions = ["UTC", "Europe/Warsaw", "Europe/Berlin", "America/New_Y
 const settingsTabs: Array<{ value: SettingsTab }> = [
   { value: "general" },
   { value: "appearance" },
+  { value: "automation" },
+  { value: "features" },
+  { value: "privacy" },
   { value: "categories" },
   { value: "backup" },
   { value: "sync" }
@@ -67,6 +75,7 @@ export function SettingsView({
   settings,
   categories,
   backupSnapshots,
+  privacy,
   t,
   onUpdateSettings,
   onCreateCategory,
@@ -274,7 +283,7 @@ export function SettingsView({
         ) : null}
       </AnimatePresence>
 
-      <div className="hidden md:block">
+      <div className="hidden overflow-x-auto pb-1 md:block">
         <div className="app-control flex min-w-max gap-2 rounded-app p-1">
           {settingsTabs.map((tab) => (
             <button
@@ -363,6 +372,37 @@ export function SettingsView({
               />
             </div>
           </div>
+        </Section>
+      ) : null}
+
+      {activeTab === "privacy" ? (
+        <Section title={t.settings.privacy}>
+          <PrivacySettingsPanel
+            settings={settings}
+            privacy={privacy}
+            t={t}
+            onUpdateSettings={onUpdateSettings}
+          />
+        </Section>
+      ) : null}
+
+      {activeTab === "automation" ? (
+        <Section title={t.settings.automation}>
+          <AutomationSettingsPanel
+            settings={settings}
+            t={t}
+            onUpdateSettings={onUpdateSettings}
+          />
+        </Section>
+      ) : null}
+
+      {activeTab === "features" ? (
+        <Section title={t.settings.features}>
+          <FeatureSettingsPanel
+            settings={settings}
+            t={t}
+            onUpdateSettings={onUpdateSettings}
+          />
         </Section>
       ) : null}
 

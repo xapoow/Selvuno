@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type {
   Category,
   MonthlyBudget,
@@ -16,6 +16,7 @@ import {
   type AnalyticsCategoryItem
 } from "../components/AnalyticsView";
 import { BudgetOverviewCard } from "../components/BudgetOverviewCard";
+import { SmartInsightsCard } from "../components/SmartInsightsCard";
 import { BudgetPlanView } from "../components/BudgetPlanView";
 import { TransactionRow } from "../components/TransactionRow";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -26,6 +27,12 @@ import { cn } from "../lib/cn";
 import { calculateMonthlyBudgetProgress, formatBudgetMonth, getBudgetMonth } from "../lib/budgets";
 import { convertMinorToBaseCurrency, type ExchangeRateTable, useExchangeRates } from "../lib/exchangeRates";
 import { getTimeGreeting } from "../lib/greetings";
+import { buildSmartInsights } from "../lib/insights";
+import {
+  filterTransactionsForTotals,
+  getIncludedWalletIds,
+  shouldHideWalletAmounts
+} from "../lib/walletFeatures";
 
 interface DashboardViewProps {
   wallets: Wallet[];
@@ -63,13 +70,27 @@ export function DashboardView({
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [chartType, setChartType] = useState<"expense" | "income">("expense");
+  const advancedWalletsEnabled = settings.advancedWalletsEnabled;
+  const includedWalletIds = useMemo(
+    () =>
+      getIncludedWalletIds(wallets, advancedWalletsEnabled),
+    [advancedWalletsEnabled, wallets]
+  );
+  const statisticsTransactions = useMemo(
+    () =>
+      filterTransactionsForTotals(transactions, includedWalletIds),
+    [includedWalletIds, transactions]
+  );
+  const activeWallet =
+    activeWalletId === "all" ? undefined : wallets.find((wallet) => wallet.id === activeWalletId);
+  const hideAmounts = shouldHideWalletAmounts(settings, activeWallet);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
   }, [analyticsOpen, budgetOpen]);
 
   const budgetConversionNeeded =
-    transactions.some(
+    statisticsTransactions.some(
       (transaction) =>
         !transaction.deletedAt &&
         transaction.type === "expense" &&
@@ -83,10 +104,12 @@ export function DashboardView({
     currency: settings.currency,
     categories,
     budgets,
-    transactions,
+    transactions: statisticsTransactions,
     exchangeRates: budgetExchangeRates.data
   });
-  const visibleTransactions = filterTransactionsByWallet(transactions, activeWalletId).filter(
+  const sourceTransactions =
+    activeWalletId === "all" ? statisticsTransactions : transactions;
+  const visibleTransactions = filterTransactionsByWallet(sourceTransactions, activeWalletId).filter(
     (transaction) => !transaction.deletedAt
   );
   const displayTransactions = visibleTransactions.map((transaction) => {
@@ -105,8 +128,9 @@ export function DashboardView({
   });
   const visibleWallets =
     activeWalletId === "all"
-      ? wallets
+      ? wallets.filter((wallet) => includedWalletIds.has(wallet.id))
       : wallets.filter((wallet) => wallet.id === activeWalletId);
+  const visibleWalletIds = new Set(visibleWallets.map((wallet) => wallet.id));
   const rawBalanceAdjustments: Array<{
     amountMinor: number;
     currency: string;
@@ -123,9 +147,8 @@ export function DashboardView({
       .filter(
         (transfer) =>
           !transfer.deletedAt &&
-          (activeWalletId === "all" ||
-            transfer.fromWalletId === activeWalletId ||
-            transfer.toWalletId === activeWalletId)
+          (visibleWalletIds.has(transfer.fromWalletId) ||
+            visibleWalletIds.has(transfer.toWalletId))
       )
       .flatMap((transfer): Array<{
         amountMinor: number;
@@ -137,14 +160,14 @@ export function DashboardView({
           currency: string;
           direction: -1 | 1;
         }> = [];
-        if (activeWalletId === "all" || transfer.fromWalletId === activeWalletId) {
+        if (visibleWalletIds.has(transfer.fromWalletId)) {
           adjustments.push({
             amountMinor: transfer.fromAmountMinor,
             currency: transfer.fromCurrency,
             direction: -1 as const
           });
         }
-        if (activeWalletId === "all" || transfer.toWalletId === activeWalletId) {
+        if (visibleWalletIds.has(transfer.toWalletId)) {
           adjustments.push({
             amountMinor: transfer.toAmountMinor,
             currency: transfer.toCurrency,
@@ -193,6 +216,21 @@ export function DashboardView({
     }
   });
   const recentTransactions = displayTransactions.slice(0, 4);
+  const smartInsights = settings.smartInsightsEnabled
+    ? buildSmartInsights({
+        transactions: displayTransactions
+          .filter((item) => !item.conversionMissing)
+          .map((item) => ({
+            type: item.transaction.type,
+            amountMinor: item.amountMinor,
+            categoryId: item.transaction.categoryId,
+            transactionDate: item.transaction.transactionDate,
+            recurringTransactionId: item.transaction.recurringTransactionId
+          })),
+        now: new Date(),
+        timeZone: settings.timeZone
+      })
+    : [];
   const greeting = getTimeGreeting(new Date(), settings.timeZone, t);
   const hasCurrencyConversion =
     displayTransactions.some(
@@ -240,7 +278,7 @@ export function DashboardView({
         initialMonth={currentBudgetMonth}
         categories={categories}
         budgets={budgets}
-        transactions={transactions}
+        transactions={statisticsTransactions}
         settings={settings}
         exchangeRates={budgetExchangeRates.data}
         t={t}
@@ -280,15 +318,15 @@ export function DashboardView({
       </div>
       <section className="grid gap-3">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <StatPanel label={t.common.balance} value={formatMoney(totals.balanceMinor, displayCurrency, settings.locale)} />
+          <StatPanel label={t.common.balance} value={formatMoney(totals.balanceMinor, displayCurrency, settings.locale, hideAmounts)} />
           <StatPanel
             label={t.common.income}
-            value={formatMoney(totals.incomeMinor, displayCurrency, settings.locale)}
+            value={formatMoney(totals.incomeMinor, displayCurrency, settings.locale, hideAmounts)}
             tone="income"
           />
           <StatPanel
             label={t.common.expenses}
-            value={formatMoney(totals.expenseMinor, displayCurrency, settings.locale)}
+            value={formatMoney(totals.expenseMinor, displayCurrency, settings.locale, hideAmounts)}
             tone="expense"
           />
         </div>
@@ -297,11 +335,16 @@ export function DashboardView({
       <BudgetOverviewCard
         currency={settings.currency}
         locale={settings.locale}
+        hideAmounts={hideAmounts}
         monthLabel={formatBudgetMonth(currentBudgetMonth, settings.locale)}
         progress={budgetProgress}
         t={t}
         onOpen={() => setBudgetOpen(true)}
       />
+
+      {settings.smartInsightsEnabled ? (
+        <SmartInsightsCard insights={smartInsights} categories={categories} t={t} />
+      ) : null}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(330px,0.85fr)]">
         <Section title={t.dashboard.cashFlow}>
@@ -344,7 +387,7 @@ export function DashboardView({
                         {chartType === "expense" ? t.common.expenses : t.common.income}
                       </span>
                       <span className="mt-1 text-lg font-semibold text-foreground">
-                        {formatMoney(chartTotal, displayCurrency, settings.locale)}
+                        {formatMoney(chartTotal, displayCurrency, settings.locale, hideAmounts)}
                       </span>
                     </span>
                   </span>
@@ -394,7 +437,7 @@ export function DashboardView({
                   transaction={item.transaction}
                   category={categories.find((category) => category.id === item.transaction.categoryId)}
                   wallet={wallets.find((wallet) => wallet.id === item.transaction.walletId)}
-                  settings={settings}
+                  settings={{ ...settings, hideAmounts }}
                   displayAmountMinor={item.amountMinor}
                   displayCurrency={item.currency}
                   conversionMissing={item.conversionMissing}

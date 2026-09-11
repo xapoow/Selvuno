@@ -10,6 +10,7 @@ import { formatSignedMoney } from "@myfinances/utils";
 import { CalendarClock, Edit3, Pause, Play, Plus, Repeat2, Trash2 } from "lucide-react";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { CategoryIcon } from "../lib/icons";
+import { shouldHideWalletAmounts } from "../lib/walletFeatures";
 import { BottomSheet } from "./ui/BottomSheet";
 import { Button } from "./ui/Button";
 import { EmptyState } from "./ui/EmptyState";
@@ -43,6 +44,7 @@ export function RecurringTransactionsPanel({
   onDelete
 }: RecurringTransactionsPanelProps) {
   const [formState, setFormState] = useState<RecurringTransaction | "new" | null>(null);
+  const hideAmounts = shouldHideWalletAmounts(settings, wallet);
   const walletSchedules = useMemo(
     () => recurringTransactions.filter((schedule) => schedule.walletId === wallet.id),
     [recurringTransactions, wallet.id]
@@ -130,7 +132,8 @@ export function RecurringTransactionsPanel({
                       schedule.amountMinor,
                       schedule.currency,
                       settings.locale,
-                      schedule.type
+                      schedule.type,
+                      hideAmounts
                     )}
                   </p>
                   <div className="flex gap-1">

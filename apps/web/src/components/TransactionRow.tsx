@@ -4,6 +4,7 @@ import { formatDate, formatSignedMoney } from "@myfinances/utils";
 import { CategoryIcon } from "../lib/icons";
 import { Button } from "./ui/Button";
 import { getCategoryName, type Dictionary } from "../i18n";
+import { shouldHideWalletAmounts } from "../lib/walletFeatures";
 
 interface TransactionRowProps {
   transaction: Transaction;
@@ -35,6 +36,7 @@ export function TransactionRow({
   const amountMinor = displayAmountMinor ?? transaction.amountMinor;
   const currency = displayCurrency ?? transaction.currency;
   const tags = Array.isArray(transaction.tags) ? transaction.tags : [];
+  const hideAmount = shouldHideWalletAmounts(settings, wallet);
 
   return (
     <article className="app-surface grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-app p-3">
@@ -71,7 +73,8 @@ export function TransactionRow({
             amountMinor,
             currency,
             settings.locale,
-            transaction.type
+            transaction.type,
+            hideAmount
           )}
           {conversionMissing ? " *" : ""}
         </p>

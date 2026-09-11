@@ -62,7 +62,15 @@ export function convertMinorBetweenCurrencies(
   return decimalToMinor(minorToDecimal(amountMinor, fromCurrency) * targetPerSourceRate, toCurrency);
 }
 
-export function formatMoney(amountMinor: number, currency: string, locale: string): string {
+export function formatMoney(
+  amountMinor: number,
+  currency: string,
+  locale: string,
+  hidden = false
+): string {
+  if (hidden) {
+    return "••••";
+  }
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
@@ -74,8 +82,12 @@ export function formatSignedMoney(
   amountMinor: number,
   currency: string,
   locale: string,
-  sign: "income" | "expense"
+  sign: "income" | "expense",
+  hidden = false
 ): string {
-  const formatted = formatMoney(amountMinor, currency, locale);
+  const formatted = formatMoney(amountMinor, currency, locale, hidden);
+  if (hidden) {
+    return formatted;
+  }
   return sign === "income" ? `+${formatted}` : `-${formatted}`;
 }

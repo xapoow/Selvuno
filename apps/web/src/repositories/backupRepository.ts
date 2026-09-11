@@ -2,7 +2,7 @@ import type {
   BackupSnapshot,
   BackupSnapshotReason,
   FinanceBackup,
-  FinanceBackupV6
+  FinanceBackupV8
 } from "@myfinances/types";
 import { backupSchema, backupSnapshotSchema } from "@myfinances/types";
 import { createId, financeDb, nowIso, seedLocalData } from "../db/database";
@@ -11,7 +11,7 @@ const MAX_AUTOMATIC_BACKUPS = 12;
 const BACKUP_SESSION_WINDOW_MS = 10 * 60 * 1000;
 
 export interface BackupRepository {
-  exportBackup(): Promise<FinanceBackupV6>;
+  exportBackup(): Promise<FinanceBackupV8>;
   importBackup(backup: unknown): Promise<FinanceBackup>;
   createSnapshot(reason?: BackupSnapshotReason): Promise<BackupSnapshot>;
   listSnapshots(): Promise<BackupSnapshot[]>;
@@ -27,18 +27,19 @@ export const backupRepository: BackupRepository = {
       throw new Error("Settings not found.");
     }
     return backupSchema.parse({
-      version: 6,
+      version: 8,
       exportedAt: nowIso(),
       wallets: await financeDb.wallets.toArray(),
       categories: await financeDb.categories.toArray(),
       transactions: await financeDb.transactions.toArray(),
+      transactionTemplates: await financeDb.transactionTemplates.toArray(),
       budgets: await financeDb.budgets.toArray(),
       recurringTransactions: await financeDb.recurringTransactions.toArray(),
       savingsGoals: await financeDb.savingsGoals.toArray(),
       savingsGoalContributions: await financeDb.savingsGoalContributions.toArray(),
       walletTransfers: await financeDb.walletTransfers.toArray(),
       settings
-    }) as FinanceBackupV6;
+    }) as FinanceBackupV8;
   },
 
   async importBackup(backup) {
@@ -49,6 +50,7 @@ export const backupRepository: BackupRepository = {
         financeDb.wallets,
         financeDb.categories,
         financeDb.transactions,
+        financeDb.transactionTemplates,
         financeDb.settings,
         financeDb.budgets,
         financeDb.recurringTransactions,
@@ -60,6 +62,7 @@ export const backupRepository: BackupRepository = {
         await financeDb.wallets.clear();
         await financeDb.categories.clear();
         await financeDb.transactions.clear();
+        await financeDb.transactionTemplates.clear();
         await financeDb.settings.clear();
         await financeDb.budgets.clear();
         await financeDb.recurringTransactions.clear();
@@ -69,7 +72,11 @@ export const backupRepository: BackupRepository = {
         await financeDb.wallets.bulkPut(
           parsed.wallets.map((wallet) => ({
             ...wallet,
-            initialBalanceMinor: wallet.initialBalanceMinor ?? 0
+            initialBalanceMinor: wallet.initialBalanceMinor ?? 0,
+            kind: wallet.kind ?? "cash",
+            creditLimitMinor: wallet.creditLimitMinor ?? 0,
+            excludeFromTotals: wallet.excludeFromTotals ?? false,
+            hideBalance: wallet.hideBalance ?? false
           }))
         );
         await financeDb.categories.bulkPut(parsed.categories);
@@ -79,7 +86,9 @@ export const backupRepository: BackupRepository = {
           parsed.version === 3 ||
           parsed.version === 4 ||
           parsed.version === 5 ||
-          parsed.version === 6
+          parsed.version === 6 ||
+          parsed.version === 7 ||
+          parsed.version === 8
         ) {
           await financeDb.budgets.bulkPut(parsed.budgets);
         }
@@ -87,16 +96,27 @@ export const backupRepository: BackupRepository = {
           parsed.version === 3 ||
           parsed.version === 4 ||
           parsed.version === 5 ||
-          parsed.version === 6
+          parsed.version === 6 ||
+          parsed.version === 7 ||
+          parsed.version === 8
         ) {
           await financeDb.recurringTransactions.bulkPut(parsed.recurringTransactions);
         }
-        if (parsed.version === 4 || parsed.version === 5 || parsed.version === 6) {
+        if (
+          parsed.version === 4 ||
+          parsed.version === 5 ||
+          parsed.version === 6 ||
+          parsed.version === 7 ||
+          parsed.version === 8
+        ) {
           await financeDb.savingsGoals.bulkPut(parsed.savingsGoals);
           await financeDb.savingsGoalContributions.bulkPut(parsed.savingsGoalContributions);
         }
-        if (parsed.version === 5 || parsed.version === 6) {
+        if (parsed.version === 5 || parsed.version === 6 || parsed.version === 7 || parsed.version === 8) {
           await financeDb.walletTransfers.bulkPut(parsed.walletTransfers);
+        }
+        if (parsed.version === 7 || parsed.version === 8) {
+          await financeDb.transactionTemplates.bulkPut(parsed.transactionTemplates);
         }
         await financeDb.settings.put(parsed.settings);
       }

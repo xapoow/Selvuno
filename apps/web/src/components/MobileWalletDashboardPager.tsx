@@ -12,6 +12,7 @@ import { DashboardView } from "../views/DashboardView";
 import { type Dictionary } from "../i18n";
 import { useExchangeRates } from "../lib/exchangeRates";
 import { MobileWalletPager } from "./MobileWalletPager";
+import { getIncludedWalletIds } from "../lib/walletFeatures";
 
 interface MobileWalletDashboardPagerProps {
   wallets: Wallet[];
@@ -44,26 +45,29 @@ function MobileWalletDashboardSlide({
 }) {
   const activeWallet = walletView === "all" ? undefined : wallets.find((wallet) => wallet.id === walletView);
   const displayCurrency = activeWallet?.currency ?? settings.currency;
+  const includedWalletIds = getIncludedWalletIds(wallets, settings.advancedWalletsEnabled);
+  const walletIsInCurrentStatistics = (walletId: string) =>
+    walletView === "all" ? includedWalletIds.has(walletId) : walletId === walletView;
   const conversionNeeded =
     transactions.some(
       (transaction) =>
         !transaction.deletedAt &&
-        (walletView === "all" || transaction.walletId === walletView) &&
+        walletIsInCurrentStatistics(transaction.walletId) &&
         transaction.currency.toUpperCase() !== displayCurrency
     ) ||
     wallets.some(
       (wallet) =>
         !wallet.deletedAt &&
-        (walletView === "all" || wallet.id === walletView) &&
+        walletIsInCurrentStatistics(wallet.id) &&
         wallet.initialBalanceMinor !== 0 &&
         wallet.currency.toUpperCase() !== displayCurrency
     ) ||
     transfers.some(
       (transfer) =>
         !transfer.deletedAt &&
-        (((walletView === "all" || transfer.fromWalletId === walletView) &&
+        ((walletIsInCurrentStatistics(transfer.fromWalletId) &&
           transfer.fromCurrency.toUpperCase() !== displayCurrency) ||
-          ((walletView === "all" || transfer.toWalletId === walletView) &&
+          (walletIsInCurrentStatistics(transfer.toWalletId) &&
             transfer.toCurrency.toUpperCase() !== displayCurrency))
     );
   const exchangeRates = useExchangeRates(displayCurrency, conversionNeeded);

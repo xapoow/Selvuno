@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import type { WalletView } from "@myfinances/types";
+import { Eye, EyeOff, LockKeyhole } from "lucide-react";
 import { BottomNavigation } from "./components/BottomNavigation";
 import { CookieNotice } from "./components/CookieNotice";
 import { HeaderNavigation } from "./components/HeaderNavigation";
@@ -8,6 +9,7 @@ import { MobileWalletDashboardPager } from "./components/MobileWalletDashboardPa
 import { MobileWalletHistoryPager } from "./components/MobileWalletHistoryPager";
 import { NotificationCenter } from "./components/NotificationCenter";
 import { OfflineIndicator } from "./components/OfflineIndicator";
+import { LockScreen } from "./components/LockScreen";
 import { UpdateAnnouncement } from "./components/UpdateAnnouncement";
 import { WalletSwitcher } from "./components/WalletSwitcher";
 import { ErrorScreen } from "./components/ErrorScreen";
@@ -17,6 +19,9 @@ import { useExchangeRates } from "./lib/exchangeRates";
 import { buildAppNotifications } from "./lib/notifications";
 import { useAppStore } from "./state/appStore";
 import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
+import { usePrivacyLock } from "./state/usePrivacyLock";
+import { getIncludedWalletIds, shouldHideWalletAmounts } from "./lib/walletFeatures";
+import { getDesktopShortcut } from "./lib/desktopShortcuts";
 import { AddTransactionView } from "./views/AddTransactionView";
 import { DashboardView } from "./views/DashboardView";
 import { HistoryView } from "./views/HistoryView";
@@ -28,6 +33,8 @@ export function App() {
   const activeView = useAppStore((state) => state.activeView);
   const setActiveView = useAppStore((state) => state.setActiveView);
   const [walletTransitionDirection, setWalletTransitionDirection] = useState(1);
+  const [historySearchRequest, setHistorySearchRequest] = useState(0);
+  const privacy = usePrivacyLock();
   const data = useFinanceData();
   const mutations = useFinanceMutations();
 
@@ -36,6 +43,7 @@ export function App() {
   const archivedWallets = data.archivedWallets.data ?? [];
   const categories = data.categories.data ?? [];
   const transactions = data.transactions.data ?? [];
+  const transactionTemplates = data.transactionTemplates.data ?? [];
   const budgets = data.budgets.data ?? [];
   const recurringTransactions = data.recurringTransactions.data ?? [];
   const savingsGoals = data.savingsGoals.data ?? [];
@@ -49,6 +57,7 @@ export function App() {
     data.archivedWallets.isLoading ||
     data.categories.isLoading ||
     data.transactions.isLoading ||
+    data.transactionTemplates.isLoading ||
     data.budgets.isLoading ||
     data.recurringTransactions.isLoading ||
     data.savingsGoals.isLoading ||
@@ -62,6 +71,7 @@ export function App() {
     data.archivedWallets.isError ||
     data.categories.isError ||
     data.transactions.isError ||
+    data.transactionTemplates.isError ||
     data.budgets.isError ||
     data.recurringTransactions.isError ||
     data.savingsGoals.isError ||
@@ -75,6 +85,7 @@ export function App() {
     archivedWallets,
     categories,
     transactions,
+    transactionTemplates,
     budgets,
     recurringTransactions,
     savingsGoals,
@@ -103,6 +114,29 @@ export function App() {
   }, [activeView]);
 
   useEffect(() => {
+    if (!settings?.onboardingCompleted || privacy.locked) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const shortcut = getDesktopShortcut(event);
+      if (!shortcut) {
+        return;
+      }
+      event.preventDefault();
+      if (shortcut === "add-transaction") {
+        setActiveView("add");
+        return;
+      }
+      setHistorySearchRequest((request) => request + 1);
+      setActiveView("history");
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [privacy.locked, setActiveView, settings?.onboardingCompleted]);
+
+  useEffect(() => {
     if (
       isLoading ||
       !settings?.onboardingCompleted ||
@@ -126,27 +160,33 @@ export function App() {
       : "all";
   const activeWallet = activeWalletId === "all" ? undefined : wallets.find((wallet) => wallet.id === activeWalletId);
   const displayCurrency = settings ? activeWallet?.currency ?? settings.currency : "USD";
+  const includedWalletIds = getIncludedWalletIds(
+    wallets,
+    settings?.advancedWalletsEnabled ?? false
+  );
+  const walletIsInCurrentStatistics = (walletId: string) =>
+    activeWalletId === "all" ? includedWalletIds.has(walletId) : walletId === activeWalletId;
   const conversionNeeded = Boolean(
     settings &&
       (transactions.some(
         (transaction) =>
           !transaction.deletedAt &&
-          (activeWalletId === "all" || transaction.walletId === activeWalletId) &&
+          walletIsInCurrentStatistics(transaction.walletId) &&
           transaction.currency.toUpperCase() !== displayCurrency
       ) ||
         wallets.some(
           (wallet) =>
             !wallet.deletedAt &&
-            (activeWalletId === "all" || wallet.id === activeWalletId) &&
+            walletIsInCurrentStatistics(wallet.id) &&
             wallet.currency.toUpperCase() !== displayCurrency &&
             wallet.initialBalanceMinor !== 0
         ) ||
         walletTransfers.some(
           (transfer) =>
             !transfer.deletedAt &&
-            (((activeWalletId === "all" || transfer.fromWalletId === activeWalletId) &&
+            ((walletIsInCurrentStatistics(transfer.fromWalletId) &&
               transfer.fromCurrency.toUpperCase() !== displayCurrency) ||
-              ((activeWalletId === "all" || transfer.toWalletId === activeWalletId) &&
+              (walletIsInCurrentStatistics(transfer.toWalletId) &&
                 transfer.toCurrency.toUpperCase() !== displayCurrency))
         ))
   );
@@ -156,6 +196,7 @@ export function App() {
     void mutations.updateSettings.mutateAsync({ activeWalletId: nextWalletId });
   };
   const addWalletId: WalletView = activeWalletId === "all" ? wallets[0]?.id ?? "all" : activeWalletId;
+  const addWallet = wallets.find((wallet) => wallet.id === addWalletId);
   const showsWalletContext = activeView === "dashboard" || activeView === "history" || activeView === "add";
 
   if (isError) {
@@ -170,6 +211,9 @@ export function App() {
           data.archivedWallets.error instanceof Error ? data.archivedWallets.error.message : null,
           data.categories.error instanceof Error ? data.categories.error.message : null,
           data.transactions.error instanceof Error ? data.transactions.error.message : null,
+          data.transactionTemplates.error instanceof Error
+            ? data.transactionTemplates.error.message
+            : null,
           data.budgets.error instanceof Error ? data.budgets.error.message : null,
           data.recurringTransactions.error instanceof Error ? data.recurringTransactions.error.message : null,
           data.savingsGoals.error instanceof Error ? data.savingsGoals.error.message : null,
@@ -194,6 +238,11 @@ export function App() {
   }
 
   const t = getDictionary(settings.locale);
+
+  if (privacy.locked) {
+    return <LockScreen t={t} onUnlock={privacy.unlock} />;
+  }
+
   const notifications = buildAppNotifications({
     settings,
     categories,
@@ -229,19 +278,58 @@ export function App() {
           <h1 className="mt-1 text-2xl font-semibold text-foreground">{t.appName}</h1>
         </div>
         <HeaderNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
-        {showsWalletContext ? (
-          <div className="mt-auto rounded-app border border-line/60 bg-elevated/70 p-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t.common.wallet}</p>
-            <p className="mt-1 truncate text-sm font-semibold text-foreground">
-              {activeWallet?.name ?? t.wallets.allWallets}
-            </p>
-            <p className="mt-0.5 text-xs text-muted">{displayCurrency}</p>
+        <div className="mt-auto grid gap-2">
+          <div className="rounded-app border border-line/50 px-3 py-2.5 text-xs text-muted">
+            <p className="mb-2 font-semibold uppercase tracking-wide">{t.shortcuts.title}</p>
+            <div className="grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1.5">
+              <kbd className="rounded border border-line/70 bg-elevated px-1.5 py-0.5 font-mono text-foreground">
+                Ctrl N
+              </kbd>
+              <span>{t.shortcuts.newTransaction}</span>
+              <kbd className="rounded border border-line/70 bg-elevated px-1.5 py-0.5 font-mono text-foreground">
+                Ctrl K
+              </kbd>
+              <span>{t.shortcuts.search}</span>
+            </div>
           </div>
-        ) : null}
+          {showsWalletContext ? (
+            <div className="rounded-app border border-line/60 bg-elevated/70 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                {t.common.wallet}
+              </p>
+              <p className="mt-1 truncate text-sm font-semibold text-foreground">
+                {activeWallet?.name ?? t.wallets.allWallets}
+              </p>
+              <p className="mt-0.5 text-xs text-muted">{displayCurrency}</p>
+            </div>
+          ) : null}
+        </div>
       </aside>
 
       <main className="mx-auto w-full max-w-[1180px] px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:px-8 md:pb-10 md:pt-7 lg:px-10">
-        <div className="mb-3 flex justify-end">
+        <div className="mb-3 flex justify-end gap-1">
+          <button
+            type="button"
+            onClick={() =>
+              void mutations.updateSettings.mutateAsync({ hideAmounts: !settings.hideAmounts })
+            }
+            className="app-focus grid h-10 w-10 place-items-center rounded-app text-muted transition hover:bg-elevated/70 hover:text-foreground"
+            aria-label={settings.hideAmounts ? t.settings.showAmounts : t.settings.hideAmounts}
+            title={settings.hideAmounts ? t.settings.showAmounts : t.settings.hideAmounts}
+          >
+            {settings.hideAmounts ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </button>
+          {privacy.pinEnabled ? (
+            <button
+              type="button"
+              onClick={privacy.lockNow}
+              className="app-focus grid h-10 w-10 place-items-center rounded-app text-muted transition hover:bg-elevated/70 hover:text-foreground"
+              aria-label={t.settings.lockNow}
+              title={t.settings.lockNow}
+            >
+              <LockKeyhole className="h-5 w-5" />
+            </button>
+          ) : null}
           <NotificationCenter notifications={notifications} t={t} />
         </div>
         {showsWalletContext ? (
@@ -315,10 +403,21 @@ export function App() {
               categories={categories}
               recurringTransactions={recurringTransactions}
               transactions={transactions}
-              settings={{ ...settings, activeWalletId: addWalletId }}
+              templates={transactionTemplates}
+              settings={{
+                ...settings,
+                activeWalletId: addWalletId,
+                hideAmounts: shouldHideWalletAmounts(settings, addWallet)
+              }}
               t={t}
               onSubmit={async (input) => {
                 await mutations.addTransaction.mutateAsync(input);
+              }}
+              onCreateTemplate={async (input) => {
+                await mutations.createTransactionTemplate.mutateAsync(input);
+              }}
+              onDeleteTemplate={async (id) => {
+                await mutations.deleteTransactionTemplate.mutateAsync(id);
               }}
               onCreateRecurring={async (input) => {
                 await mutations.createRecurringTransaction.mutateAsync(input);
@@ -368,6 +467,8 @@ export function App() {
                     displayCurrency={displayCurrency}
                     exchangeRates={exchangeRates.data}
                     t={t}
+                    desktopTools
+                    searchFocusRequest={historySearchRequest}
                     onUpdate={async (id, input) => {
                       await mutations.updateTransaction.mutateAsync({ id, input });
                     }}
@@ -421,6 +522,7 @@ export function App() {
               settings={settings}
               categories={categories}
               backupSnapshots={backupSnapshots}
+              privacy={privacy}
               t={t}
               onUpdateSettings={async (input) => {
                 await mutations.updateSettings.mutateAsync(input);

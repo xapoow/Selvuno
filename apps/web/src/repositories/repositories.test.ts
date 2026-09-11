@@ -7,6 +7,7 @@ import { recurringTransactionRepository } from "./recurringTransactionRepository
 import { savingsGoalRepository } from "./savingsGoalRepository";
 import { settingsRepository } from "./settingsRepository";
 import { transactionRepository } from "./transactionRepository";
+import { transactionTemplateRepository } from "./transactionTemplateRepository";
 import { walletRepository } from "./walletRepository";
 import { walletTransferRepository } from "./walletTransferRepository";
 
@@ -78,6 +79,10 @@ describe("finance repositories", () => {
       name: "Savings",
       currency: "eur",
       initialBalanceMinor: 12500,
+      kind: "credit",
+      creditLimitMinor: 100000,
+      excludeFromTotals: true,
+      hideBalance: true,
       color: "#7b61ff",
       icon: "piggy-bank"
     });
@@ -87,6 +92,10 @@ describe("finance repositories", () => {
       name: "Reserve",
       currency: "EUR",
       initialBalanceMinor: 12500,
+      kind: "credit",
+      creditLimitMinor: 100000,
+      excludeFromTotals: true,
+      hideBalance: true,
       color: "#7b61ff",
       icon: "piggy-bank"
     });
@@ -193,6 +202,10 @@ describe("finance repositories", () => {
     await financeDb.wallets.put({
       ...wallet,
       currency: undefined,
+      kind: undefined,
+      creditLimitMinor: undefined,
+      excludeFromTotals: undefined,
+      hideBalance: undefined,
       color: undefined,
       icon: undefined
     } as never);
@@ -206,7 +219,11 @@ describe("finance repositories", () => {
     expect((await walletRepository.listWallets())[0].initialBalanceMinor).toBe(0);
     expect((await walletRepository.listWallets())[0]).toMatchObject({
       color: "#207a6f",
-      icon: "wallet-cards"
+      icon: "wallet-cards",
+      kind: "cash",
+      creditLimitMinor: 0,
+      excludeFromTotals: false,
+      hideBalance: false
     });
     expect((await transactionRepository.listTransactions({ includeDeleted: true }))[0].currency).toBeTruthy();
     expect((await transactionRepository.listTransactions({ includeDeleted: true }))[0].tags).toEqual([]);
@@ -242,6 +259,36 @@ describe("finance repositories", () => {
 
     expect(await transactionRepository.listTransactions({ walletId: wallet.id })).toHaveLength(0);
     expect(await transactionRepository.listTransactions({ walletId: wallet.id, includeDeleted: true })).toHaveLength(1);
+  });
+
+  it("creates and soft deletes reusable transaction templates", async () => {
+    await seedLocalData();
+    const [wallet] = await walletRepository.listWallets();
+    const [category] = await categoryRepository.listCategories("expense");
+
+    const template = await transactionTemplateRepository.createTemplate({
+      name: "Coffee",
+      walletId: wallet.id,
+      categoryId: category.id,
+      type: "expense",
+      amountMinor: 550,
+      currency: "EUR",
+      note: "Morning coffee",
+      tags: [" Daily ", "#daily"]
+    });
+
+    expect(template).toMatchObject({
+      name: "Coffee",
+      currency: wallet.currency,
+      amountMinor: 550,
+      tags: ["Daily"]
+    });
+    expect(await transactionTemplateRepository.listTemplates()).toHaveLength(1);
+
+    await transactionTemplateRepository.deleteTemplate(template.id);
+
+    expect(await transactionTemplateRepository.listTemplates()).toHaveLength(0);
+    expect((await financeDb.transactionTemplates.get(template.id))?.deletedAt).toBeTruthy();
   });
 
   it("moves money between wallets without creating income or expense transactions", async () => {
@@ -456,6 +503,15 @@ describe("finance repositories", () => {
       toAmountMinor: 5000,
       transferDate: "2026-07-26T12:00:00.000Z"
     });
+    await transactionTemplateRepository.createTemplate({
+      name: "Lunch",
+      walletId: wallet.id,
+      categoryId: category.id,
+      type: "expense",
+      amountMinor: 1800,
+      currency: wallet.currency,
+      tags: ["Work"]
+    });
     const backup = await backupRepository.exportBackup();
 
     await resetDatabaseForTests();
@@ -470,6 +526,7 @@ describe("finance repositories", () => {
     expect(restored.savingsGoals).toHaveLength(1);
     expect(restored.savingsGoalContributions).toHaveLength(1);
     expect(restored.walletTransfers).toHaveLength(1);
+    expect(restored.transactionTemplates).toHaveLength(1);
     expect(restored.settings).toMatchObject({ id: "default" });
   });
 
