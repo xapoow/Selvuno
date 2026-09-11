@@ -46,6 +46,11 @@ export interface Dictionary {
   appName: string;
   brand: string;
   nav: Record<AppView, string>;
+  shortcuts: {
+    title: string;
+    newTransaction: string;
+    search: string;
+  };
   common: {
     add: string;
     all: string;
@@ -297,7 +302,26 @@ export interface Dictionary {
   history: {
     title: string;
     viewList: string;
+    viewTable: string;
     viewCalendar: string;
+    exportCsv: string;
+    selectAll: string;
+    selectTransaction: string;
+    selected: string;
+    bulkCategory: string;
+    chooseBulkCategory: string;
+    mixedTypesHint: string;
+    applyCategory: string;
+    deleteSelected: string;
+    confirmDeleteSelected: string;
+    csvDate: string;
+    csvType: string;
+    csvAmount: string;
+    csvCurrency: string;
+    csvCategory: string;
+    csvWallet: string;
+    csvNote: string;
+    csvTags: string;
     calendarSelectedDay: string;
     calendarEmptyDay: string;
     calendarMissingRates: string;
@@ -544,6 +568,11 @@ export const dictionaries: Record<Language, Dictionary> = {
       wallets: "Wallets",
       settings: "Settings"
     },
+    shortcuts: {
+      title: "Shortcuts",
+      newTransaction: "New transaction",
+      search: "Search history"
+    },
     common: {
       add: "Add",
       all: "All",
@@ -754,7 +783,26 @@ export const dictionaries: Record<Language, Dictionary> = {
     history: {
       title: "History",
       viewList: "List",
+      viewTable: "Table",
       viewCalendar: "Calendar",
+      exportCsv: "Export CSV",
+      selectAll: "Select all visible transactions",
+      selectTransaction: "Select {category}",
+      selected: "Selected: {count}",
+      bulkCategory: "Change category",
+      chooseBulkCategory: "Choose a category",
+      mixedTypesHint: "Choose transactions of one type to change their category.",
+      applyCategory: "Apply category",
+      deleteSelected: "Delete",
+      confirmDeleteSelected: "Delete {count} selected transactions?",
+      csvDate: "Date",
+      csvType: "Type",
+      csvAmount: "Amount",
+      csvCurrency: "Currency",
+      csvCategory: "Category",
+      csvWallet: "Wallet",
+      csvNote: "Note",
+      csvTags: "Tags",
       calendarSelectedDay: "Selected day",
       calendarEmptyDay: "No transactions on this day.",
       calendarMissingRates: "Some totals exclude transactions without an exchange rate.",
@@ -1124,6 +1172,11 @@ export const dictionaries: Record<Language, Dictionary> = {
       wallets: "Кошельки",
       settings: "Настройки"
     },
+    shortcuts: {
+      title: "Быстрые действия",
+      newTransaction: "Новая операция",
+      search: "Поиск в истории"
+    },
     common: {
       add: "Добавить",
       all: "Все",
@@ -1334,7 +1387,26 @@ export const dictionaries: Record<Language, Dictionary> = {
     history: {
       title: "История",
       viewList: "Список",
+      viewTable: "Таблица",
       viewCalendar: "Календарь",
+      exportCsv: "Экспорт CSV",
+      selectAll: "Выбрать все видимые операции",
+      selectTransaction: "Выбрать операцию «{category}»",
+      selected: "Выбрано: {count}",
+      bulkCategory: "Изменить категорию",
+      chooseBulkCategory: "Выбери категорию",
+      mixedTypesHint: "Для замены категории выбери операции одного типа.",
+      applyCategory: "Применить категорию",
+      deleteSelected: "Удалить",
+      confirmDeleteSelected: "Удалить выбранные операции ({count})?",
+      csvDate: "Дата",
+      csvType: "Тип",
+      csvAmount: "Сумма",
+      csvCurrency: "Валюта",
+      csvCategory: "Категория",
+      csvWallet: "Кошелек",
+      csvNote: "Заметка",
+      csvTags: "Теги",
       calendarSelectedDay: "Выбранный день",
       calendarEmptyDay: "В этот день операций нет.",
       calendarMissingRates: "Некоторые итоги не включают операции без курса валют.",

@@ -21,6 +21,7 @@ import { useAppStore } from "./state/appStore";
 import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
 import { usePrivacyLock } from "./state/usePrivacyLock";
 import { getIncludedWalletIds, shouldHideWalletAmounts } from "./lib/walletFeatures";
+import { getDesktopShortcut } from "./lib/desktopShortcuts";
 import { AddTransactionView } from "./views/AddTransactionView";
 import { DashboardView } from "./views/DashboardView";
 import { HistoryView } from "./views/HistoryView";
@@ -32,6 +33,7 @@ export function App() {
   const activeView = useAppStore((state) => state.activeView);
   const setActiveView = useAppStore((state) => state.setActiveView);
   const [walletTransitionDirection, setWalletTransitionDirection] = useState(1);
+  const [historySearchRequest, setHistorySearchRequest] = useState(0);
   const privacy = usePrivacyLock();
   const data = useFinanceData();
   const mutations = useFinanceMutations();
@@ -110,6 +112,29 @@ export function App() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [activeView]);
+
+  useEffect(() => {
+    if (!settings?.onboardingCompleted || privacy.locked) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const shortcut = getDesktopShortcut(event);
+      if (!shortcut) {
+        return;
+      }
+      event.preventDefault();
+      if (shortcut === "add-transaction") {
+        setActiveView("add");
+        return;
+      }
+      setHistorySearchRequest((request) => request + 1);
+      setActiveView("history");
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [privacy.locked, setActiveView, settings?.onboardingCompleted]);
 
   useEffect(() => {
     if (
@@ -253,15 +278,32 @@ export function App() {
           <h1 className="mt-1 text-2xl font-semibold text-foreground">{t.appName}</h1>
         </div>
         <HeaderNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
-        {showsWalletContext ? (
-          <div className="mt-auto rounded-app border border-line/60 bg-elevated/70 p-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t.common.wallet}</p>
-            <p className="mt-1 truncate text-sm font-semibold text-foreground">
-              {activeWallet?.name ?? t.wallets.allWallets}
-            </p>
-            <p className="mt-0.5 text-xs text-muted">{displayCurrency}</p>
+        <div className="mt-auto grid gap-2">
+          <div className="rounded-app border border-line/50 px-3 py-2.5 text-xs text-muted">
+            <p className="mb-2 font-semibold uppercase tracking-wide">{t.shortcuts.title}</p>
+            <div className="grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1.5">
+              <kbd className="rounded border border-line/70 bg-elevated px-1.5 py-0.5 font-mono text-foreground">
+                Ctrl N
+              </kbd>
+              <span>{t.shortcuts.newTransaction}</span>
+              <kbd className="rounded border border-line/70 bg-elevated px-1.5 py-0.5 font-mono text-foreground">
+                Ctrl K
+              </kbd>
+              <span>{t.shortcuts.search}</span>
+            </div>
           </div>
-        ) : null}
+          {showsWalletContext ? (
+            <div className="rounded-app border border-line/60 bg-elevated/70 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                {t.common.wallet}
+              </p>
+              <p className="mt-1 truncate text-sm font-semibold text-foreground">
+                {activeWallet?.name ?? t.wallets.allWallets}
+              </p>
+              <p className="mt-0.5 text-xs text-muted">{displayCurrency}</p>
+            </div>
+          ) : null}
+        </div>
       </aside>
 
       <main className="mx-auto w-full max-w-[1180px] px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:px-8 md:pb-10 md:pt-7 lg:px-10">
@@ -425,6 +467,8 @@ export function App() {
                     displayCurrency={displayCurrency}
                     exchangeRates={exchangeRates.data}
                     t={t}
+                    desktopTools
+                    searchFocusRequest={historySearchRequest}
                     onUpdate={async (id, input) => {
                       await mutations.updateTransaction.mutateAsync({ id, input });
                     }}
