@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Settings, Transaction, Wallet, WalletTransfer, WalletView } from "@myfinances/types";
-import { motion, useAnimation, type PanInfo } from "framer-motion";
+import { animate, motion, useMotionValue, useTransform, type MotionValue, type PanInfo } from "framer-motion";
 import { ChevronLeft, ChevronRight, Layers3, ShieldCheck } from "lucide-react";
 import { calculateWalletTotals, formatMoney } from "@myfinances/utils";
 import { cn } from "../lib/cn";
@@ -34,6 +34,165 @@ export interface MonobankCardData {
 
 const GAP = 16;
 
+interface CarouselCardSlideProps {
+  card: MonobankCardData;
+  idx: number;
+  cardWidth: number;
+  step: number;
+  trackX: MotionValue<number>;
+  settings: Settings;
+  t: Dictionary;
+  hideAmounts: boolean;
+}
+
+function CarouselCardSlide({
+  card,
+  idx,
+  cardWidth,
+  step,
+  trackX,
+  settings,
+  t,
+  hideAmounts
+}: CarouselCardSlideProps) {
+  const centerPos = -idx * step;
+  const opacity = useTransform(
+    trackX,
+    [centerPos - step, centerPos, centerPos + step],
+    [0.18, 1, 0.18]
+  );
+  const scale = useTransform(
+    trackX,
+    [centerPos - step, centerPos, centerPos + step],
+    [0.93, 1, 0.93]
+  );
+
+  return (
+    <div style={{ width: `${cardWidth}px` }} className="flex-shrink-0">
+      <motion.div
+        style={{
+          opacity,
+          scale,
+          background: !card.isAll
+            ? `linear-gradient(135deg, ${card.color ?? "#207a6f"}dd 0%, #13171b 100%)`
+            : undefined,
+          boxShadow: !card.isAll
+            ? `0 18px 40px -10px ${card.color ?? "#207a6f"}44, inset 0 1px 0 0 rgba(255,255,255,0.25)`
+            : "0 18px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 0 rgba(255,255,255,0.2)"
+        }}
+        className={cn(
+          "relative flex aspect-[1.586/1] w-full flex-col justify-between overflow-hidden rounded-[24px] p-5 text-white select-none",
+          card.isAll
+            ? "bg-gradient-to-br from-[#24272c] via-[#1a1c20] to-[#0f1012] border border-white/10"
+            : "border border-white/15"
+        )}
+      >
+        {/* Subtle background card watermark pattern */}
+        <div
+          className="pointer-events-none absolute -bottom-10 -right-10 h-44 w-44 rounded-full opacity-10 blur-xl"
+          style={{ backgroundColor: card.color ?? "#ffffff" }}
+        />
+
+        {/* Top Row: Wallet Icon & Name + Kind Badge */}
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <span
+              className={cn(
+                "grid h-9 w-9 place-items-center rounded-control text-white backdrop-blur-md shadow-sm",
+                card.isAll ? "bg-white/20" : "bg-black/25"
+              )}
+            >
+              {card.isAll ? (
+                <Layers3 className="h-4 w-4" />
+              ) : (
+                <WalletIcon name={card.icon ?? "wallet-cards"} className="h-4 w-4" />
+              )}
+            </span>
+            <span className="text-sm font-semibold tracking-wide text-white drop-shadow-sm">
+              {card.name}
+            </span>
+          </div>
+
+          {/* Right Badge: Kind */}
+          <div className="flex items-center gap-1.5 rounded-full bg-black/25 px-2.5 py-1 text-xs font-semibold backdrop-blur-md text-white/90">
+            {card.isAll ? (
+              <span>{t.wallets.allWallets}</span>
+            ) : card.kind === "credit" ? (
+              <span className="flex items-center gap-1 text-amber-300">
+                <ShieldCheck className="h-3 w-3" />
+                Кредитный
+              </span>
+            ) : (
+              <span>{t.common.wallet}</span>
+            )}
+          </div>
+        </div>
+
+        {/* Center: Main Balance */}
+        <div className="relative z-10 my-auto py-2">
+          <p className="text-xs font-medium uppercase tracking-wider text-white/70">
+            {t.common.balance}
+          </p>
+          <div className="mt-1 flex items-baseline gap-2">
+            <p className="truncate text-3xl font-extrabold tracking-tight text-white drop-shadow-md sm:text-4xl">
+              {formatMoney(
+                card.balanceMinor,
+                card.currency,
+                settings.locale,
+                hideAmounts
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* Bottom Row: Currency info & Credit Limit bar */}
+        <div className="relative z-10">
+          {card.kind === "credit" && card.creditLimitMinor ? (
+            <div className="mb-2">
+              <div className="flex justify-between text-[11px] font-medium text-white/70">
+                <span>Лимит</span>
+                <span>
+                  {formatMoney(
+                    card.creditLimitMinor,
+                    card.currency,
+                    settings.locale,
+                    hideAmounts
+                  )}
+                </span>
+              </div>
+              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/20">
+                <div
+                  className="h-full rounded-full bg-accent transition-all duration-300"
+                  style={{
+                    width: `${Math.min(
+                      100,
+                      Math.max(
+                        0,
+                        ((card.balanceMinor + card.creditLimitMinor) /
+                          card.creditLimitMinor) *
+                          100
+                      )
+                    )}%`
+                  }}
+                />
+              </div>
+            </div>
+          ) : null}
+
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-white/75">
+              {card.currency}
+            </span>
+            <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm backdrop-blur-md">
+              {getCurrencyLabel(card.currency)}
+            </span>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 export function MonobankWalletCarousel({
   wallets,
   activeWalletId,
@@ -44,7 +203,6 @@ export function MonobankWalletCarousel({
   onChange,
   className
 }: MonobankWalletCarouselProps) {
-  const controls = useAnimation();
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [internalActiveId, setInternalActiveId] = useState<WalletView>(activeWalletId);
@@ -116,23 +274,28 @@ export function MonobankWalletCarousel({
 
   const cardWidth = containerWidth || 380;
   const step = cardWidth + GAP;
+  const trackX = useMotionValue(-resolvedIndex * step);
 
   useEffect(() => {
     if (!containerWidth) return;
-    void controls.start({
-      x: -resolvedIndex * step,
-      transition: { type: "spring", stiffness: 380, damping: 32, mass: 0.55 }
+    void animate(trackX, -resolvedIndex * step, {
+      type: "spring",
+      stiffness: 380,
+      damping: 32,
+      mass: 0.55
     });
-  }, [resolvedIndex, containerWidth, step, controls]);
+  }, [resolvedIndex, containerWidth, step, trackX]);
 
   function selectByIndex(index: number) {
     if (index < 0 || index >= cardItems.length) return;
     const direction = index > resolvedIndex ? 1 : -1;
     setInternalActiveId(cardItems[index].id);
     onChange(cardItems[index].id, direction);
-    void controls.start({
-      x: -index * step,
-      transition: { type: "spring", stiffness: 380, damping: 32, mass: 0.55 }
+    void animate(trackX, -index * step, {
+      type: "spring",
+      stiffness: 380,
+      damping: 32,
+      mass: 0.55
     });
   }
 
@@ -153,9 +316,11 @@ export function MonobankWalletCarousel({
     }
 
     selectByIndex(targetIndex);
-    void controls.start({
-      x: -targetIndex * step,
-      transition: { type: "spring", stiffness: 380, damping: 32, mass: 0.55 }
+    void animate(trackX, -targetIndex * step, {
+      type: "spring",
+      stiffness: 380,
+      damping: 32,
+      mass: 0.55
     });
   }
 
@@ -181,13 +346,27 @@ export function MonobankWalletCarousel({
           </button>
         ) : null}
 
-        {/* Carousel Viewport Container */}
+        {/* Carousel Viewport Container with Soft Feather Mask */}
         <div
           ref={containerRef}
           className="relative w-full overflow-hidden rounded-[26px] py-2 px-1 -my-2 -mx-1"
+          style={
+            canSwitch
+              ? {
+                  maskImage:
+                    "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
+                  WebkitMaskImage:
+                    "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)"
+                }
+              : undefined
+          }
         >
           <motion.div
-            animate={controls}
+            style={{
+              x: trackX,
+              gap: `${GAP}px`,
+              width: `${cardItems.length * cardWidth + (cardItems.length - 1) * GAP}px`
+            }}
             drag={canSwitch ? "x" : false}
             dragConstraints={{
               left: -((cardItems.length - 1) * step),
@@ -196,148 +375,20 @@ export function MonobankWalletCarousel({
             dragElastic={0.16}
             onDragEnd={handleDragEnd}
             className="flex cursor-grab active:cursor-grabbing touch-pan-y"
-            style={{
-              gap: `${GAP}px`,
-              width: `${cardItems.length * cardWidth + (cardItems.length - 1) * GAP}px`
-            }}
           >
-            {cardItems.map((card, idx) => {
-              const isActive = idx === resolvedIndex;
-              return (
-                <div
-                  key={card.id}
-                  style={{ width: `${cardWidth}px` }}
-                  className="flex-shrink-0"
-                >
-                  <motion.div
-                    animate={{
-                      scale: isActive ? 1 : 0.96,
-                      opacity: isActive ? 1 : 0.72
-                    }}
-                    transition={{ duration: 0.22, ease: "easeOut" }}
-                    className={cn(
-                      "relative flex aspect-[1.586/1] w-full flex-col justify-between overflow-hidden rounded-[24px] p-5 text-white select-none",
-                      card.isAll
-                        ? "bg-gradient-to-br from-[#24272c] via-[#1a1c20] to-[#0f1012] border border-white/10"
-                        : "border border-white/15"
-                    )}
-                    style={
-                      !card.isAll
-                        ? {
-                            background: `linear-gradient(135deg, ${card.color ?? "#207a6f"}dd 0%, #13171b 100%)`,
-                            boxShadow: `0 18px 40px -10px ${card.color ?? "#207a6f"}44, inset 0 1px 0 0 rgba(255,255,255,0.25)`
-                          }
-                        : {
-                            boxShadow:
-                              "0 18px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 0 rgba(255,255,255,0.2)"
-                          }
-                    }
-                  >
-                    {/* Subtle background card watermark pattern */}
-                    <div
-                      className="pointer-events-none absolute -bottom-10 -right-10 h-44 w-44 rounded-full opacity-10 blur-xl"
-                      style={{ backgroundColor: card.color ?? "#ffffff" }}
-                    />
-
-                    {/* Top Row: Wallet Icon & Name + Kind Badge */}
-                    <div className="relative z-10 flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <span
-                          className={cn(
-                            "grid h-9 w-9 place-items-center rounded-control text-white backdrop-blur-md shadow-sm",
-                            card.isAll ? "bg-white/20" : "bg-black/25"
-                          )}
-                        >
-                          {card.isAll ? (
-                            <Layers3 className="h-4 w-4" />
-                          ) : (
-                            <WalletIcon name={card.icon ?? "wallet-cards"} className="h-4 w-4" />
-                          )}
-                        </span>
-                        <span className="text-sm font-semibold tracking-wide text-white drop-shadow-sm">
-                          {card.name}
-                        </span>
-                      </div>
-
-                      {/* Right Badge: Kind */}
-                      <div className="flex items-center gap-1.5 rounded-full bg-black/25 px-2.5 py-1 text-xs font-semibold backdrop-blur-md text-white/90">
-                        {card.isAll ? (
-                          <span>{t.wallets.allWallets}</span>
-                        ) : card.kind === "credit" ? (
-                          <span className="flex items-center gap-1 text-amber-300">
-                            <ShieldCheck className="h-3 w-3" />
-                            Кредитный
-                          </span>
-                        ) : (
-                          <span>{t.common.wallet}</span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Center: Main Balance */}
-                    <div className="relative z-10 my-auto py-2">
-                      <p className="text-xs font-medium uppercase tracking-wider text-white/70">
-                        {t.common.balance}
-                      </p>
-                      <div className="mt-1 flex items-baseline gap-2">
-                        <p className="truncate text-3xl font-extrabold tracking-tight text-white drop-shadow-md sm:text-4xl">
-                          {formatMoney(
-                            card.balanceMinor,
-                            card.currency,
-                            settings.locale,
-                            hideAmounts
-                          )}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Bottom Row: Currency info & Credit Limit bar */}
-                    <div className="relative z-10">
-                      {card.kind === "credit" && card.creditLimitMinor ? (
-                        <div className="mb-2">
-                          <div className="flex justify-between text-[11px] font-medium text-white/70">
-                            <span>Лимит</span>
-                            <span>
-                              {formatMoney(
-                                card.creditLimitMinor,
-                                card.currency,
-                                settings.locale,
-                                hideAmounts
-                              )}
-                            </span>
-                          </div>
-                          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/20">
-                            <div
-                              className="h-full rounded-full bg-accent transition-all duration-300"
-                              style={{
-                                width: `${Math.min(
-                                  100,
-                                  Math.max(
-                                    0,
-                                    ((card.balanceMinor + card.creditLimitMinor) /
-                                      card.creditLimitMinor) *
-                                      100
-                                  )
-                                )}%`
-                              }}
-                            />
-                          </div>
-                        </div>
-                      ) : null}
-
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-white/75">
-                          {card.currency}
-                        </span>
-                        <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm backdrop-blur-md">
-                          {getCurrencyLabel(card.currency)}
-                        </span>
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
-              );
-            })}
+            {cardItems.map((card, idx) => (
+              <CarouselCardSlide
+                key={card.id}
+                card={card}
+                idx={idx}
+                cardWidth={cardWidth}
+                step={step}
+                trackX={trackX}
+                settings={settings}
+                t={t}
+                hideAmounts={hideAmounts}
+              />
+            ))}
           </motion.div>
         </div>
 
