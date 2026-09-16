@@ -12,6 +12,7 @@ import { OfflineIndicator } from "./components/OfflineIndicator";
 import { LockScreen } from "./components/LockScreen";
 import { UpdateAnnouncement } from "./components/UpdateAnnouncement";
 import { WalletSwitcher } from "./components/WalletSwitcher";
+import { DesktopWalletCarousel } from "./components/DesktopWalletCarousel";
 import { ErrorScreen } from "./components/ErrorScreen";
 import { getDictionary } from "./i18n";
 import { applyRootVisualTheme } from "./lib/colorThemes";
@@ -272,28 +273,28 @@ export function App() {
 
   return (
     <div className="app-page-bg min-h-dvh text-foreground md:grid md:grid-cols-[236px_minmax(0,1fr)]">
-      <aside className="app-chrome sticky top-0 hidden h-dvh border-r border-line/60 p-4 md:flex md:flex-col">
+      <aside className="app-chrome sticky top-0 hidden h-dvh p-4 shadow-[1px_0_0_0_rgb(var(--color-foreground)/0.04)] md:flex md:flex-col">
         <div className="mb-7 px-2 pt-2">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">MyFinances</p>
           <h1 className="mt-1 text-2xl font-semibold text-foreground">{t.appName}</h1>
         </div>
         <HeaderNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
         <div className="mt-auto grid gap-2">
-          <div className="rounded-app border border-line/50 px-3 py-2.5 text-xs text-muted">
+          <div className="app-control rounded-app p-3 text-xs text-muted">
             <p className="mb-2 font-semibold uppercase tracking-wide">{t.shortcuts.title}</p>
             <div className="grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1.5">
-              <kbd className="rounded border border-line/70 bg-elevated px-1.5 py-0.5 font-mono text-foreground">
+              <kbd className="rounded-md bg-surface/80 px-1.5 py-0.5 font-mono text-foreground shadow-sm">
                 Ctrl N
               </kbd>
               <span>{t.shortcuts.newTransaction}</span>
-              <kbd className="rounded border border-line/70 bg-elevated px-1.5 py-0.5 font-mono text-foreground">
+              <kbd className="rounded-md bg-surface/80 px-1.5 py-0.5 font-mono text-foreground shadow-sm">
                 Ctrl K
               </kbd>
               <span>{t.shortcuts.search}</span>
             </div>
           </div>
           {showsWalletContext ? (
-            <div className="rounded-app border border-line/60 bg-elevated/70 p-3">
+            <div className="app-surface rounded-app p-3.5">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">
                 {t.common.wallet}
               </p>
@@ -334,16 +335,30 @@ export function App() {
         </div>
         {showsWalletContext ? (
           <div className={activeView === "add" ? "mb-6" : "mb-6 hidden md:block"}>
-            <WalletSwitcher
-              wallets={wallets}
-              value={activeView === "add" ? addWalletId : activeWalletId}
-              label={t.common.wallet}
-              allLabel={t.wallets.allWallets}
-              allCurrency={settings.currency}
-              className="w-full"
-              includeAll={activeView !== "add"}
-              onChange={handleWalletChange}
-            />
+            {activeView === "dashboard" ? (
+              <DesktopWalletCarousel
+                wallets={wallets}
+                activeWalletId={activeWalletId}
+                transactions={transactions}
+                transfers={walletTransfers}
+                settings={settings}
+                t={t}
+                displayCurrency={displayCurrency}
+                onChange={handleWalletChange}
+                onAdd={() => setActiveView("add")}
+              />
+            ) : (
+              <WalletSwitcher
+                wallets={wallets}
+                value={activeView === "add" ? addWalletId : activeWalletId}
+                label={t.common.wallet}
+                allLabel={t.wallets.allWallets}
+                allCurrency={settings.currency}
+                className="w-full"
+                includeAll={activeView !== "add"}
+                onChange={handleWalletChange}
+              />
+            )}
           </div>
         ) : null}
         <motion.div

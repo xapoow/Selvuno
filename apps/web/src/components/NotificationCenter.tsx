@@ -100,44 +100,44 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
             notifications.map((notification) => {
               const isRead = readSet.has(notification.id);
               return (
-                <button
-                  key={notification.id}
-                  type="button"
-                  className={cn(
-                    "app-focus flex w-full gap-3 rounded-app border border-line/60 bg-elevated p-3 text-left transition-opacity",
-                    isRead && "opacity-60"
-                  )}
-                  onClick={() => {
-                    markAsRead(notification.id);
-                    setOpen(false);
-                    setSelected(notification);
-                  }}
-                >
-                  <span
+                  <button
+                    key={notification.id}
+                    type="button"
                     className={cn(
-                      "grid h-10 w-10 shrink-0 place-items-center rounded-app",
-                      toneStyles[notification.tone]
+                      "app-focus app-control flex w-full gap-3 rounded-app p-3.5 text-left transition-opacity",
+                      isRead && "opacity-60"
                     )}
+                    onClick={() => {
+                      markAsRead(notification.id);
+                      setOpen(false);
+                      setSelected(notification);
+                    }}
                   >
-                    <NotificationIcon tone={notification.tone} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-semibold text-foreground">
-                      {notification.title}
+                    <span
+                      className={cn(
+                        "grid h-10 w-10 shrink-0 place-items-center rounded-control",
+                        toneStyles[notification.tone]
+                      )}
+                    >
+                      <NotificationIcon tone={notification.tone} />
                     </span>
-                    <span className="mt-1 block text-sm leading-5 text-muted">
-                      {notification.body}
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold text-foreground">
+                        {notification.title}
+                      </span>
+                      <span className="mt-1 block text-sm leading-5 text-muted">
+                        {notification.body}
+                      </span>
                     </span>
-                  </span>
-                  {isRead ? <Check className="mt-1 h-4 w-4 shrink-0 text-accent" /> : null}
-                </button>
-              );
-            })
-          ) : (
-            <p className="rounded-app border border-line/60 bg-elevated p-5 text-center text-sm text-muted">
-              {t.notifications.empty}
-            </p>
-          )}
+                    {isRead ? <Check className="mt-1 h-4 w-4 shrink-0 text-accent" /> : null}
+                  </button>
+                );
+              })
+            ) : (
+              <p className="app-control rounded-app p-5 text-center text-sm text-muted">
+                {t.notifications.empty}
+              </p>
+            )}
         </div>
         {unreadCount ? (
           <Button className="mt-4 w-full" variant="secondary" onClick={markAllAsRead}>

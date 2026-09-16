@@ -22,12 +22,12 @@ export function BottomNavigation({ activeView, labels, onChange }: BottomNavigat
               onClick={() => onChange(item.view)}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "app-focus grid h-12 place-items-center rounded-app text-[11px] font-medium text-muted outline-none active:scale-[0.98]",
-                isActive && "app-navigation-active"
+                "app-focus grid h-12 place-items-center rounded-control text-[11px] font-medium text-muted outline-none transition-all active:scale-[0.96]",
+                isActive ? "app-navigation-active font-semibold" : "hover:text-foreground"
               )}
             >
-              <Icon className="h-5 w-5" />
-              <span>{labels[item.view]}</span>
+              <Icon className={cn("h-5 w-5 transition-transform", isActive && "scale-105")} />
+              <span className="tracking-tight">{labels[item.view]}</span>
             </button>
           );
         })}
