@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Settings, Transaction, Wallet, WalletTransfer, WalletView } from "@myfinances/types";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import { ChevronLeft, ChevronRight, Layers3, ShieldCheck, WalletCards } from "lucide-react";
@@ -32,6 +32,26 @@ export interface MonobankCardData {
   creditLimitMinor?: number;
 }
 
+const cardVariants = {
+  enter: (dir: number) => ({
+    x: (dir || 1) > 0 ? "100%" : "-100%",
+    opacity: 0,
+    scale: 0.94
+  }),
+  center: {
+    zIndex: 1,
+    x: 0,
+    opacity: 1,
+    scale: 1
+  },
+  exit: (dir: number) => ({
+    zIndex: 0,
+    x: (dir || 1) > 0 ? "-100%" : "100%",
+    opacity: 0,
+    scale: 0.94
+  })
+};
+
 export function MonobankWalletCarousel({
   wallets,
   activeWalletId,
@@ -42,7 +62,7 @@ export function MonobankWalletCarousel({
   onChange,
   className
 }: MonobankWalletCarouselProps) {
-  const [transitionDirection, setTransitionDirection] = useState(0);
+  const [transitionDirection, setTransitionDirection] = useState(1);
 
   const includedWalletIds = useMemo(
     () => getIncludedWalletIds(wallets, settings.advancedWalletsEnabled),
@@ -67,7 +87,8 @@ export function MonobankWalletCarousel({
       isAll: true
     };
 
-    const walletCards: MonobankCardData[] = wallets
+    // 2. Individual wallet cards
+    const individualCards: MonobankCardData[] = wallets
       .filter((w) => !w.deletedAt)
       .map((wallet) => {
         const totals = calculateWalletTotals(wallet, transactions, transfers);
@@ -84,24 +105,33 @@ export function MonobankWalletCarousel({
         };
       });
 
-    return [allCard, ...walletCards];
-  }, [wallets, includedWalletIds, transactions, transfers, settings.currency, t.wallets.allWallets]);
+    return [allCard, ...individualCards];
+  }, [wallets, transactions, transfers, settings.currency, includedWalletIds, t.wallets.allWallets]);
 
-  const activeIndex = cardItems.findIndex((item) => item.id === activeWalletId);
-  const resolvedIndex = activeIndex >= 0 ? activeIndex : 0;
+  const rawIndex = cardItems.findIndex((item) => item.id === activeWalletId);
+  const resolvedIndex = rawIndex >= 0 ? rawIndex : 0;
   const currentCard = cardItems[resolvedIndex] ?? cardItems[0];
   const canSwitch = cardItems.length > 1;
+
+  const prevIndexRef = useRef(resolvedIndex);
+  useEffect(() => {
+    if (resolvedIndex !== prevIndexRef.current) {
+      setTransitionDirection(resolvedIndex > prevIndexRef.current ? 1 : -1);
+      prevIndexRef.current = resolvedIndex;
+    }
+  }, [resolvedIndex]);
 
   function selectByIndex(index: number) {
     if (index === resolvedIndex || index < 0 || index >= cardItems.length) return;
     const direction = index > resolvedIndex ? 1 : -1;
+    prevIndexRef.current = resolvedIndex;
     setTransitionDirection(direction);
     onChange(cardItems[index].id, direction);
   }
 
   function handleDragEnd(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) {
     if (!canSwitch) return;
-    const swipeThreshold = 45;
+    const swipeThreshold = 40;
     const velocityThreshold = 300;
 
     if (info.offset.x < -swipeThreshold || info.velocity.x < -velocityThreshold) {
@@ -137,45 +167,38 @@ export function MonobankWalletCarousel({
           </button>
         ) : null}
 
-        {/* Main Swipeable Card Deck */}
-        <motion.div
-          drag={canSwitch ? "x" : false}
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.16}
-          dragSnapToOrigin
-          onDragEnd={handleDragEnd}
-          className="relative w-full cursor-grab active:cursor-grabbing touch-pan-y"
+        {/* Main Swipeable Card Deck Viewport */}
+        <div
+          className="relative w-full aspect-[1.586/1] overflow-hidden rounded-[24px]"
+          style={
+            !currentCard.isAll
+              ? {
+                  boxShadow: `0 18px 40px -10px ${currentCard.color ?? "#207a6f"}44`
+                }
+              : {
+                  boxShadow: "0 18px 40px -10px rgba(0,0,0,0.5)"
+                }
+          }
         >
-          <AnimatePresence initial={false} mode="wait" custom={transitionDirection}>
+          <AnimatePresence initial={false} custom={transitionDirection}>
             <motion.div
               key={currentCard.id}
               custom={transitionDirection}
-              initial={{
-                opacity: 0,
-                x: transitionDirection * 40,
-                scale: 0.95,
-                rotateY: transitionDirection * 6
-              }}
-              animate={{
-                opacity: 1,
-                x: 0,
-                scale: 1,
-                rotateY: 0
-              }}
-              exit={{
-                opacity: 0,
-                x: transitionDirection * -40,
-                scale: 0.95,
-                rotateY: transitionDirection * -6
-              }}
+              variants={cardVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
               transition={{
-                type: "spring",
-                stiffness: 380,
-                damping: 32,
-                mass: 0.7
+                x: { type: "spring", stiffness: 340, damping: 30, mass: 0.6 },
+                opacity: { duration: 0.22, ease: "easeInOut" },
+                scale: { duration: 0.25, ease: "easeOut" }
               }}
+              drag={canSwitch ? "x" : false}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.2}
+              onDragEnd={handleDragEnd}
               className={cn(
-                "relative flex aspect-[1.586/1] w-full flex-col justify-between overflow-hidden rounded-[24px] p-5 text-white shadow-2xl transition-all",
+                "absolute inset-0 flex flex-col justify-between p-5 text-white cursor-grab active:cursor-grabbing touch-pan-y select-none",
                 currentCard.isAll
                   ? "bg-gradient-to-br from-[#24272c] via-[#1a1c20] to-[#0f1012] border border-white/10"
                   : "border border-white/15"
@@ -184,11 +207,10 @@ export function MonobankWalletCarousel({
                 !currentCard.isAll
                   ? {
                       background: `linear-gradient(135deg, ${currentCard.color ?? "#207a6f"}dd 0%, #13171b 100%)`,
-                      boxShadow: `0 18px 40px -10px ${currentCard.color ?? "#207a6f"}44, inset 0 1px 0 0 rgba(255,255,255,0.25)`
+                      boxShadow: "inset 0 1px 0 0 rgba(255,255,255,0.25)"
                     }
                   : {
-                      boxShadow:
-                        "0 18px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 0 rgba(255,255,255,0.2)"
+                      boxShadow: "inset 0 1px 0 0 rgba(255,255,255,0.2)"
                     }
               }
             >
@@ -295,7 +317,7 @@ export function MonobankWalletCarousel({
               </div>
             </motion.div>
           </AnimatePresence>
-        </motion.div>
+        </div>
 
         {/* Next Card Peek (right preview button) */}
         {canGoNext ? (
