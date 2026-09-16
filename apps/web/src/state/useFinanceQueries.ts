@@ -5,6 +5,7 @@ import type {
   RecurringTransactionInput,
   SavingsGoalContributionInput,
   SavingsGoalInput,
+  Settings,
   SettingsUpdate,
   TransactionInput,
   TransactionTemplateInput,
@@ -276,7 +277,29 @@ export function useFinanceMutations() {
     }),
     updateSettings: useMutation({
       mutationFn: (update: SettingsUpdate) => settingsRepository.updateSettings(update),
-      onSuccess: invalidate
+      onMutate: async (update) => {
+        await queryClient.cancelQueries({ queryKey: queryKeys.settings });
+        const previousSettings = queryClient.getQueryData<Settings>(queryKeys.settings);
+        if (previousSettings) {
+          queryClient.setQueryData<Settings>(queryKeys.settings, {
+            ...previousSettings,
+            ...update
+          });
+        }
+        return { previousSettings };
+      },
+      onError: (_err, _update, context) => {
+        if (context?.previousSettings) {
+          queryClient.setQueryData(queryKeys.settings, context.previousSettings);
+        }
+      },
+      onSuccess: (_data, update) => {
+        if (update.currency || update.locale || update.advancedWalletsEnabled !== undefined) {
+          invalidate();
+        } else {
+          void queryClient.invalidateQueries({ queryKey: queryKeys.settings });
+        }
+      }
     }),
     exportBackup: useMutation({
       mutationFn: () => backupRepository.exportBackup()

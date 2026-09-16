@@ -155,10 +155,14 @@ export function App() {
     return () => window.clearTimeout(timer);
   }, [backupRevision, isLoading, settings?.onboardingCompleted]);
 
+  const [selectedWalletId, setSelectedWalletId] = useState<WalletView | null>(null);
+
   const activeWalletId: WalletView =
-    settings && (settings.activeWalletId === "all" || wallets.some((wallet) => wallet.id === settings.activeWalletId))
-      ? settings.activeWalletId
-      : "all";
+    selectedWalletId !== null && (selectedWalletId === "all" || wallets.some((wallet) => wallet.id === selectedWalletId))
+      ? selectedWalletId
+      : settings && (settings.activeWalletId === "all" || wallets.some((wallet) => wallet.id === settings.activeWalletId))
+        ? settings.activeWalletId
+        : "all";
   const activeWallet = activeWalletId === "all" ? undefined : wallets.find((wallet) => wallet.id === activeWalletId);
   const displayCurrency = settings ? activeWallet?.currency ?? settings.currency : "USD";
   const includedWalletIds = getIncludedWalletIds(
@@ -193,6 +197,7 @@ export function App() {
   );
   const exchangeRates = useExchangeRates(displayCurrency, conversionNeeded);
   const handleWalletChange = (nextWalletId: WalletView, direction = 1) => {
+    setSelectedWalletId(nextWalletId);
     setWalletTransitionDirection(direction);
     void mutations.updateSettings.mutateAsync({ activeWalletId: nextWalletId });
   };

@@ -34,7 +34,7 @@ export interface MonobankCardData {
 
 const cardVariants = {
   enter: (dir: number) => ({
-    x: (dir || 1) > 0 ? "100%" : "-100%",
+    x: (dir || 1) > 0 ? 440 : -440,
     opacity: 0,
     scale: 0.94
   }),
@@ -46,7 +46,7 @@ const cardVariants = {
   },
   exit: (dir: number) => ({
     zIndex: 0,
-    x: (dir || 1) > 0 ? "-100%" : "100%",
+    x: (dir || 1) > 0 ? -440 : 440,
     opacity: 0,
     scale: 0.94
   })
@@ -63,6 +63,11 @@ export function MonobankWalletCarousel({
   className
 }: MonobankWalletCarouselProps) {
   const [transitionDirection, setTransitionDirection] = useState(1);
+  const [internalActiveId, setInternalActiveId] = useState<WalletView>(activeWalletId);
+
+  useEffect(() => {
+    setInternalActiveId(activeWalletId);
+  }, [activeWalletId]);
 
   const includedWalletIds = useMemo(
     () => getIncludedWalletIds(wallets, settings.advancedWalletsEnabled),
@@ -108,7 +113,7 @@ export function MonobankWalletCarousel({
     return [allCard, ...individualCards];
   }, [wallets, transactions, transfers, settings.currency, includedWalletIds, t.wallets.allWallets]);
 
-  const rawIndex = cardItems.findIndex((item) => item.id === activeWalletId);
+  const rawIndex = cardItems.findIndex((item) => item.id === internalActiveId);
   const resolvedIndex = rawIndex >= 0 ? rawIndex : 0;
   const currentCard = cardItems[resolvedIndex] ?? cardItems[0];
   const canSwitch = cardItems.length > 1;
@@ -126,13 +131,14 @@ export function MonobankWalletCarousel({
     const direction = index > resolvedIndex ? 1 : -1;
     prevIndexRef.current = resolvedIndex;
     setTransitionDirection(direction);
+    setInternalActiveId(cardItems[index].id);
     onChange(cardItems[index].id, direction);
   }
 
   function handleDragEnd(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) {
     if (!canSwitch) return;
-    const swipeThreshold = 40;
-    const velocityThreshold = 300;
+    const swipeThreshold = 35;
+    const velocityThreshold = 250;
 
     if (info.offset.x < -swipeThreshold || info.velocity.x < -velocityThreshold) {
       if (resolvedIndex < cardItems.length - 1) {
@@ -189,9 +195,9 @@ export function MonobankWalletCarousel({
               animate="center"
               exit="exit"
               transition={{
-                x: { type: "spring", stiffness: 340, damping: 30, mass: 0.6 },
-                opacity: { duration: 0.22, ease: "easeInOut" },
-                scale: { duration: 0.25, ease: "easeOut" }
+                x: { type: "spring", stiffness: 380, damping: 32, mass: 0.55 },
+                opacity: { duration: 0.2, ease: "easeInOut" },
+                scale: { duration: 0.22, ease: "easeOut" }
               }}
               drag={canSwitch ? "x" : false}
               dragConstraints={{ left: 0, right: 0 }}
