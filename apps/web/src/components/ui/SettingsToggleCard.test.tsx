@@ -4,6 +4,34 @@ import { describe, expect, it, vi } from "vitest";
 import { SettingsToggleCard } from "./SettingsToggleCard";
 
 describe("SettingsToggleCard", () => {
+  it("keeps the thumb inside the track in both states", () => {
+    const { rerender } = render(
+      <SettingsToggleCard
+        checked={false}
+        icon={<span />}
+        label="Setting"
+        hint="Hint"
+        onChange={vi.fn()}
+      />
+    );
+
+    const getThumb = () => screen.getByRole("switch").querySelector("span > span");
+    expect(getThumb()).toHaveClass("left-0.5", "translate-x-0");
+    expect(getThumb()).not.toHaveClass("translate-x-6");
+
+    rerender(
+      <SettingsToggleCard
+        checked
+        icon={<span />}
+        label="Setting"
+        hint="Hint"
+        onChange={vi.fn()}
+      />
+    );
+
+    expect(getThumb()).toHaveClass("left-0.5", "translate-x-6");
+  });
+
   it("prevents repeated changes while a setting is being saved", async () => {
     const user = userEvent.setup();
     let finishSaving: (() => void) | undefined;
