@@ -206,7 +206,6 @@ export function MonobankWalletCarousel({
   className
 }: MonobankWalletCarouselProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(0);
   const [internalActiveId, setInternalActiveId] = useState<WalletView>(activeWalletId);
 
   useEffect(() => {
@@ -261,11 +260,18 @@ export function MonobankWalletCarousel({
   const resolvedIndex = rawIndex >= 0 ? rawIndex : 0;
   const canSwitch = cardItems.length > 1;
 
+  const [containerWidth, setContainerWidth] = useState(() =>
+    typeof window !== "undefined" ? Math.min(window.innerWidth - 32, 440) : 340
+  );
+
   useEffect(() => {
     if (!containerRef.current) return;
     const updateWidth = () => {
       if (containerRef.current) {
-        setContainerWidth(containerRef.current.offsetWidth);
+        const w = containerRef.current.clientWidth;
+        if (w > 0) {
+          setContainerWidth(w);
+        }
       }
     };
     updateWidth();
@@ -275,13 +281,13 @@ export function MonobankWalletCarousel({
   }, []);
 
   const peek = canSwitch
-    ? containerWidth < 420
-      ? 24
+    ? containerWidth < 400
+      ? 18
       : containerWidth < 520
-        ? 32
-        : 40
+        ? 28
+        : 36
     : 0;
-  const cardWidth = containerWidth ? Math.max(260, containerWidth - peek * 2) : 380;
+  const cardWidth = Math.max(240, containerWidth - peek * 2);
   const step = cardWidth + GAP;
   const trackX = useMotionValue(peek - resolvedIndex * step);
 
@@ -338,12 +344,12 @@ export function MonobankWalletCarousel({
   const hideAmounts = settings.hideAmounts;
   const canGoPrev = resolvedIndex > 0;
   const canGoNext = resolvedIndex < cardItems.length - 1;
-  const fadeWidth = Math.max(12, peek - 8);
+  const fadeWidth = Math.max(10, peek - 6);
 
   return (
-    <div className={cn("relative mx-auto w-full max-w-lg md:max-w-xl select-none", className)}>
+    <div className={cn("relative mx-auto w-full max-w-full select-none md:max-w-xl", className)}>
       {/* Monobank Card Viewport */}
-      <div className="relative flex items-center justify-center">
+      <div className="relative flex w-full min-w-0 items-center justify-center">
         {/* Previous Card Peek (left preview button) */}
         {canGoPrev ? (
           <button
@@ -359,7 +365,7 @@ export function MonobankWalletCarousel({
         {/* Carousel Viewport Container with Soft Feather Mask */}
         <div
           ref={containerRef}
-          className="relative w-full overflow-hidden rounded-[26px] py-2 px-1 -my-2 -mx-1"
+          className="relative w-full max-w-full overflow-hidden rounded-[26px] py-2"
           style={
             canSwitch
               ? {
@@ -372,8 +378,7 @@ export function MonobankWalletCarousel({
           <motion.div
             style={{
               x: trackX,
-              gap: `${GAP}px`,
-              width: `${cardItems.length * cardWidth + (cardItems.length - 1) * GAP}px`
+              gap: `${GAP}px`
             }}
             drag={canSwitch ? "x" : false}
             dragConstraints={{
@@ -382,7 +387,7 @@ export function MonobankWalletCarousel({
             }}
             dragElastic={0.16}
             onDragEnd={handleDragEnd}
-            className="flex cursor-grab active:cursor-grabbing touch-pan-y"
+            className="flex min-w-0 cursor-grab active:cursor-grabbing touch-pan-y"
           >
             {cardItems.map((card, idx) => (
               <CarouselCardSlide

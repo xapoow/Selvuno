@@ -9,6 +9,14 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.8.0",
+      notes: [
+        "Устранено растягивание страницы и переполнение карусели на смартфонах",
+        "PWA-манифест синхронизирован с тёмной темой для статусной строки Android и WebAPK",
+        "Блокировка зума и корректный масштаб карточек на мобильных экранах"
+      ]
+    },
+    {
       version: "0.7.9",
       notes: [
         "Адаптивный статус-бар для смартфонов в тёмной теме под цвет выбранной схемы",
@@ -82,6 +90,14 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.8.0",
+      notes: [
+        "Eliminated horizontal page stretch and carousel overflow on mobile phones",
+        "Synchronized PWA manifest with dark theme for Android and WebAPK status bar",
+        "Scale protection and responsive card sizing for mobile screens"
+      ]
+    },
     {
       version: "0.7.9",
       notes: [

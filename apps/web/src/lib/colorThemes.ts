@@ -58,28 +58,27 @@ export function applyRootVisualTheme(theme: ThemePreference, colorTheme: ColorTh
   const modeKey = shouldUseDark ? "dark" : "light";
   const hex = themeBackgroundHex[modeKey]?.[activeColorTheme] || (shouldUseDark ? "#101412" : "#f5f8f5");
 
-  // Update or insert all theme-color meta tags with hex color for mobile browsers
-  const themeColorMetas = document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]');
-  if (themeColorMetas.length) {
-    themeColorMetas.forEach((meta) => {
-      meta.content = hex;
-      meta.removeAttribute("media");
-    });
+  // Update or insert single theme-color meta tag with hex color for mobile browsers
+  const themeColorMeta = (document.getElementById("theme-color-meta") as HTMLMetaElement | null) || document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  if (themeColorMeta) {
+    themeColorMeta.setAttribute("content", hex);
+    themeColorMeta.removeAttribute("media");
   } else {
     const meta = document.createElement("meta");
     meta.name = "theme-color";
-    meta.content = hex;
+    meta.id = "theme-color-meta";
+    meta.setAttribute("content", hex);
     document.head.appendChild(meta);
   }
 
   // Update Apple Mobile Web App status bar style
   const appleStatusBarMeta = document.querySelector<HTMLMetaElement>('meta[name="apple-mobile-web-app-status-bar-style"]');
   if (appleStatusBarMeta) {
-    appleStatusBarMeta.content = shouldUseDark ? "black-translucent" : "default";
+    appleStatusBarMeta.setAttribute("content", shouldUseDark ? "black-translucent" : "default");
   } else {
     const meta = document.createElement("meta");
     meta.name = "apple-mobile-web-app-status-bar-style";
-    meta.content = shouldUseDark ? "black-translucent" : "default";
+    meta.setAttribute("content", shouldUseDark ? "black-translucent" : "default");
     document.head.appendChild(meta);
   }
 }

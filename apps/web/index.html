@@ -2,9 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f5f8f5" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101412" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#101412" id="theme-color-meta" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -34,10 +33,10 @@
             dark: { sage: "#101412", rose: "#151214", violet: "#131217", sky: "#101316", amber: "#151310", graphite: "#121314", mint: "#0f1513", coral: "#161211" }
           };
           var hex = (hexMap[dark ? "dark" : "light"] && hexMap[dark ? "dark" : "light"][colorTheme]) || (dark ? "#101412" : "#f5f8f5");
-          var metas = document.querySelectorAll('meta[name="theme-color"]');
-          metas.forEach(function (m) { m.content = hex; m.removeAttribute("media"); });
+          var meta = document.getElementById("theme-color-meta") || document.querySelector('meta[name="theme-color"]');
+          if (meta) { meta.setAttribute("content", hex); }
           var appleMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-          if (appleMeta) { appleMeta.content = dark ? "black-translucent" : "default"; }
+          if (appleMeta) { appleMeta.setAttribute("content", dark ? "black-translucent" : "default"); }
         } catch (e) {}
       })();
     </script>

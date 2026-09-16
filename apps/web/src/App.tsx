@@ -312,7 +312,7 @@ export function App() {
         </div>
       </aside>
 
-      <main className="mx-auto w-full max-w-[1180px] px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:px-8 md:pb-10 md:pt-7 lg:px-10">
+      <main className="mx-auto w-full min-w-0 max-w-[1180px] overflow-x-hidden px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:px-8 md:pb-10 md:pt-7 lg:px-10">
         <div className="mb-3 flex justify-end gap-1">
           <button
             type="button"
