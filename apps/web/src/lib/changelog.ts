@@ -9,6 +9,14 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.8.1",
+      notes: [
+        "Исправлен неконтролируемый рост карточек кошельков на узких экранах",
+        "Восстановлены стабильные границы свайпа без растягивания страницы",
+        "Обновлены цвета status bar PWA и фон безопасной области при запуске"
+      ]
+    },
+    {
       version: "0.8.0",
       notes: [
         "Устранено растягивание страницы и переполнение карусели на смартфонах",
@@ -90,6 +98,14 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.8.1",
+      notes: [
+        "Fixed runaway wallet card sizing on narrow mobile screens",
+        "Restored stable swipe bounds without stretching the page",
+        "Refreshed PWA status bar colors and safe-area startup background"
+      ]
+    },
     {
       version: "0.8.0",
       notes: [
