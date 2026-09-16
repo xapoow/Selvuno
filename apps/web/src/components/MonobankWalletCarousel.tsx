@@ -32,13 +32,14 @@ export interface MonobankCardData {
   creditLimitMinor?: number;
 }
 
-const GAP = 16;
+const GAP = 14;
 
 interface CarouselCardSlideProps {
   card: MonobankCardData;
   idx: number;
   cardWidth: number;
   step: number;
+  peek: number;
   trackX: MotionValue<number>;
   settings: Settings;
   t: Dictionary;
@@ -50,16 +51,17 @@ function CarouselCardSlide({
   idx,
   cardWidth,
   step,
+  peek,
   trackX,
   settings,
   t,
   hideAmounts
 }: CarouselCardSlideProps) {
-  const centerPos = -idx * step;
+  const centerPos = peek - idx * step;
   const opacity = useTransform(
     trackX,
-    [centerPos - step, centerPos, centerPos + step],
-    [0.18, 1, 0.18]
+    [centerPos - step, centerPos - step * 0.35, centerPos, centerPos + step * 0.35, centerPos + step],
+    [0.2, 0.96, 1, 0.96, 0.2]
   );
   const scale = useTransform(
     trackX,
@@ -272,31 +274,44 @@ export function MonobankWalletCarousel({
     return () => ro.disconnect();
   }, []);
 
-  const cardWidth = containerWidth || 380;
+  const peek = canSwitch
+    ? containerWidth < 420
+      ? 24
+      : containerWidth < 520
+        ? 32
+        : 40
+    : 0;
+  const cardWidth = containerWidth ? Math.max(260, containerWidth - peek * 2) : 380;
   const step = cardWidth + GAP;
-  const trackX = useMotionValue(-resolvedIndex * step);
+  const trackX = useMotionValue(peek - resolvedIndex * step);
 
   useEffect(() => {
     if (!containerWidth) return;
-    void animate(trackX, -resolvedIndex * step, {
+    void animate(trackX, peek - resolvedIndex * step, {
       type: "spring",
       stiffness: 380,
       damping: 32,
       mass: 0.55
     });
-  }, [resolvedIndex, containerWidth, step, trackX]);
+  }, [resolvedIndex, containerWidth, step, trackX, peek]);
+
+  function snapTo(index: number, fireChange = true) {
+    if (index < 0 || index >= cardItems.length) return;
+    if (fireChange && index !== resolvedIndex) {
+      const direction = index > resolvedIndex ? 1 : -1;
+      setInternalActiveId(cardItems[index].id);
+      onChange(cardItems[index].id, direction);
+    }
+    void animate(trackX, peek - index * step, {
+      type: "spring",
+      stiffness: 380,
+      damping: 32,
+      mass: 0.55
+    });
+  }
 
   function selectByIndex(index: number) {
-    if (index < 0 || index >= cardItems.length) return;
-    const direction = index > resolvedIndex ? 1 : -1;
-    setInternalActiveId(cardItems[index].id);
-    onChange(cardItems[index].id, direction);
-    void animate(trackX, -index * step, {
-      type: "spring",
-      stiffness: 380,
-      damping: 32,
-      mass: 0.55
-    });
+    snapTo(index, true);
   }
 
   function handleDragEnd(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) {
@@ -315,13 +330,7 @@ export function MonobankWalletCarousel({
       }
     }
 
-    selectByIndex(targetIndex);
-    void animate(trackX, -targetIndex * step, {
-      type: "spring",
-      stiffness: 380,
-      damping: 32,
-      mass: 0.55
-    });
+    snapTo(targetIndex, targetIndex !== resolvedIndex);
   }
 
   if (!cardItems.length) return null;
@@ -329,9 +338,10 @@ export function MonobankWalletCarousel({
   const hideAmounts = settings.hideAmounts;
   const canGoPrev = resolvedIndex > 0;
   const canGoNext = resolvedIndex < cardItems.length - 1;
+  const fadeWidth = Math.max(12, peek - 8);
 
   return (
-    <div className={cn("relative mx-auto w-full max-w-md select-none", className)}>
+    <div className={cn("relative mx-auto w-full max-w-lg md:max-w-xl select-none", className)}>
       {/* Monobank Card Viewport */}
       <div className="relative flex items-center justify-center">
         {/* Previous Card Peek (left preview button) */}
@@ -353,10 +363,8 @@ export function MonobankWalletCarousel({
           style={
             canSwitch
               ? {
-                  maskImage:
-                    "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
-                  WebkitMaskImage:
-                    "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)"
+                  maskImage: `linear-gradient(to right, transparent 0px, black ${fadeWidth}px, black calc(100% - ${fadeWidth}px), transparent 100%)`,
+                  WebkitMaskImage: `linear-gradient(to right, transparent 0px, black ${fadeWidth}px, black calc(100% - ${fadeWidth}px), transparent 100%)`
                 }
               : undefined
           }
@@ -369,8 +377,8 @@ export function MonobankWalletCarousel({
             }}
             drag={canSwitch ? "x" : false}
             dragConstraints={{
-              left: -((cardItems.length - 1) * step),
-              right: 0
+              left: peek - (cardItems.length - 1) * step,
+              right: peek
             }}
             dragElastic={0.16}
             onDragEnd={handleDragEnd}
@@ -383,6 +391,7 @@ export function MonobankWalletCarousel({
                 idx={idx}
                 cardWidth={cardWidth}
                 step={step}
+                peek={peek}
                 trackX={trackX}
                 settings={settings}
                 t={t}

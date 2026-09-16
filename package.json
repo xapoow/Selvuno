@@ -1,7 +1,7 @@
 {
   "name": "myfinances",
   "private": true,
-  "version": "0.7.6",
+  "version": "0.7.7",
   "packageManager": "pnpm@10.12.4",
   "scripts": {
     "dev": "corepack pnpm --filter @myfinances/web dev",
