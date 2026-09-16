@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.7.9";
+export const appVersion = "0.8.0";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -969,9 +969,9 @@ export const dictionaries: Record<Language, Dictionary> = {
       intro: "More control on every device, with privacy and productivity features that stay optional.",
       gotIt: "Explore the update",
       notes: [
-        "Adaptive mobile status bar in dark theme matching the active color scheme",
-        "Preserve complete changelog history across updates in notifications",
-        "Crisp active card display and widened carousel boundaries"
+        "Eliminated horizontal page stretch and carousel overflow on mobile phones",
+        "Synchronized PWA manifest with dark theme for Android and WebAPK status bar",
+        "Scale protection and responsive card sizing for mobile screens"
       ]
     },
     categories: {
@@ -1579,9 +1579,9 @@ export const dictionaries: Record<Language, Dictionary> = {
       intro: "Больше контроля на любом устройстве — приватность и дополнительные возможности остаются опциональными.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Адаптивный статус-бар для смартфонов в тёмной теме под цвет выбранной схемы",
-        "Сохранение истории changelog всех обновлений в уведомлениях",
-        "Чёткое отображение активной карты карусели и расширенные границы"
+        "Устранено растягивание страницы и переполнение карусели на смартфонах",
+        "PWA-манифест синхронизирован с тёмной темой для статусной строки Android и WebAPK",
+        "Блокировка зума и корректный масштаб карточек на мобильных экранах"
       ]
     },
     categories: {

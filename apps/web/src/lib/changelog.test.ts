@@ -15,10 +15,10 @@ describe("changelog", () => {
 
   it("returns builtin changelogs in descending order", () => {
     const list = getChangelogHistory("ru-RU");
-    expect(list.length).toBeGreaterThanOrEqual(9);
-    expect(list[0].version).toBe("0.7.9");
-    expect(list[1].version).toBe("0.7.8");
-    expect(list[2].version).toBe("0.7.7");
+    expect(list.length).toBeGreaterThanOrEqual(10);
+    expect(list[0].version).toBe("0.8.0");
+    expect(list[1].version).toBe("0.7.9");
+    expect(list[2].version).toBe("0.7.8");
   });
 
   it("preserves stored changelog history from previous versions", () => {
