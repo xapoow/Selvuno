@@ -58,18 +58,23 @@ export function applyRootVisualTheme(theme: ThemePreference, colorTheme: ColorTh
   const modeKey = shouldUseDark ? "dark" : "light";
   const hex = themeBackgroundHex[modeKey]?.[activeColorTheme] || (shouldUseDark ? "#101412" : "#f5f8f5");
 
-  // Update or insert single theme-color meta tag with hex color for mobile browsers
-  const themeColorMeta = (document.getElementById("theme-color-meta") as HTMLMetaElement | null) || document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-  if (themeColorMeta) {
-    themeColorMeta.setAttribute("content", hex);
-    themeColorMeta.removeAttribute("media");
+  // Keep every browser and installed-PWA theme source in sync. Some mobile
+  // browsers choose a matching media-tag before application JavaScript runs.
+  const themeColorMetas = document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]');
+  if (themeColorMetas.length) {
+    themeColorMetas.forEach((meta) => {
+      meta.content = hex;
+      meta.removeAttribute("media");
+    });
   } else {
     const meta = document.createElement("meta");
     meta.name = "theme-color";
-    meta.id = "theme-color-meta";
     meta.setAttribute("content", hex);
     document.head.appendChild(meta);
   }
+
+  document.documentElement.style.backgroundColor = hex;
+  document.body.style.backgroundColor = hex;
 
   // Update Apple Mobile Web App status bar style
   const appleStatusBarMeta = document.querySelector<HTMLMetaElement>('meta[name="apple-mobile-web-app-status-bar-style"]');

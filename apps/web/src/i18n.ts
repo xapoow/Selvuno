@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.8.0";
+export const appVersion = "0.8.1";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -969,9 +969,9 @@ export const dictionaries: Record<Language, Dictionary> = {
       intro: "More control on every device, with privacy and productivity features that stay optional.",
       gotIt: "Explore the update",
       notes: [
-        "Eliminated horizontal page stretch and carousel overflow on mobile phones",
-        "Synchronized PWA manifest with dark theme for Android and WebAPK status bar",
-        "Scale protection and responsive card sizing for mobile screens"
+        "Fixed runaway wallet card sizing on narrow mobile screens",
+        "Restored stable swipe bounds without stretching the page",
+        "Refreshed PWA status bar colors and safe-area startup background"
       ]
     },
     categories: {
@@ -1580,9 +1580,9 @@ export const dictionaries: Record<Language, Dictionary> = {
       intro: "Больше контроля на любом устройстве — приватность и дополнительные возможности остаются опциональными.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Устранено растягивание страницы и переполнение карусели на смартфонах",
-        "PWA-манифест синхронизирован с тёмной темой для статусной строки Android и WebAPK",
-        "Блокировка зума и корректный масштаб карточек на мобильных экранах"
+        "Исправлен неконтролируемый рост карточек кошельков на узких экранах",
+        "Восстановлены стабильные границы свайпа без растягивания страницы",
+        "Обновлены цвета status bar PWA и фон безопасной области при запуске"
       ]
     },
     categories: {
