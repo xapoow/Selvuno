@@ -7,8 +7,10 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      manifestFilename: "manifest-v0.8.1.webmanifest",
       includeAssets: ["pwa.svg"],
       manifest: {
+        id: "/",
         name: "MyFinances Budget Tracker",
         short_name: "MyFinances",
         description: "A local-first budget tracker for wallets, income, expenses, and backups.",
