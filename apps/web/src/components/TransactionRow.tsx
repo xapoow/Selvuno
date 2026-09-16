@@ -39,9 +39,9 @@ export function TransactionRow({
   const hideAmount = shouldHideWalletAmounts(settings, wallet);
 
   return (
-    <article className="app-surface grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-app p-3">
+    <article className="app-surface grid grid-cols-[auto_1fr_auto] items-center gap-3.5 rounded-app p-3.5 transition-all">
       <span
-        className="grid h-11 w-11 place-items-center rounded-app text-white"
+        className="grid h-11 w-11 place-items-center rounded-control text-white shadow-sm"
         style={{ backgroundColor: category?.color ?? "#676761" }}
       >
         <CategoryIcon name={category?.icon ?? "sparkles"} className="h-5 w-5" />
@@ -51,7 +51,7 @@ export function TransactionRow({
           <h3 className="truncate text-sm font-semibold text-foreground">
             {categoryName}
           </h3>
-          {wallet ? <span className="truncate text-xs text-muted">{wallet.name}</span> : null}
+          {wallet ? <span className="truncate text-xs font-medium text-muted">{wallet.name}</span> : null}
         </div>
         <p className="truncate text-xs text-muted">
           {formatDate(transaction.transactionDate, settings.locale, settings.dateFormat, settings.timeZone)}
@@ -60,7 +60,7 @@ export function TransactionRow({
         {tags.length ? (
           <div className="mt-1.5 flex flex-wrap gap-1">
             {tags.map((tag) => (
-              <span key={tag} className="app-control rounded-[6px] px-1.5 py-0.5 text-[11px] font-medium text-muted">
+              <span key={tag} className="app-control rounded-full px-2 py-0.5 text-[11px] font-medium text-muted">
                 #{tag}
               </span>
             ))}

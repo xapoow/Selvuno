@@ -120,6 +120,13 @@ describe("app notifications", () => {
     });
   });
 
+  it("retains notifications for previous changelog updates in history", () => {
+    const list = build();
+    expect(list.length).toBeGreaterThan(1);
+    expect(list.some((n) => n.id === "update:0.7.7")).toBe(true);
+    expect(list.some((n) => n.id === "update:0.7.6")).toBe(true);
+  });
+
   it("warns near a budget limit and escalates after it is exceeded", () => {
     const near = build({ budgets: [budget], transactions: [transaction] });
     expect(near).toContainEqual(
@@ -153,7 +160,8 @@ describe("app notifications", () => {
         tone: "info"
       })
     );
-    expect(build({ recurringTransactions: [{ ...recurring, paused: true }] })).toHaveLength(1);
+    const baseCount = build().length;
+    expect(build({ recurringTransactions: [{ ...recurring, paused: true }] })).toHaveLength(baseCount);
   });
 
   it("reports nearby deadlines and completed savings goals", () => {

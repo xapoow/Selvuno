@@ -28,11 +28,11 @@ export function HeaderNavigation({ activeView, labels, onChange }: HeaderNavigat
                   : undefined
             }
             className={cn(
-              "app-focus inline-flex h-11 items-center justify-start gap-3 rounded-app px-3 text-sm font-medium text-muted outline-none active:scale-[0.98]",
-              isActive && "app-navigation-active"
+              "app-focus inline-flex h-11 items-center justify-start gap-3 rounded-control px-3.5 text-sm font-medium text-muted outline-none transition-all active:scale-[0.97]",
+              isActive ? "app-navigation-active font-semibold" : "hover:bg-elevated/60 hover:text-foreground"
             )}
             >
-            <Icon className="h-[18px] w-[18px]" />
+            <Icon className={cn("h-[18px] w-[18px] transition-transform", isActive && "scale-105")} />
             <span>{labels[item.view]}</span>
           </button>
         );

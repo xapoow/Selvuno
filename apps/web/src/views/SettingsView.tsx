@@ -12,16 +12,27 @@ import type {
   TransactionType
 } from "@myfinances/types";
 import {
+  AlertCircle,
+  Check,
+  Cloud,
   Combine,
+  DatabaseBackup,
   Edit3,
   FileDown,
   FileUp,
   GripVertical,
   History,
+  LoaderCircle,
   Menu,
+  Palette,
   RotateCcw,
+  Settings2,
+  ShieldCheck,
+  SlidersHorizontal,
   Tags,
   Trash2,
+  Zap,
+  type LucideIcon,
   X
 } from "lucide-react";
 import { CategoryIcon } from "../lib/icons";
@@ -60,16 +71,18 @@ interface SettingsViewProps {
 }
 
 const timeZoneOptions = ["UTC", "Europe/Warsaw", "Europe/Berlin", "America/New_York", "Asia/Tokyo"];
-const settingsTabs: Array<{ value: SettingsTab }> = [
-  { value: "general" },
-  { value: "appearance" },
-  { value: "automation" },
-  { value: "features" },
-  { value: "privacy" },
-  { value: "categories" },
-  { value: "backup" },
-  { value: "sync" }
+const settingsTabs: Array<{ value: SettingsTab; icon: LucideIcon }> = [
+  { value: "general", icon: Settings2 },
+  { value: "appearance", icon: Palette },
+  { value: "automation", icon: Zap },
+  { value: "features", icon: SlidersHorizontal },
+  { value: "privacy", icon: ShieldCheck },
+  { value: "categories", icon: Tags },
+  { value: "backup", icon: DatabaseBackup },
+  { value: "sync", icon: Cloud }
 ];
+
+type SettingsSaveState = "idle" | "saving" | "saved" | "error";
 
 export function SettingsView({
   settings,
@@ -96,16 +109,23 @@ export function SettingsView({
   const [sourceCategoryId, setSourceCategoryId] = useState("");
   const [targetCategoryId, setTargetCategoryId] = useState("");
   const [categoryActionError, setCategoryActionError] = useState("");
+  const [categoryListError, setCategoryListError] = useState("");
   const [categoryOrder, setCategoryOrder] = useState<Record<TransactionType, string[]>>({
     expense: [],
     income: []
   });
   const [activeTab, setActiveTab] = useState<SettingsTab>("general");
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
+  const [settingsSaveState, setSettingsSaveState] = useState<SettingsSaveState>("idle");
   const [visualTheme, setVisualTheme] = useState<ThemePreference>(settings.theme);
   const [visualColorTheme, setVisualColorTheme] = useState<ColorThemePreference>(settings.colorTheme);
   const [importError, setImportError] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const settingsTopRef = useRef<HTMLDivElement | null>(null);
+  const settingsMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const settingsMenuPanelRef = useRef<HTMLElement | null>(null);
+  const saveRevisionRef = useRef(0);
+  const saveStateTimerRef = useRef<number | null>(null);
   const displayedTimeZones = useMemo(
     () => Array.from(new Set([settings.timeZone, ...timeZoneOptions].filter(Boolean))),
     [settings.timeZone]
@@ -146,23 +166,96 @@ export function SettingsView({
       return;
     }
     const previousOverflow = document.body.style.overflow;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setSettingsMenuOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") {
+        return;
+      }
+      const focusable = Array.from(
+        settingsMenuPanelRef.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        ) ?? []
+      );
+      if (!focusable.length) {
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", handleKeyDown);
+    window.requestAnimationFrame(() => {
+      settingsMenuPanelRef.current
+        ?.querySelector<HTMLElement>('[aria-current="page"]')
+        ?.focus();
+    });
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
+      if (previouslyFocused?.isConnected) {
+        previouslyFocused.focus();
+      } else {
+        settingsMenuButtonRef.current?.focus();
+      }
     };
   }, [settingsMenuOpen]);
+
+  useEffect(
+    () => () => {
+      if (saveStateTimerRef.current !== null) {
+        window.clearTimeout(saveStateTimerRef.current);
+      }
+    },
+    []
+  );
+
+  async function updateSettings(update: SettingsUpdate) {
+    const revision = saveRevisionRef.current + 1;
+    saveRevisionRef.current = revision;
+    if (saveStateTimerRef.current !== null) {
+      window.clearTimeout(saveStateTimerRef.current);
+    }
+    setSettingsSaveState("saving");
+    try {
+      await onUpdateSettings(update);
+      if (saveRevisionRef.current === revision) {
+        setSettingsSaveState("saved");
+        saveStateTimerRef.current = window.setTimeout(() => {
+          setSettingsSaveState("idle");
+          saveStateTimerRef.current = null;
+        }, 1800);
+      }
+    } catch (cause) {
+      if (saveRevisionRef.current === revision) {
+        setSettingsSaveState("error");
+      }
+      throw cause;
+    }
+  }
+
+  function selectSettingsTab(tab: SettingsTab) {
+    setActiveTab(tab);
+    setSettingsMenuOpen(false);
+    window.requestAnimationFrame(() => {
+      settingsTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
 
   function handleThemeChange(theme: ThemePreference) {
     setVisualTheme(theme);
     applyRootVisualTheme(theme, visualColorTheme);
-    void onUpdateSettings({ theme }).catch(() => {
+    void updateSettings({ theme }).catch(() => {
       setVisualTheme(settings.theme);
       applyRootVisualTheme(settings.theme, settings.colorTheme);
     });
@@ -171,21 +264,29 @@ export function SettingsView({
   function handleColorThemeChange(colorTheme: ColorThemePreference) {
     setVisualColorTheme(colorTheme);
     applyRootVisualTheme(visualTheme, colorTheme);
-    void onUpdateSettings({ colorTheme }).catch(() => {
+    void updateSettings({ colorTheme }).catch(() => {
       setVisualColorTheme(settings.colorTheme);
       applyRootVisualTheme(settings.theme, settings.colorTheme);
     });
   }
 
   async function handleExport() {
-    const backup = await onExportBackup();
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `myfinances-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+    setImportError("");
+    try {
+      const backup = await onExportBackup();
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `myfinances-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      anchor.hidden = true;
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 0);
+    } catch (cause) {
+      setImportError(cause instanceof Error ? cause.message : t.settings.exportError);
+    }
   }
 
   async function handleImport(file: File | undefined) {
@@ -208,16 +309,55 @@ export function SettingsView({
     }
   }
 
+  async function saveCategoryOrder(type: TransactionType) {
+    setCategoryListError("");
+    try {
+      await onReorderCategories(type, categoryOrder[type]);
+    } catch {
+      setCategoryListError(t.categories.saveError);
+      setCategoryOrder((current) => ({
+        ...current,
+        [type]: groupedCategories[type].map((category) => category.id)
+      }));
+    }
+  }
+
   return (
-    <div className="grid gap-6">
+    <div ref={settingsTopRef} className="grid scroll-mt-4 gap-6">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold text-foreground">{t.settings.title}</h2>
+        <div className="min-w-0">
+          <h2 className="text-xl font-semibold text-foreground">{t.settings.title}</h2>
+          <p
+            className={`mt-1 flex min-h-5 items-center gap-1.5 text-xs ${
+              settingsSaveState === "error" ? "text-expense" : "text-muted"
+            }`}
+            aria-live="polite"
+          >
+            {settingsSaveState === "saving" ? (
+              <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+            ) : settingsSaveState === "saved" ? (
+              <Check className="h-3.5 w-3.5 text-income" />
+            ) : settingsSaveState === "error" ? (
+              <AlertCircle className="h-3.5 w-3.5" />
+            ) : null}
+            <span>
+              {settingsSaveState === "saving"
+                ? t.settings.saving
+                : settingsSaveState === "saved"
+                  ? t.settings.saved
+                  : settingsSaveState === "error"
+                    ? t.settings.saveError
+                    : t.settings.tabs[activeTab]}
+            </span>
+          </p>
+        </div>
         <Button
+          ref={settingsMenuButtonRef}
           variant="secondary"
           size="icon"
           className="md:hidden"
           onClick={() => setSettingsMenuOpen(true)}
-          aria-label={t.settings.section}
+          aria-label={`${t.settings.section}: ${t.settings.tabs[activeTab]}`}
           aria-expanded={settingsMenuOpen}
         >
           <Menu className="h-5 w-5" />
@@ -239,10 +379,11 @@ export function SettingsView({
               aria-label={t.common.close}
             />
             <motion.aside
+              ref={settingsMenuPanelRef}
               role="dialog"
               aria-modal="true"
               aria-label={t.settings.section}
-              className="app-surface relative grid h-full w-[min(82vw,304px)] content-start gap-4 rounded-r-[8px] px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+16px)]"
+              className="app-surface relative grid h-full w-[min(86vw,320px)] content-start gap-4 overflow-y-auto rounded-r-[8px] px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+16px)]"
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
@@ -260,19 +401,21 @@ export function SettingsView({
               <nav className="grid gap-2" aria-label={t.settings.section}>
                 {settingsTabs.map((tab) => {
                   const isActive = activeTab === tab.value;
+                  const Icon = tab.icon;
                   return (
                     <button
                       key={tab.value}
                       type="button"
-                      onClick={() => {
-                        setActiveTab(tab.value);
-                        setSettingsMenuOpen(false);
-                      }}
+                      aria-current={isActive ? "page" : undefined}
+                      onClick={() => selectSettingsTab(tab.value)}
                       className={`app-focus flex h-11 items-center justify-between rounded-app px-3 text-left text-sm font-medium active:scale-[0.98] ${
                         isActive ? "app-selected-control text-foreground" : "text-muted hover:bg-elevated/70 hover:text-foreground"
                       }`}
                     >
-                      <span>{t.settings.tabs[tab.value]}</span>
+                      <span className="flex min-w-0 items-center gap-3">
+                        <Icon className="h-[18px] w-[18px] shrink-0" />
+                        <span className="truncate">{t.settings.tabs[tab.value]}</span>
+                      </span>
                       {isActive ? <span className="h-1.5 w-1.5 rounded-full bg-accent" /> : null}
                     </button>
                   );
@@ -283,30 +426,77 @@ export function SettingsView({
         ) : null}
       </AnimatePresence>
 
-      <div className="hidden overflow-x-auto pb-1 md:block">
-        <div className="app-control flex min-w-max gap-2 rounded-app p-1">
-          {settingsTabs.map((tab) => (
-            <button
-              key={tab.value}
-              type="button"
-              onClick={() => setActiveTab(tab.value)}
-              className={`h-9 rounded-[6px] px-3 text-sm font-medium transition duration-200 active:scale-[0.98] ${
-                activeTab === tab.value ? "app-selected-control text-foreground" : "text-muted hover:text-foreground"
-              }`}
-            >
-              {t.settings.tabs[tab.value]}
-            </button>
-          ))}
-        </div>
-      </div>
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start">
+        <aside className="app-surface sticky top-5 hidden rounded-app p-2 lg:block">
+          <nav className="grid gap-1" aria-label={t.settings.section}>
+            {settingsTabs.map((tab) => {
+              const isActive = activeTab === tab.value;
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.value}
+                  type="button"
+                  aria-current={isActive ? "page" : undefined}
+                  onClick={() => selectSettingsTab(tab.value)}
+                  className={`app-focus flex h-11 items-center gap-3 rounded-app px-3 text-left text-sm font-medium active:scale-[0.98] ${
+                    isActive
+                      ? "app-selected-control text-foreground"
+                      : "text-muted hover:bg-elevated/70 hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="h-[18px] w-[18px] shrink-0" />
+                  <span className="truncate">{t.settings.tabs[tab.value]}</span>
+                </button>
+              );
+            })}
+          </nav>
+          <p className="mt-3 border-t border-line/60 px-3 pt-3 text-xs font-medium text-muted">
+            {t.settings.version} {appVersion}
+          </p>
+        </aside>
 
+        <div className="grid min-w-0 gap-5">
+          <div className="hidden overflow-x-auto pb-1 md:block lg:hidden">
+            <div className="app-control flex min-w-max gap-1 rounded-app p-1">
+              {settingsTabs.map((tab) => {
+                const isActive = activeTab === tab.value;
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.value}
+                    type="button"
+                    aria-current={isActive ? "page" : undefined}
+                    onClick={() => selectSettingsTab(tab.value)}
+                    className={`app-focus flex h-10 items-center gap-2 whitespace-nowrap rounded-[6px] px-3 text-sm font-medium active:scale-[0.98] ${
+                      isActive
+                        ? "app-selected-control text-foreground"
+                        : "text-muted hover:text-foreground"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {t.settings.tabs[tab.value]}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <motion.div
+            key={activeTab}
+            className="grid min-w-0 gap-5"
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.16, ease: "easeOut" }}
+          >
       {activeTab === "general" ? (
         <Section title={t.settings.general}>
           <div className="app-surface grid gap-4 rounded-app p-4 sm:grid-cols-2">
             <SelectField
               label={t.common.language}
               value={settings.locale}
-              onChange={(event) => void onUpdateSettings({ locale: event.target.value })}
+              onChange={(event) =>
+                void updateSettings({ locale: event.target.value }).catch(() => undefined)
+              }
             >
               {languageOptions.map((language) => (
                 <option key={language.value} value={language.value}>
@@ -317,7 +507,9 @@ export function SettingsView({
             <SelectField
               label={t.settings.globalCurrency}
               value={settings.currency}
-              onChange={(event) => void onUpdateSettings({ currency: event.target.value })}
+              onChange={(event) =>
+                void updateSettings({ currency: event.target.value }).catch(() => undefined)
+              }
             >
               {currencyOptions.map((currency) => (
                 <option key={currency} value={currency}>
@@ -329,7 +521,9 @@ export function SettingsView({
               label={t.settings.dateFormat}
               value={settings.dateFormat}
               onChange={(event) =>
-                void onUpdateSettings({ dateFormat: event.target.value as DateFormatPreference })
+                void updateSettings({
+                  dateFormat: event.target.value as DateFormatPreference
+                }).catch(() => undefined)
               }
             >
               <option value="short">{t.settings.dateFormats.short}</option>
@@ -339,7 +533,9 @@ export function SettingsView({
             <SelectField
               label={t.common.timeZone}
               value={settings.timeZone}
-              onChange={(event) => void onUpdateSettings({ timeZone: event.target.value })}
+              onChange={(event) =>
+                void updateSettings({ timeZone: event.target.value }).catch(() => undefined)
+              }
             >
               {displayedTimeZones.map((timeZone) => (
                 <option key={timeZone} value={timeZone}>
@@ -381,7 +577,7 @@ export function SettingsView({
             settings={settings}
             privacy={privacy}
             t={t}
-            onUpdateSettings={onUpdateSettings}
+            onUpdateSettings={updateSettings}
           />
         </Section>
       ) : null}
@@ -391,7 +587,7 @@ export function SettingsView({
           <AutomationSettingsPanel
             settings={settings}
             t={t}
-            onUpdateSettings={onUpdateSettings}
+            onUpdateSettings={updateSettings}
           />
         </Section>
       ) : null}
@@ -401,7 +597,7 @@ export function SettingsView({
           <FeatureSettingsPanel
             settings={settings}
             t={t}
-            onUpdateSettings={onUpdateSettings}
+            onUpdateSettings={updateSettings}
           />
         </Section>
       ) : null}
@@ -410,7 +606,7 @@ export function SettingsView({
         <Section
           title={t.categories.title}
           action={
-            <span className="flex gap-2">
+            <span className="flex flex-wrap gap-2">
               <Button variant="secondary" size="small" onClick={() => setOrganizingCategories(true)}>
                 <Combine className="h-4 w-4" />
                 {t.categories.organize}
@@ -424,6 +620,11 @@ export function SettingsView({
           {categories.length ? (
             <div className="grid gap-3">
               <p className="text-xs text-muted">{t.categories.reorderHint}</p>
+              {categoryListError ? (
+                <p className="text-sm font-medium text-expense" role="alert">
+                  {categoryListError}
+                </p>
+              ) : null}
               {(["expense", "income"] as const).map((type) => (
                 <div key={type} className="grid gap-2">
                   <h3 className="text-sm font-semibold capitalize text-foreground">
@@ -446,7 +647,7 @@ export function SettingsView({
                         <Reorder.Item
                           key={category.id}
                           value={category.id}
-                          onDragEnd={() => void onReorderCategories(type, categoryOrder[type])}
+                          onDragEnd={() => void saveCategoryOrder(type)}
                           className="app-surface grid grid-cols-[auto_auto_1fr_auto] items-center gap-3 rounded-app p-3"
                         >
                           <GripVertical className="h-4 w-4 cursor-grab text-muted active:cursor-grabbing" />
@@ -464,6 +665,7 @@ export function SettingsView({
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8"
+                              onPointerDown={(event) => event.stopPropagation()}
                               onClick={() => setEditingCategory(category)}
                               aria-label={t.categories.editTitle}
                             >
@@ -473,9 +675,13 @@ export function SettingsView({
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8 text-expense"
+                              onPointerDown={(event) => event.stopPropagation()}
                               onClick={() => {
                                 if (window.confirm(t.categories.confirmDelete)) {
-                                  void onDeleteCategory(category.id);
+                                  setCategoryListError("");
+                                  void onDeleteCategory(category.id).catch(() =>
+                                    setCategoryListError(t.categories.saveError)
+                                  );
                                 }
                               }}
                               aria-label={t.common.delete}
@@ -581,7 +787,12 @@ export function SettingsView({
                           aria-label={t.settings.deleteBackup}
                           onClick={() => {
                             if (window.confirm(t.settings.deleteBackupConfirm)) {
-                              void onDeleteBackupSnapshot(snapshot.id);
+                              setImportError("");
+                              void onDeleteBackupSnapshot(snapshot.id).catch((cause: unknown) =>
+                                setImportError(
+                                  cause instanceof Error ? cause.message : t.settings.deleteBackupError
+                                )
+                              );
                             }
                           }}
                         >
@@ -613,9 +824,13 @@ export function SettingsView({
         </Section>
       ) : null}
 
-      <p className="text-center text-xs font-medium text-muted">
-        {t.settings.version} {appVersion}
-      </p>
+            <p className="text-center text-xs font-medium text-muted lg:hidden">
+              {t.settings.version} {appVersion}
+            </p>
+          </motion.div>
+        </div>
+      </div>
+
       <BottomSheet open={creatingCategory} title={t.categories.newTitle} onClose={() => setCreatingCategory(false)}>
         <CategoryForm
           t={t}
@@ -719,6 +934,7 @@ export function SettingsView({
           </Button>
         </form>
       </BottomSheet>
+
     </div>
   );
 }

@@ -2,18 +2,10 @@ import type { ColorThemePreference } from "@myfinances/types";
 import type { AppView } from "./state/appStore";
 
 export type Language = "en" | "ru";
-export type SettingsTab =
-  | "general"
-  | "appearance"
-  | "automation"
-  | "features"
-  | "privacy"
-  | "categories"
-  | "backup"
-  | "sync";
+export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.6.0";
+export const appVersion = "0.7.9";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -467,6 +459,9 @@ export interface Dictionary {
   settings: {
     title: string;
     section: string;
+    saving: string;
+    saved: string;
+    saveError: string;
     tabs: Record<SettingsTab, string>;
     general: string;
     appearance: string;
@@ -509,6 +504,8 @@ export interface Dictionary {
     appLocked: string;
     appLockedHint: string;
     enterPin: string;
+    pinKeypad: string;
+    deleteDigit: string;
     checkingPin: string;
     unlock: string;
     globalCurrency: string;
@@ -521,6 +518,7 @@ export interface Dictionary {
     colorThemes: Record<ColorThemePreference, string>;
     backup: string;
     exportJson: string;
+    exportError: string;
     importJson: string;
     importError: string;
     replaceBackup: string;
@@ -534,12 +532,19 @@ export interface Dictionary {
     restoreBackup: string;
     restoreBackupConfirm: string;
     deleteBackup: string;
+    deleteBackupError: string;
     deleteBackupConfirm: string;
     sync: string;
     comingSoon: string;
     syncTitle: string;
     syncBody: string;
+    debug: string;
     version: string;
+    triggerRuntimeError: string;
+    resetLocalData: string;
+    resetLocalDataConfirm: string;
+    errorPreview: string;
+    closePreview: string;
   };
   errors: ErrorCopy;
 }
@@ -964,9 +969,9 @@ export const dictionaries: Record<Language, Dictionary> = {
       intro: "More control on every device, with privacy and productivity features that stay optional.",
       gotIt: "Explore the update",
       notes: [
-        "Optional PIN, auto-lock, and private balance visibility controls",
-        "Faster transactions, advanced wallets, and local smart insights",
-        "Desktop shortcuts, table history, bulk actions, and filtered CSV export"
+        "Adaptive mobile status bar in dark theme matching the active color scheme",
+        "Preserve complete changelog history across updates in notifications",
+        "Crisp active card display and widened carousel boundaries"
       ]
     },
     categories: {
@@ -996,6 +1001,9 @@ export const dictionaries: Record<Language, Dictionary> = {
     settings: {
       title: "Settings",
       section: "Section",
+      saving: "Saving changes…",
+      saved: "Changes saved",
+      saveError: "Unable to save changes. Try again.",
       tabs: {
         general: "General",
         appearance: "Appearance",
@@ -1047,6 +1055,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       appLocked: "App locked",
       appLockedHint: "Enter your PIN to return to your finances.",
       enterPin: "PIN",
+      pinKeypad: "PIN keypad",
+      deleteDigit: "Delete last digit",
       checkingPin: "Checking…",
       unlock: "Unlock",
       globalCurrency: "Global currency",
@@ -1072,6 +1082,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       },
       backup: "Backup",
       exportJson: "Export JSON",
+      exportError: "Unable to export backup.",
       importJson: "Import JSON",
       importError: "Unable to import backup.",
       replaceBackup: "Replace local data with this backup?",
@@ -1085,12 +1096,19 @@ export const dictionaries: Record<Language, Dictionary> = {
       restoreBackup: "Restore",
       restoreBackupConfirm: "Replace current local data with this saved version?",
       deleteBackup: "Delete backup",
+      deleteBackupError: "Unable to delete this backup.",
       deleteBackupConfirm: "Delete this saved version?",
       sync: "Sync",
       comingSoon: "Coming soon",
       syncTitle: "Cloud sync is planned",
       syncBody: "Accounts, cloud backup, restore, and multi-device synchronization will live here.",
-      version: "Version"
+      debug: "Debug",
+      version: "Version",
+      triggerRuntimeError: "Trigger runtime error",
+      resetLocalData: "Reset local data",
+      resetLocalDataConfirm: "Clear local data, cookies, and restart onboarding?",
+      errorPreview: "Error preview",
+      closePreview: "Close preview"
     },
     errors: {
       actions: {
@@ -1561,9 +1579,9 @@ export const dictionaries: Record<Language, Dictionary> = {
       intro: "Больше контроля на любом устройстве — приватность и дополнительные возможности остаются опциональными.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Опциональные PIN-код, автоблокировка и скрытие сумм",
-        "Быстрый ввод операций, расширенные кошельки и локальные умные наблюдения",
-        "Горячие клавиши, табличная история, массовые действия и экспорт CSV на ПК"
+        "Адаптивный статус-бар для смартфонов в тёмной теме под цвет выбранной схемы",
+        "Сохранение истории changelog всех обновлений в уведомлениях",
+        "Чёткое отображение активной карты карусели и расширенные границы"
       ]
     },
     categories: {
@@ -1593,6 +1611,9 @@ export const dictionaries: Record<Language, Dictionary> = {
     settings: {
       title: "Настройки",
       section: "Раздел",
+      saving: "Сохраняем изменения…",
+      saved: "Изменения сохранены",
+      saveError: "Не удалось сохранить изменения. Попробуй ещё раз.",
       tabs: {
         general: "Общее",
         appearance: "Вид",
@@ -1644,6 +1665,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       appLocked: "Приложение заблокировано",
       appLockedHint: "Введи PIN, чтобы вернуться к своим финансам.",
       enterPin: "PIN-код",
+      pinKeypad: "Клавиатура PIN-кода",
+      deleteDigit: "Удалить последнюю цифру",
       checkingPin: "Проверяем…",
       unlock: "Разблокировать",
       globalCurrency: "Общая валюта",
@@ -1669,6 +1692,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       },
       backup: "Бэкап",
       exportJson: "Экспорт JSON",
+      exportError: "Не удалось экспортировать бэкап.",
       importJson: "Импорт JSON",
       importError: "Не удалось импортировать бэкап.",
       replaceBackup: "Заменить локальные данные этим бэкапом?",
@@ -1682,12 +1706,19 @@ export const dictionaries: Record<Language, Dictionary> = {
       restoreBackup: "Восстановить",
       restoreBackupConfirm: "Заменить текущие локальные данные этой сохранённой версией?",
       deleteBackup: "Удалить бэкап",
+      deleteBackupError: "Не удалось удалить этот бэкап.",
       deleteBackupConfirm: "Удалить эту сохранённую версию?",
       sync: "Синхронизация",
       comingSoon: "Скоро",
       syncTitle: "Облачная синхронизация запланирована",
       syncBody: "Аккаунты, облачный бэкап, восстановление и синхронизация между устройствами будут здесь.",
-      version: "Версия"
+      debug: "Дебаг",
+      version: "Версия",
+      triggerRuntimeError: "Вызвать runtime ошибку",
+      resetLocalData: "Сбросить локальные данные",
+      resetLocalDataConfirm: "Очистить локальные данные, cookies и запустить onboarding заново?",
+      errorPreview: "Превью ошибки",
+      closePreview: "Закрыть превью"
     },
     errors: {
       actions: {

@@ -162,7 +162,16 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
     }
 
     return (
-      <label ref={containerRef} className="relative grid gap-2 text-sm font-medium text-foreground">
+      <label
+        ref={containerRef}
+        className="relative grid gap-2 text-sm font-medium text-foreground"
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+            setOpen(false);
+            onBlur?.(event as unknown as React.FocusEvent<HTMLSelectElement>);
+          }
+        }}
+      >
         <span>{label}</span>
         <select
           ref={ref}
@@ -195,7 +204,6 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
           aria-haspopup="listbox"
           aria-label={label}
           disabled={disabled}
-          onBlur={(event) => onBlur?.(event as unknown as React.FocusEvent<HTMLSelectElement>)}
           onClick={() => setOpen((current) => !current)}
           onKeyDown={handleKeyDown}
           className={cn(
