@@ -13,7 +13,6 @@ import type {
 } from "@myfinances/types";
 import {
   AlertCircle,
-  Bug,
   Check,
   Cloud,
   Combine,
@@ -39,7 +38,6 @@ import {
 import { CategoryIcon } from "../lib/icons";
 import { currencyOptions, getCurrencyLabel } from "../lib/currencies";
 import { applyRootVisualTheme } from "../lib/colorThemes";
-import { resetLocalApplicationData } from "../lib/resetLocalData";
 import { ColorThemePicker } from "../components/ColorThemePicker";
 import { CategoryForm } from "../components/CategoryForm";
 import { AutomationSettingsPanel } from "../components/AutomationSettingsPanel";
@@ -47,7 +45,6 @@ import { FeatureSettingsPanel } from "../components/FeatureSettingsPanel";
 import { PrivacySettingsPanel } from "../components/PrivacySettingsPanel";
 import { BottomSheet } from "../components/ui/BottomSheet";
 import { Button } from "../components/ui/Button";
-import { ErrorScreen, type ErrorScreenKind, errorPresets } from "../components/ErrorScreen";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Section } from "../components/ui/Section";
 import { SegmentedControl } from "../components/ui/SegmentedControl";
@@ -74,16 +71,6 @@ interface SettingsViewProps {
 }
 
 const timeZoneOptions = ["UTC", "Europe/Warsaw", "Europe/Berlin", "America/New_York", "Asia/Tokyo"];
-const debugErrorKinds: ErrorScreenKind[] = [
-  "bad-request",
-  "unauthorized",
-  "forbidden",
-  "not-found",
-  "server",
-  "unavailable",
-  "offline",
-  "storage"
-];
 const settingsTabs: Array<{ value: SettingsTab; icon: LucideIcon }> = [
   { value: "general", icon: Settings2 },
   { value: "appearance", icon: Palette },
@@ -92,8 +79,7 @@ const settingsTabs: Array<{ value: SettingsTab; icon: LucideIcon }> = [
   { value: "privacy", icon: ShieldCheck },
   { value: "categories", icon: Tags },
   { value: "backup", icon: DatabaseBackup },
-  { value: "sync", icon: Cloud },
-  { value: "debug", icon: Bug }
+  { value: "sync", icon: Cloud }
 ];
 
 type SettingsSaveState = "idle" | "saving" | "saved" | "error";
@@ -128,8 +114,6 @@ export function SettingsView({
     expense: [],
     income: []
   });
-  const [debugError, setDebugError] = useState<ErrorScreenKind | null>(null);
-  const [shouldCrash, setShouldCrash] = useState(false);
   const [activeTab, setActiveTab] = useState<SettingsTab>("general");
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const [settingsSaveState, setSettingsSaveState] = useState<SettingsSaveState>("idle");
@@ -336,18 +320,6 @@ export function SettingsView({
         [type]: groupedCategories[type].map((category) => category.id)
       }));
     }
-  }
-
-  if (shouldCrash) {
-    throw new Error("Manual debug crash from Settings.");
-  }
-
-  async function handleResetLocalData() {
-    if (!window.confirm(t.settings.resetLocalDataConfirm)) {
-      return;
-    }
-    await resetLocalApplicationData();
-    window.location.reload();
   }
 
   return (
@@ -852,29 +824,6 @@ export function SettingsView({
         </Section>
       ) : null}
 
-      {activeTab === "debug" ? (
-        <Section title={t.settings.debug}>
-          <div className="app-surface grid gap-3 rounded-app p-4">
-            <div className="app-control rounded-app px-3 py-2 text-sm text-muted">
-              {t.settings.version}: <span className="font-semibold text-foreground">{appVersion}</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {debugErrorKinds.map((kind) => (
-                <Button key={kind} variant="secondary" size="small" onClick={() => setDebugError(kind)}>
-                  {errorPresets[kind].status}
-                </Button>
-              ))}
-            </div>
-            <Button variant="danger" size="small" onClick={() => setShouldCrash(true)}>
-              {t.settings.triggerRuntimeError}
-            </Button>
-            <Button variant="danger" size="small" onClick={() => void handleResetLocalData()}>
-              {t.settings.resetLocalData}
-            </Button>
-          </div>
-        </Section>
-      ) : null}
-
             <p className="text-center text-xs font-medium text-muted lg:hidden">
               {t.settings.version} {appVersion}
             </p>
@@ -986,29 +935,6 @@ export function SettingsView({
         </form>
       </BottomSheet>
 
-      <BottomSheet open={Boolean(debugError)} title={t.settings.errorPreview} onClose={() => setDebugError(null)}>
-        {debugError ? (
-          <ErrorScreen
-            kind={debugError}
-            copy={t.errors}
-            compact
-            details={[
-              `Preview: ${debugError}`,
-              `Status: ${errorPresets[debugError].status}`,
-              `Time: ${new Date().toISOString()}`
-            ].join("\n")}
-            primaryAction={{
-              label: t.settings.closePreview,
-              onClick: () => setDebugError(null)
-            }}
-            secondaryAction={{
-              label: t.common.reload,
-              variant: "secondary",
-              onClick: () => window.location.reload()
-            }}
-          />
-        ) : null}
-      </BottomSheet>
     </div>
   );
 }

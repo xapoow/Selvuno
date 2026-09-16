@@ -2,7 +2,7 @@ import type { ColorThemePreference } from "@myfinances/types";
 import type { AppView } from "./state/appStore";
 
 export type Language = "en" | "ru";
-export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
+export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync";
 export type DateFormatLabel = "short" | "medium" | "long";
 
 export const appVersion = "0.7.9";
@@ -1012,8 +1012,7 @@ export const dictionaries: Record<Language, Dictionary> = {
         privacy: "Privacy",
         categories: "Categories",
         backup: "Backup",
-        sync: "Sync",
-        debug: "Debug"
+        sync: "Sync"
       },
       general: "General",
       appearance: "Appearance",
@@ -1623,8 +1622,7 @@ export const dictionaries: Record<Language, Dictionary> = {
         privacy: "Приватность",
         categories: "Категории",
         backup: "Бэкап",
-        sync: "Синхронизация",
-        debug: "Дебаг"
+        sync: "Синхронизация"
       },
       general: "Общее",
       appearance: "Внешний вид",
