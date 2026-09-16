@@ -1,4 +1,4 @@
-﻿import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { compareVersions, getChangelogHistory, changelogStorageKey } from "./changelog";
 
 describe("changelog", () => {
@@ -15,10 +15,10 @@ describe("changelog", () => {
 
   it("returns builtin changelogs in descending order", () => {
     const list = getChangelogHistory("ru-RU");
-    expect(list.length).toBeGreaterThanOrEqual(8);
-    expect(list[0].version).toBe("0.7.8");
-    expect(list[1].version).toBe("0.7.7");
-    expect(list[2].version).toBe("0.7.6");
+    expect(list.length).toBeGreaterThanOrEqual(9);
+    expect(list[0].version).toBe("0.7.9");
+    expect(list[1].version).toBe("0.7.8");
+    expect(list[2].version).toBe("0.7.7");
   });
 
   it("preserves stored changelog history from previous versions", () => {

@@ -1,4 +1,4 @@
-﻿import { appVersion } from "../i18n";
+import { appVersion } from "../i18n";
 
 export interface ChangelogItem {
   version: string;
@@ -8,6 +8,13 @@ export interface ChangelogItem {
 
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
+    {
+      version: "0.7.9",
+      notes: [
+        "Адаптивный статус-бар для смартфонов в тёмной теме под цвет выбранной схемы",
+        "Устранение белого статус-бара и белых вспышек при запуске на мобильных устройствах"
+      ]
+    },
     {
       version: "0.7.8",
       notes: [
@@ -75,6 +82,13 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.7.9",
+      notes: [
+        "Adaptive mobile status bar in dark mode matching the active color scheme",
+        "Eliminated white status bar and startup flashes on mobile devices"
+      ]
+    },
     {
       version: "0.7.8",
       notes: [
