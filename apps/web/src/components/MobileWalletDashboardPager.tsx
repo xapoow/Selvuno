@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type {
   Category,
   MonthlyBudget,
@@ -24,13 +25,14 @@ interface MobileWalletDashboardPagerProps {
   activeWalletId: WalletView;
   allLabel: string;
   t: Dictionary;
-  onChange: (value: WalletView) => void;
+  onChange: (value: WalletView, direction?: number) => void;
   onAdd: () => void;
   onSetBudget: (input: MonthlyBudgetInput) => Promise<unknown>;
 }
 
 function MobileWalletDashboardSlide({
   walletView,
+  direction = 1,
   wallets,
   categories,
   transactions,
@@ -42,6 +44,7 @@ function MobileWalletDashboardSlide({
   onSetBudget
 }: Omit<MobileWalletDashboardPagerProps, "activeWalletId" | "allLabel" | "onChange"> & {
   walletView: WalletView;
+  direction?: number;
 }) {
   const activeWallet = walletView === "all" ? undefined : wallets.find((wallet) => wallet.id === walletView);
   const displayCurrency = activeWallet?.currency ?? settings.currency;
@@ -85,6 +88,7 @@ function MobileWalletDashboardSlide({
       exchangeRates={exchangeRates.data}
       isUpdatingExchangeRates={exchangeRates.isFetching && conversionNeeded}
       hasExchangeRateError={exchangeRates.isError && conversionNeeded}
+      direction={direction}
       t={t}
       onAdd={onAdd}
       onSetBudget={onSetBudget}
@@ -106,6 +110,13 @@ export function MobileWalletDashboardPager({
   onAdd,
   onSetBudget
 }: MobileWalletDashboardPagerProps) {
+  const [slideDirection, setSlideDirection] = useState(1);
+
+  const handleWalletChange = (nextWalletId: WalletView, direction = 1) => {
+    setSlideDirection(direction);
+    onChange(nextWalletId, direction);
+  };
+
   return (
     <div className="grid gap-6">
       <MonobankWalletCarousel
@@ -115,11 +126,12 @@ export function MobileWalletDashboardPager({
         transfers={transfers}
         settings={settings}
         t={t}
-        onChange={onChange}
+        onChange={handleWalletChange}
       />
 
       <MobileWalletDashboardSlide
         walletView={activeWalletId}
+        direction={slideDirection}
         wallets={wallets}
         categories={categories}
         transactions={transactions}

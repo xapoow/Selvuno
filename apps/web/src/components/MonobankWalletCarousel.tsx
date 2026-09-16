@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Settings, Transaction, Wallet, WalletTransfer, WalletView } from "@myfinances/types";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
-import { ChevronLeft, ChevronRight, Layers3, Radio, ShieldCheck, WalletCards } from "lucide-react";
+import { ChevronLeft, ChevronRight, Layers3, ShieldCheck, WalletCards } from "lucide-react";
 import { calculateWalletTotals, formatMoney } from "@myfinances/utils";
 import { cn } from "../lib/cn";
 import { WalletIcon } from "../lib/icons";
@@ -198,43 +198,45 @@ export function MonobankWalletCarousel({
                 style={{ backgroundColor: currentCard.color ?? "#ffffff" }}
               />
 
-              {/* Top Row: Chip + NFC Wave + Card Type */}
+              {/* Top Row: Wallet Icon & Name + Kind Badge */}
               <div className="relative z-10 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {/* EMV Microchip Simulation */}
-                  <div className="relative h-7 w-9 overflow-hidden rounded-[5px] border border-amber-300/40 bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 shadow-inner">
-                    <div className="absolute inset-0 grid grid-cols-2 divide-x divide-amber-700/30">
-                      <div className="border-b border-amber-700/30" />
-                      <div className="border-b border-amber-700/30" />
-                    </div>
-                  </div>
-                  {/* Contactless Wave */}
-                  <Radio className="h-4 w-4 rotate-90 text-white/70" />
+                <div className="flex items-center gap-2.5">
+                  <span
+                    className={cn(
+                      "grid h-9 w-9 place-items-center rounded-control text-white backdrop-blur-md shadow-sm",
+                      currentCard.isAll ? "bg-white/20" : "bg-black/25"
+                    )}
+                  >
+                    {currentCard.isAll ? (
+                      <Layers3 className="h-4 w-4" />
+                    ) : (
+                      <WalletIcon name={currentCard.icon ?? "wallet-cards"} className="h-4 w-4" />
+                    )}
+                  </span>
+                  <span className="text-sm font-semibold tracking-wide text-white drop-shadow-sm">
+                    {currentCard.name}
+                  </span>
                 </div>
 
                 {/* Right Badge: Kind */}
-                <div className="flex items-center gap-1.5 rounded-full bg-black/25 px-2.5 py-0.5 text-xs font-semibold backdrop-blur-md text-white/90">
+                <div className="flex items-center gap-1.5 rounded-full bg-black/25 px-2.5 py-1 text-xs font-semibold backdrop-blur-md text-white/90">
                   {currentCard.isAll ? (
-                    <Layers3 className="h-3.5 w-3.5" />
+                    <span>{t.wallets.allWallets}</span>
                   ) : currentCard.kind === "credit" ? (
-                    <ShieldCheck className="h-3.5 w-3.5 text-amber-300" />
+                    <span className="flex items-center gap-1 text-amber-300">
+                      <ShieldCheck className="h-3 w-3" />
+                      Кредитный
+                    </span>
                   ) : (
-                    <WalletCards className="h-3.5 w-3.5" />
+                    <span>{t.common.wallet}</span>
                   )}
-                  <span>
-                    {currentCard.isAll
-                      ? t.wallets.allWallets
-                      : currentCard.kind === "credit"
-                        ? "Кредитная"
-                        : "Дебетовая"}
-                  </span>
                 </div>
               </div>
 
-              {/* Center: Card Name & Main Hero Balance */}
-              <div className="relative z-10 my-auto">
-                <p className="text-xs font-medium tracking-wide text-white/75 drop-shadow-sm">
-                  {currentCard.name}
+              {/* Center: Main Balance */}
+              <div className="relative z-10 my-auto py-2">
+                <p className="text-xs font-medium uppercase tracking-wider text-white/70">
+                  {t.common.balance}
                 </p>
                 <div className="mt-1 flex items-baseline gap-2">
                   <p className="truncate text-3xl font-extrabold tracking-tight text-white drop-shadow-md sm:text-4xl">
@@ -283,10 +285,10 @@ export function MonobankWalletCarousel({
                 ) : null}
 
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs tracking-wider text-white/60">
-                    •••• •••• •••• {currentCard.isAll ? "ALL" : currentCard.id.slice(0, 4).toUpperCase()}
+                  <span className="text-xs font-medium text-white/75">
+                    {currentCard.currency}
                   </span>
-                  <span className="rounded-md bg-white/15 px-2 py-0.5 text-xs font-bold text-white shadow-sm backdrop-blur-md">
+                  <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm backdrop-blur-md">
                     {getCurrencyLabel(currentCard.currency)}
                   </span>
                 </div>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import type {
   Category,
   MonthlyBudget,
@@ -47,6 +48,7 @@ interface DashboardViewProps {
   isUpdatingExchangeRates: boolean;
   hasExchangeRateError: boolean;
   showBalanceStat?: boolean;
+  direction?: number;
   t: Dictionary;
   onAdd: () => void;
   onSetBudget: (input: MonthlyBudgetInput) => Promise<unknown>;
@@ -65,6 +67,7 @@ export function DashboardView({
   isUpdatingExchangeRates,
   hasExchangeRateError,
   showBalanceStat = false,
+  direction = 1,
   t,
   onAdd,
   onSetBudget
@@ -304,9 +307,46 @@ export function DashboardView({
     );
   }
 
+  const staggerContainer = {
+    hidden: { opacity: 1 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.045,
+        delayChildren: 0.01
+      }
+    }
+  };
+
+  const staggerItem = {
+    hidden: (dir: number) => ({
+      opacity: 0,
+      x: (dir || 1) * 22,
+      y: 6
+    }),
+    visible: {
+      opacity: 1,
+      x: 0,
+      y: 0,
+      transition: {
+        type: "spring" as const,
+        stiffness: 380,
+        damping: 32,
+        mass: 0.7
+      }
+    }
+  };
+
   return (
-    <div className="grid gap-6">
-      <div>
+    <motion.div
+      key={activeWalletId}
+      custom={direction}
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+      className="grid gap-6"
+    >
+      <motion.div custom={direction} variants={staggerItem}>
         <p className="text-xl font-semibold text-foreground">{greeting}</p>
         {hasCurrencyConversion ? (
           <p className="mt-1 text-sm text-muted">
@@ -317,8 +357,8 @@ export function DashboardView({
                 : `${t.dashboard.convertedTo} ${displayCurrency}`}
           </p>
         ) : null}
-      </div>
-      <section className="grid gap-3">
+      </motion.div>
+      <motion.section custom={direction} variants={staggerItem} className="grid gap-3">
         {showBalanceStat ? (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <StatPanel label={t.common.balance} value={formatMoney(totals.balanceMinor, displayCurrency, settings.locale, hideAmounts)} />
@@ -347,23 +387,31 @@ export function DashboardView({
             />
           </div>
         )}
-      </section>
+      </motion.section>
 
-      <BudgetOverviewCard
-        currency={settings.currency}
-        locale={settings.locale}
-        hideAmounts={hideAmounts}
-        monthLabel={formatBudgetMonth(currentBudgetMonth, settings.locale)}
-        progress={budgetProgress}
-        t={t}
-        onOpen={() => setBudgetOpen(true)}
-      />
+      <motion.div custom={direction} variants={staggerItem}>
+        <BudgetOverviewCard
+          currency={settings.currency}
+          locale={settings.locale}
+          hideAmounts={hideAmounts}
+          monthLabel={formatBudgetMonth(currentBudgetMonth, settings.locale)}
+          progress={budgetProgress}
+          t={t}
+          onOpen={() => setBudgetOpen(true)}
+        />
+      </motion.div>
 
       {settings.smartInsightsEnabled ? (
-        <SmartInsightsCard insights={smartInsights} categories={categories} t={t} />
+        <motion.div custom={direction} variants={staggerItem}>
+          <SmartInsightsCard insights={smartInsights} categories={categories} t={t} />
+        </motion.div>
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(330px,0.85fr)]">
+      <motion.div
+        custom={direction}
+        variants={staggerItem}
+        className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(330px,0.85fr)]"
+      >
         <Section title={t.dashboard.cashFlow}>
           <div className="app-surface grid min-h-[286px] gap-4 rounded-app p-4 sm:p-5">
             <div className="app-control grid w-full max-w-sm grid-cols-2 justify-self-center rounded-app p-1">
@@ -475,7 +523,7 @@ export function DashboardView({
             />
           )}
         </Section>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

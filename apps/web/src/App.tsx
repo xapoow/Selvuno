@@ -402,6 +402,7 @@ export function App() {
                     exchangeRates={exchangeRates.data}
                     isUpdatingExchangeRates={exchangeRates.isFetching && conversionNeeded}
                     hasExchangeRateError={exchangeRates.isError && conversionNeeded}
+                    direction={walletTransitionDirection}
                     t={t}
                     onAdd={() => setActiveView("add")}
                     onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
