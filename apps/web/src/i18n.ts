@@ -504,6 +504,8 @@ export interface Dictionary {
     appLocked: string;
     appLockedHint: string;
     enterPin: string;
+    pinKeypad: string;
+    deleteDigit: string;
     checkingPin: string;
     unlock: string;
     globalCurrency: string;
@@ -1054,6 +1056,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       appLocked: "App locked",
       appLockedHint: "Enter your PIN to return to your finances.",
       enterPin: "PIN",
+      pinKeypad: "PIN keypad",
+      deleteDigit: "Delete last digit",
       checkingPin: "Checking…",
       unlock: "Unlock",
       globalCurrency: "Global currency",
@@ -1663,6 +1667,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       appLocked: "Приложение заблокировано",
       appLockedHint: "Введи PIN, чтобы вернуться к своим финансам.",
       enterPin: "PIN-код",
+      pinKeypad: "Клавиатура PIN-кода",
+      deleteDigit: "Удалить последнюю цифру",
       checkingPin: "Проверяем…",
       unlock: "Разблокировать",
       globalCurrency: "Общая валюта",

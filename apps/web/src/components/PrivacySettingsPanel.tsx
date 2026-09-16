@@ -8,6 +8,7 @@ import { BottomSheet } from "./ui/BottomSheet";
 import { Button } from "./ui/Button";
 import { SelectField } from "./ui/SelectField";
 import { SettingsToggleCard } from "./ui/SettingsToggleCard";
+import { PinCodeField, PinKeypad } from "./ui/PinKeypad";
 
 interface PrivacySettingsPanelProps {
   settings: Settings;
@@ -17,6 +18,7 @@ interface PrivacySettingsPanelProps {
 }
 
 type PinAction = "enable" | "change" | "disable" | null;
+type PinFieldName = "current" | "next" | "confirm";
 
 export function PrivacySettingsPanel({ settings, privacy, t, onUpdateSettings }: PrivacySettingsPanelProps) {
   const [pinAction, setPinAction] = useState<PinAction>(null);
@@ -25,6 +27,13 @@ export function PrivacySettingsPanel({ settings, privacy, t, onUpdateSettings }:
   const [confirmPin, setConfirmPin] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [activePinField, setActivePinField] = useState<PinFieldName>("next");
+
+  const openPinSheet = (action: Exclude<PinAction, null>) => {
+    setPinAction(action);
+    setActivePinField(action === "enable" ? "next" : "current");
+    setError("");
+  };
 
   const closePinSheet = () => {
     setPinAction(null);
@@ -62,19 +71,19 @@ export function PrivacySettingsPanel({ settings, privacy, t, onUpdateSettings }:
           <div className="flex flex-wrap gap-2">
             {privacy.pinEnabled ? (
               <>
-                <Button variant="secondary" size="small" onClick={() => setPinAction("change")}>
+                <Button variant="secondary" size="small" onClick={() => openPinSheet("change")}>
                   {t.settings.changePin}
                 </Button>
                 <Button variant="secondary" size="small" onClick={privacy.lockNow}>
                   <LockKeyhole className="h-4 w-4" />
                   {t.settings.lockNow}
                 </Button>
-                <Button variant="danger" size="small" onClick={() => setPinAction("disable")}>
+                <Button variant="danger" size="small" onClick={() => openPinSheet("disable")}>
                   {t.settings.disablePin}
                 </Button>
               </>
             ) : (
-              <Button size="small" onClick={() => setPinAction("enable")}>
+              <Button size="small" onClick={() => openPinSheet("enable")}>
                 {t.settings.enablePin}
               </Button>
             )}
@@ -155,17 +164,54 @@ export function PrivacySettingsPanel({ settings, privacy, t, onUpdateSettings }:
           }}
         >
           {pinAction !== "enable" ? (
-            <PinField label={t.settings.currentPin} value={currentPin} onChange={setCurrentPin} />
+            <PinCodeField
+              label={t.settings.currentPin}
+              value={currentPin}
+              active={activePinField === "current"}
+              onActivate={() => setActivePinField("current")}
+            />
           ) : null}
           {pinAction !== "disable" ? (
             <>
-              <PinField label={t.settings.newPin} value={nextPin} onChange={setNextPin} />
-              <PinField label={t.settings.confirmPin} value={confirmPin} onChange={setConfirmPin} />
+              <PinCodeField
+                label={t.settings.newPin}
+                value={nextPin}
+                active={activePinField === "next"}
+                onActivate={() => setActivePinField("next")}
+              />
+              <PinCodeField
+                label={t.settings.confirmPin}
+                value={confirmPin}
+                active={activePinField === "confirm"}
+                onActivate={() => setActivePinField("confirm")}
+              />
               <p className="text-xs leading-5 text-muted">{t.settings.pinRequirements}</p>
             </>
           ) : (
             <p className="text-sm leading-6 text-muted">{t.settings.disablePinHint}</p>
           )}
+          <PinKeypad
+            value={
+              activePinField === "current"
+                ? currentPin
+                : activePinField === "next"
+                  ? nextPin
+                  : confirmPin
+            }
+            label={t.settings.pinKeypad}
+            deleteLabel={t.settings.deleteDigit}
+            disabled={submitting}
+            onChange={(value) => {
+              setError("");
+              if (activePinField === "current") {
+                setCurrentPin(value);
+              } else if (activePinField === "next") {
+                setNextPin(value);
+              } else {
+                setConfirmPin(value);
+              }
+            }}
+          />
           {error ? <p className="text-sm font-medium text-expense">{error}</p> : null}
           <Button type="submit" variant={pinAction === "disable" ? "danger" : "primary"} disabled={submitting}>
             {actionTitle}
@@ -173,24 +219,5 @@ export function PrivacySettingsPanel({ settings, privacy, t, onUpdateSettings }:
         </form>
       </BottomSheet>
     </>
-  );
-}
-
-function PinField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return (
-    <label className="grid gap-2 text-sm font-medium text-foreground">
-      <span>{label}</span>
-      <input
-        type="password"
-        inputMode="numeric"
-        autoComplete="off"
-        pattern="[0-9]*"
-        minLength={4}
-        maxLength={12}
-        value={value}
-        onChange={(event) => onChange(event.target.value.replace(/\D/g, "").slice(0, 12))}
-        className="app-field app-focus h-11 rounded-app px-3 text-center text-lg tracking-[0.3em] outline-none"
-      />
-    </label>
   );
 }

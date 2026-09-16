@@ -66,8 +66,13 @@ describe("PrivacySettingsPanel", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Enable PIN" }));
-    await user.type(screen.getByLabelText("New PIN"), "4826");
-    await user.type(screen.getByLabelText("Confirm PIN"), "4826");
+    for (const digit of ["4", "8", "2", "6"]) {
+      await user.click(screen.getByRole("button", { name: digit }));
+    }
+    await user.click(screen.getByRole("button", { name: "Confirm PIN" }));
+    for (const digit of ["4", "8", "2", "6"]) {
+      await user.click(screen.getByRole("button", { name: digit }));
+    }
     const enableButtons = screen.getAllByRole("button", { name: "Enable PIN" });
     await user.click(enableButtons.at(-1)!);
 
