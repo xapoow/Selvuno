@@ -10,6 +10,7 @@ import type {
 import { appVersion, getCategoryName, type Dictionary } from "../i18n";
 import { calculateMonthlyBudgetProgress, getBudgetMonth } from "./budgets";
 import { toCalendarDate } from "./dates";
+import { getChangelogHistory, type ChangelogItem } from "./changelog";
 
 export type AppNotificationTone = "update" | "info" | "warning" | "danger" | "success";
 
@@ -34,6 +35,7 @@ interface NotificationInput {
   savingsGoalContributions: SavingsGoalContribution[];
   t: Dictionary;
   now?: Date;
+  changelogItems?: ChangelogItem[];
 }
 
 function fillTemplate(template: string, values: Record<string, string | number>): string {
@@ -66,20 +68,20 @@ export function buildAppNotifications({
   savingsGoals,
   savingsGoalContributions,
   t,
-  now = new Date()
+  now = new Date(),
+  changelogItems
 }: NotificationInput): AppNotification[] {
-  const notifications: AppNotification[] = [
-    {
-      id: `update:${appVersion}`,
-      tone: "update",
-      title: fillTemplate(t.notifications.updateTitle, { version: appVersion }),
-      body: t.notifications.updateBody,
-      details: [
-        { label: t.notifications.detailVersion, value: appVersion },
-        { label: t.notifications.detailChanges, value: t.updates.notes.join(" • ") }
-      ]
-    }
-  ];
+  const changelogs = changelogItems ?? getChangelogHistory(settings.locale, t.updates.notes);
+  const notifications: AppNotification[] = changelogs.map((item) => ({
+    id: `update:${item.version}`,
+    tone: "update",
+    title: fillTemplate(t.notifications.updateTitle, { version: item.version }),
+    body: item.version === appVersion ? t.notifications.updateBody : fillTemplate(t.notifications.updateTitle, { version: item.version }),
+    details: [
+      { label: t.notifications.detailVersion, value: item.version },
+      { label: t.notifications.detailChanges, value: item.notes.map((note) => `• ${note}`).join("\n") }
+    ]
+  }));
   const today = toCalendarDate(now);
   const currentMonth = getBudgetMonth(now, settings.timeZone);
   const budgetProgress = calculateMonthlyBudgetProgress({

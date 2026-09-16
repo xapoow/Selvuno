@@ -175,7 +175,7 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
                     <dt className="text-xs font-semibold uppercase tracking-wide text-muted">
                       {detail.label}
                     </dt>
-                    <dd className="text-sm leading-5 text-foreground">{detail.value}</dd>
+                    <dd className="text-sm leading-5 text-foreground whitespace-pre-line">{detail.value}</dd>
                   </div>
                 ))}
               </dl>

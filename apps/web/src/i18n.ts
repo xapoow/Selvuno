@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.7.7";
+export const appVersion = "0.7.8";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -969,9 +969,9 @@ export const dictionaries: Record<Language, Dictionary> = {
       intro: "More control on every device, with privacy and productivity features that stay optional.",
       gotIt: "Explore the update",
       notes: [
-        "Optional PIN, auto-lock, and private balance visibility controls",
-        "Faster transactions, advanced wallets, and local smart insights",
-        "Desktop shortcuts, table history, bulk actions, and filtered CSV export"
+        "Preserve complete changelog history across updates in notifications",
+        "Crisp active card display and widened carousel boundaries",
+        "Smooth Monobank-style physics for wallet card sliding"
       ]
     },
     categories: {
@@ -1580,9 +1580,9 @@ export const dictionaries: Record<Language, Dictionary> = {
       intro: "Больше контроля на любом устройстве — приватность и дополнительные возможности остаются опциональными.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Опциональные PIN-код, автоблокировка и скрытие сумм",
-        "Быстрый ввод операций, расширенные кошельки и локальные умные наблюдения",
-        "Горячие клавиши, табличная история, массовые действия и экспорт CSV на ПК"
+        "Сохранение истории changelog всех обновлений в уведомлениях",
+        "Чёткое отображение активной карты карусели и расширенные границы",
+        "Плавная физика перелистывания кошельков в стиле Monobank"
       ]
     },
     categories: {
