@@ -46,6 +46,7 @@ interface DashboardViewProps {
   exchangeRates?: ExchangeRateTable;
   isUpdatingExchangeRates: boolean;
   hasExchangeRateError: boolean;
+  showBalanceStat?: boolean;
   t: Dictionary;
   onAdd: () => void;
   onSetBudget: (input: MonthlyBudgetInput) => Promise<unknown>;
@@ -63,6 +64,7 @@ export function DashboardView({
   exchangeRates,
   isUpdatingExchangeRates,
   hasExchangeRateError,
+  showBalanceStat = false,
   t,
   onAdd,
   onSetBudget
@@ -317,19 +319,34 @@ export function DashboardView({
         ) : null}
       </div>
       <section className="grid gap-3">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <StatPanel label={t.common.balance} value={formatMoney(totals.balanceMinor, displayCurrency, settings.locale, hideAmounts)} />
-          <StatPanel
-            label={t.common.income}
-            value={formatMoney(totals.incomeMinor, displayCurrency, settings.locale, hideAmounts)}
-            tone="income"
-          />
-          <StatPanel
-            label={t.common.expenses}
-            value={formatMoney(totals.expenseMinor, displayCurrency, settings.locale, hideAmounts)}
-            tone="expense"
-          />
-        </div>
+        {showBalanceStat ? (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <StatPanel label={t.common.balance} value={formatMoney(totals.balanceMinor, displayCurrency, settings.locale, hideAmounts)} />
+            <StatPanel
+              label={t.common.income}
+              value={formatMoney(totals.incomeMinor, displayCurrency, settings.locale, hideAmounts)}
+              tone="income"
+            />
+            <StatPanel
+              label={t.common.expenses}
+              value={formatMoney(totals.expenseMinor, displayCurrency, settings.locale, hideAmounts)}
+              tone="expense"
+            />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            <StatPanel
+              label={t.common.income}
+              value={formatMoney(totals.incomeMinor, displayCurrency, settings.locale, hideAmounts)}
+              tone="income"
+            />
+            <StatPanel
+              label={t.common.expenses}
+              value={formatMoney(totals.expenseMinor, displayCurrency, settings.locale, hideAmounts)}
+              tone="expense"
+            />
+          </div>
+        )}
       </section>
 
       <BudgetOverviewCard

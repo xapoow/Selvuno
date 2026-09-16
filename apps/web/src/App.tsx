@@ -12,7 +12,7 @@ import { OfflineIndicator } from "./components/OfflineIndicator";
 import { LockScreen } from "./components/LockScreen";
 import { UpdateAnnouncement } from "./components/UpdateAnnouncement";
 import { WalletSwitcher } from "./components/WalletSwitcher";
-import { DesktopWalletCarousel } from "./components/DesktopWalletCarousel";
+import { MonobankWalletCarousel } from "./components/MonobankWalletCarousel";
 import { ErrorScreen } from "./components/ErrorScreen";
 import { getDictionary } from "./i18n";
 import { applyRootVisualTheme } from "./lib/colorThemes";
@@ -336,16 +336,14 @@ export function App() {
         {showsWalletContext ? (
           <div className={activeView === "add" ? "mb-6" : "mb-6 hidden md:block"}>
             {activeView === "dashboard" ? (
-              <DesktopWalletCarousel
+              <MonobankWalletCarousel
                 wallets={wallets}
                 activeWalletId={activeWalletId}
                 transactions={transactions}
                 transfers={walletTransfers}
                 settings={settings}
                 t={t}
-                displayCurrency={displayCurrency}
                 onChange={handleWalletChange}
-                onAdd={() => setActiveView("add")}
               />
             ) : (
               <WalletSwitcher
