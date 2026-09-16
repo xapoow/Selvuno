@@ -459,6 +459,9 @@ export interface Dictionary {
   settings: {
     title: string;
     section: string;
+    saving: string;
+    saved: string;
+    saveError: string;
     tabs: Record<SettingsTab, string>;
     general: string;
     appearance: string;
@@ -513,6 +516,7 @@ export interface Dictionary {
     colorThemes: Record<ColorThemePreference, string>;
     backup: string;
     exportJson: string;
+    exportError: string;
     importJson: string;
     importError: string;
     replaceBackup: string;
@@ -526,6 +530,7 @@ export interface Dictionary {
     restoreBackup: string;
     restoreBackupConfirm: string;
     deleteBackup: string;
+    deleteBackupError: string;
     deleteBackupConfirm: string;
     sync: string;
     comingSoon: string;
@@ -994,6 +999,9 @@ export const dictionaries: Record<Language, Dictionary> = {
     settings: {
       title: "Settings",
       section: "Section",
+      saving: "Saving changes…",
+      saved: "Changes saved",
+      saveError: "Unable to save changes. Try again.",
       tabs: {
         general: "General",
         appearance: "Appearance",
@@ -1071,6 +1079,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       },
       backup: "Backup",
       exportJson: "Export JSON",
+      exportError: "Unable to export backup.",
       importJson: "Import JSON",
       importError: "Unable to import backup.",
       replaceBackup: "Replace local data with this backup?",
@@ -1084,6 +1093,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       restoreBackup: "Restore",
       restoreBackupConfirm: "Replace current local data with this saved version?",
       deleteBackup: "Delete backup",
+      deleteBackupError: "Unable to delete this backup.",
       deleteBackupConfirm: "Delete this saved version?",
       sync: "Sync",
       comingSoon: "Coming soon",
@@ -1598,6 +1608,9 @@ export const dictionaries: Record<Language, Dictionary> = {
     settings: {
       title: "Настройки",
       section: "Раздел",
+      saving: "Сохраняем изменения…",
+      saved: "Изменения сохранены",
+      saveError: "Не удалось сохранить изменения. Попробуй ещё раз.",
       tabs: {
         general: "Общее",
         appearance: "Вид",
@@ -1675,6 +1688,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       },
       backup: "Бэкап",
       exportJson: "Экспорт JSON",
+      exportError: "Не удалось экспортировать бэкап.",
       importJson: "Импорт JSON",
       importError: "Не удалось импортировать бэкап.",
       replaceBackup: "Заменить локальные данные этим бэкапом?",
@@ -1688,6 +1702,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       restoreBackup: "Восстановить",
       restoreBackupConfirm: "Заменить текущие локальные данные этой сохранённой версией?",
       deleteBackup: "Удалить бэкап",
+      deleteBackupError: "Не удалось удалить этот бэкап.",
       deleteBackupConfirm: "Удалить эту сохранённую версию?",
       sync: "Синхронизация",
       comingSoon: "Скоро",

@@ -7,6 +7,7 @@ import type { PrivacyLockController } from "../state/usePrivacyLock";
 import { BottomSheet } from "./ui/BottomSheet";
 import { Button } from "./ui/Button";
 import { SelectField } from "./ui/SelectField";
+import { SettingsToggleCard } from "./ui/SettingsToggleCard";
 
 interface PrivacySettingsPanelProps {
   settings: Settings;
@@ -96,33 +97,19 @@ export function PrivacySettingsPanel({ settings, privacy, t, onUpdateSettings }:
           </SelectField>
         </article>
 
-        <article className="app-surface flex items-start gap-3 rounded-app p-4">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-app bg-accent-soft text-accent">
-            {settings.hideAmounts ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-          </span>
-          <div className="min-w-0 flex-1">
-            <h3 className="text-sm font-semibold text-foreground">{t.settings.hideAmounts}</h3>
-            <p className="mt-1 text-xs leading-5 text-muted">{t.settings.hideAmountsHint}</p>
-          </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={settings.hideAmounts}
-            aria-label={t.settings.hideAmounts}
-            onClick={() => void onUpdateSettings({ hideAmounts: !settings.hideAmounts })}
-            className={`app-focus relative mt-1 h-7 w-12 shrink-0 rounded-full border transition-colors ${
-              settings.hideAmounts
-                ? "border-accent bg-accent"
-                : "border-line bg-elevated"
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
-                settings.hideAmounts ? "translate-x-5" : "translate-x-0.5"
-              }`}
-            />
-          </button>
-        </article>
+        <SettingsToggleCard
+          checked={settings.hideAmounts}
+          icon={
+            settings.hideAmounts ? (
+              <EyeOff className="h-5 w-5" />
+            ) : (
+              <Eye className="h-5 w-5" />
+            )
+          }
+          label={t.settings.hideAmounts}
+          hint={t.settings.hideAmountsHint}
+          onChange={(checked) => onUpdateSettings({ hideAmounts: checked })}
+        />
 
         <p className="px-1 text-xs leading-5 text-muted">{t.settings.localPrivacyNote}</p>
       </div>
