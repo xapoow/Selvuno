@@ -10,12 +10,15 @@ describe("LockScreen", () => {
     const onUnlock = vi.fn().mockResolvedValue(false);
     render(<LockScreen t={getDictionary("en-US")} onUnlock={onUnlock} />);
 
-    const input = screen.getByLabelText("PIN");
-    await user.type(input, "1111");
+    const pinField = screen.getByRole("button", { name: "PIN" });
+    for (let index = 0; index < 4; index += 1) {
+      await user.click(screen.getByRole("button", { name: "1" }));
+    }
     await user.click(screen.getByRole("button", { name: "Unlock" }));
 
     expect(onUnlock).toHaveBeenCalledWith("1111");
     expect(await screen.findByText("Incorrect PIN. Try again.")).toBeInTheDocument();
-    expect(input).toHaveValue("");
+    expect(pinField).toHaveTextContent("0");
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
   });
 });
