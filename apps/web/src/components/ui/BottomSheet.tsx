@@ -24,7 +24,7 @@ export function BottomSheet({ open, title, children, onClose }: BottomSheetProps
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            className="app-surface relative mx-auto w-full max-w-xl rounded-app p-4"
+            className="app-surface relative mx-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-xl overflow-y-auto rounded-app p-4"
             initial={{ y: 36, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 24, opacity: 0 }}
