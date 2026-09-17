@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.8.2";
+export const appVersion = "0.8.3";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -971,10 +971,10 @@ export const dictionaries: Record<Language, Dictionary> = {
       intro: "More control on every device, with privacy and productivity features that stay optional.",
       gotIt: "Explore the update",
       notes: [
-        "Reorder wallets via drag-and-drop handles in the Wallets tab",
-        "Refined category drag on mobile: items only move when grabbed by the left edge",
-        "Smooth, fluid page transitions and animated onboarding setup wizard",
-        "Consistent wallet switching: card carousel on Dashboard, classic switcher on other pages"
+        "Refined color theme picker UI: eliminated redundant dots and balanced item layout",
+        "Interactive animated indicator for segmented controls with equal column sizing",
+        "Silky-smooth spatial page transitions with soft depth blur and Apple-style curves",
+        "Fluid iPhone Setup Assistant-style transitions and spring physics in onboarding wizard"
       ]
     },
     categories: {
@@ -1584,10 +1584,10 @@ export const dictionaries: Record<Language, Dictionary> = {
       intro: "Больше контроля на любом устройстве — приватность и дополнительные возможности остаются опциональными.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Изменение порядка кошельков перетаскиванием за левый край во вкладке «Кошельки»",
-        "Перетаскивание категорий на смартфонах теперь срабатывает только за левую ручку",
-        "Плавные переходы между страницами и анимированный мастер первого запуска",
-        "Карточки карусели на главной и классический компактный переключатель на остальных экранах"
+        "Устранены визуальные несостыковки в переключателе цветовых схем (убраны лишние точки и дублирующиеся иконки)",
+        "Плавный скользящий индикатор для переключателей режимов с равным распределением колонок",
+        "Сверхплавные кинематические переходы между страницами с пространственной ориентацией и размытием",
+        "Анимация мастера первого запуска в стиле iOS Setup Assistant с мягким размытием и пружинной физикой"
       ]
     },
     categories: {

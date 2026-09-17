@@ -13,6 +13,7 @@ import { ColorThemePicker } from "../components/ColorThemePicker";
 import { currencyOptions, getCurrencyLabel } from "../lib/currencies";
 import { applyRootVisualTheme } from "../lib/colorThemes";
 import { getDictionary, languageOptions } from "../i18n";
+import { cn } from "../lib/cn";
 import { Button } from "../components/ui/Button";
 import { SelectField } from "../components/ui/SelectField";
 import { SegmentedControl } from "../components/ui/SegmentedControl";
@@ -89,18 +90,21 @@ export function OnboardingView({
     <main className="app-page-bg min-h-dvh px-4 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-[calc(env(safe-area-inset-top)+20px)] text-foreground">
       <section className="mx-auto flex min-h-[calc(100dvh-40px)] max-w-xl flex-col justify-center gap-6">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-semibold uppercase text-muted">MyFinances</p>
-          <div className="flex gap-1.5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted">MyFinances</p>
+          <div className="flex items-center gap-2">
             {[1, 2].map((item) => (
               <motion.span
                 key={item}
                 layout
                 animate={{
-                  width: item === step ? 28 : 16,
-                  opacity: item === step ? 1 : 0.45
+                  width: item === step ? 32 : 8,
+                  opacity: item === step ? 1 : 0.35
                 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
-                className={`h-1.5 rounded-full ${item === step ? "bg-accent" : "bg-muted/40"}`}
+                transition={{ type: "spring", stiffness: 380, damping: 26 }}
+                className={cn(
+                  "h-1.5 rounded-full transition-colors duration-300",
+                  item === step ? "bg-accent" : "bg-muted/40"
+                )}
               />
             ))}
           </div>
@@ -111,20 +115,26 @@ export function OnboardingView({
             <motion.div
               key={step}
               custom={direction}
-              initial={{ opacity: 0, x: direction * 28, scale: 0.99 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: -direction * 28, scale: 0.99 }}
-              transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, x: direction * 70, scale: 0.98, filter: "blur(8px)" }}
+              animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
+              exit={{
+                opacity: 0,
+                x: -direction * 50,
+                scale: 0.98,
+                filter: "blur(8px)",
+                transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] }
+              }}
+              transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
             >
               {step === 1 ? (
-                <div className="grid gap-5">
-                  <div className="app-control grid h-12 w-12 place-items-center rounded-app text-accent">
-                    <Languages className="h-6 w-6" />
+                <div className="grid gap-6">
+                  <div className="app-control grid h-14 w-14 place-items-center rounded-2xl text-accent shadow-sm ring-1 ring-black/5 dark:ring-white/10">
+                    <Languages className="h-7 w-7" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase text-muted">{t.onboarding.welcomeEyebrow}</p>
-                    <h1 className="mt-2 text-3xl font-semibold leading-tight text-foreground">{t.onboarding.welcomeTitle}</h1>
-                    <p className="mt-3 text-sm leading-6 text-muted">{t.onboarding.welcomeBody}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted">{t.onboarding.welcomeEyebrow}</p>
+                    <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">{t.onboarding.welcomeTitle}</h1>
+                    <p className="mt-3 text-base leading-relaxed text-muted">{t.onboarding.welcomeBody}</p>
                   </div>
                   <SelectField label={t.onboarding.languageTitle} value={locale} onChange={(event) => setLocale(event.target.value)}>
                     {languageOptions.map((option) => (
@@ -133,21 +143,21 @@ export function OnboardingView({
                       </option>
                     ))}
                   </SelectField>
-                  <Button onClick={() => goToStep(2)}>
+                  <Button onClick={() => goToStep(2)} className="h-12 text-base font-semibold">
                     {t.onboarding.start}
                   </Button>
                 </div>
               ) : (
-                <div className="grid gap-5">
-                  <div className="app-control grid h-12 w-12 place-items-center rounded-app text-accent">
-                    <WalletCards className="h-6 w-6" />
+                <div className="grid gap-6">
+                  <div className="app-control grid h-14 w-14 place-items-center rounded-2xl text-accent shadow-sm ring-1 ring-black/5 dark:ring-white/10">
+                    <WalletCards className="h-7 w-7" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase text-muted">{t.onboarding.setupEyebrow}</p>
-                    <h1 className="mt-2 text-3xl font-semibold leading-tight text-foreground">{t.onboarding.setupTitle}</h1>
-                    <p className="mt-3 text-sm leading-6 text-muted">{t.onboarding.setupBody}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted">{t.onboarding.setupEyebrow}</p>
+                    <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">{t.onboarding.setupTitle}</h1>
+                    <p className="mt-3 text-base leading-relaxed text-muted">{t.onboarding.setupBody}</p>
                   </div>
-                  <div className="app-surface grid gap-4 rounded-app p-4">
+                  <div className="app-surface grid gap-4 rounded-2xl p-5 shadow-sm ring-1 ring-line/50">
                     <SelectField
                       label={t.onboarding.globalCurrency}
                       value={globalCurrency}

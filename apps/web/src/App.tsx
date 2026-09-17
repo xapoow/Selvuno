@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
 import type { WalletView } from "@myfinances/types";
 import { Eye, EyeOff, LockKeyhole } from "lucide-react";
 import { BottomNavigation } from "./components/BottomNavigation";
@@ -17,7 +17,7 @@ import { getDictionary } from "./i18n";
 import { applyRootVisualTheme } from "./lib/colorThemes";
 import { useExchangeRates } from "./lib/exchangeRates";
 import { buildAppNotifications } from "./lib/notifications";
-import { useAppStore } from "./state/appStore";
+import { useAppStore, type AppView } from "./state/appStore";
 import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
 import { usePrivacyLock } from "./state/usePrivacyLock";
 import { getIncludedWalletIds, shouldHideWalletAmounts } from "./lib/walletFeatures";
@@ -29,9 +29,52 @@ import { OnboardingView } from "./views/OnboardingView";
 import { SettingsView } from "./views/SettingsView";
 import { WalletsHubView } from "./views/WalletsHubView";
 
+const viewOrder: Record<AppView, number> = {
+  dashboard: 0,
+  history: 1,
+  add: 2,
+  wallets: 3,
+  settings: 4
+};
+
+const pageVariants: Variants = {
+  enter: (direction: number) => ({
+    opacity: 0,
+    x: direction * 24,
+    scale: 0.995,
+    filter: "blur(4px)"
+  }),
+  center: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.28,
+      ease: [0.16, 1, 0.3, 1] as const
+    }
+  },
+  exit: (direction: number) => ({
+    opacity: 0,
+    x: -direction * 18,
+    scale: 0.995,
+    filter: "blur(4px)",
+    transition: {
+      duration: 0.16,
+      ease: [0.22, 1, 0.36, 1] as const
+    }
+  })
+};
+
 export function App() {
   const activeView = useAppStore((state) => state.activeView);
   const setActiveView = useAppStore((state) => state.setActiveView);
+  const prevViewRef = useRef<AppView>(activeView);
+  const viewTransitionDirection = (viewOrder[activeView] ?? 0) >= (viewOrder[prevViewRef.current] ?? 0) ? 1 : -1;
+
+  useEffect(() => {
+    prevViewRef.current = activeView;
+  }, [activeView]);
   const [walletTransitionDirection, setWalletTransitionDirection] = useState(1);
   const [historySearchRequest, setHistorySearchRequest] = useState(0);
   const privacy = usePrivacyLock();
@@ -110,7 +153,7 @@ export function App() {
   }, [settings]);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "instant" });
   }, [activeView]);
 
   useEffect(() => {
@@ -363,13 +406,14 @@ export function App() {
             )}
           </div>
         ) : null}
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode="wait" custom={viewTransitionDirection} initial={false}>
           <motion.div
             key={activeView}
-            initial={{ opacity: 0, y: 10, scale: 0.995 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.995 }}
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            custom={viewTransitionDirection}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
           >
           {activeView === "dashboard" ? (
             <>

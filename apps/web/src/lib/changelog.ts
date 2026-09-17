@@ -9,6 +9,15 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.8.3",
+      notes: [
+        "Устранены визуальные несостыковки в переключателе цветовых схем (убраны лишние точки и дублирующиеся иконки)",
+        "Плавный скользящий индикатор для переключателей режимов с равным распределением колонок",
+        "Сверхплавные кинематические переходы между страницами с пространственной ориентацией и размытием",
+        "Анимация мастера первого запуска в стиле iOS Setup Assistant с мягким размытием и пружинной физикой"
+      ]
+    },
+    {
       version: "0.8.2",
       notes: [
         "Изменение порядка кошельков перетаскиванием за левый край во вкладке «Кошельки»",
@@ -107,6 +116,15 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.8.3",
+      notes: [
+        "Refined color theme picker UI: eliminated redundant dots and balanced item layout",
+        "Interactive animated indicator for segmented controls with equal column sizing",
+        "Silky-smooth spatial page transitions with soft depth blur and Apple-style curves",
+        "Fluid iPhone Setup Assistant-style transitions and spring physics in onboarding wizard"
+      ]
+    },
     {
       version: "0.8.2",
       notes: [
