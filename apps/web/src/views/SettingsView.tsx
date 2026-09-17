@@ -210,6 +210,8 @@ export function SettingsView({
     () => new Map(categories.map((category) => [category.id, category])),
     [categories]
   );
+  const activeTabMeta = settingsTabs.find((tab) => tab.value === activeTab) ?? settingsTabs[0];
+  const ActiveTabIcon = activeTabMeta.icon;
 
   useEffect(() => {
     setVisualTheme(settings.theme);
@@ -423,20 +425,21 @@ export function SettingsView({
         <Button
           ref={settingsMenuButtonRef}
           variant="secondary"
-          size="icon"
-          className="md:hidden"
+          className="h-11 max-w-[min(68vw,240px)] gap-2 px-3 md:hidden"
           onClick={() => setSettingsMenuOpen(true)}
           aria-label={`${t.settings.section}: ${t.settings.tabs[activeTab]}`}
           aria-expanded={settingsMenuOpen}
         >
-          <Menu className="h-5 w-5" />
+          <ActiveTabIcon className="h-4 w-4 shrink-0 text-accent" />
+          <span className="min-w-0 truncate">{t.settings.tabs[activeTab]}</span>
+          <Menu className="h-4 w-4 shrink-0 text-muted" />
         </Button>
       </div>
 
       <AnimatePresence>
         {settingsMenuOpen ? (
           <motion.div
-            className="fixed inset-0 z-50 bg-black/50 md:hidden"
+            className="fixed inset-0 z-50 flex items-end bg-black/55 px-3 pt-[calc(env(safe-area-inset-top)+1rem)] backdrop-blur-[4px] md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -447,27 +450,30 @@ export function SettingsView({
               onClick={() => setSettingsMenuOpen(false)}
               aria-label={t.common.close}
             />
-            <motion.aside
+            <motion.section
               ref={settingsMenuPanelRef}
               role="dialog"
               aria-modal="true"
               aria-label={t.settings.section}
-              className="app-surface relative grid h-full w-[min(86vw,320px)] content-start gap-4 overflow-y-auto rounded-r-2xl px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+16px)]"
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "spring", stiffness: 360, damping: 34 }}
+              className="app-surface relative mx-auto grid max-h-[82dvh] w-full max-w-lg content-start gap-4 overflow-y-auto rounded-t-3xl px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3 shadow-2xl"
+              initial={{ y: "100%", opacity: 0.7 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "100%", opacity: 0.7 }}
+              transition={{ type: "spring", stiffness: 420, damping: 36 }}
             >
+              <span className="mx-auto h-1 w-10 rounded-full bg-line" aria-hidden="true" />
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase text-muted">{t.settings.section}</p>
-                  <h3 className="text-lg font-semibold text-foreground">{t.settings.title}</h3>
+                  <h3 className="mt-0.5 text-lg font-semibold text-foreground">
+                    {t.settings.tabs[activeTab]}
+                  </h3>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => setSettingsMenuOpen(false)} aria-label={t.common.close}>
                   <X className="h-5 w-5" />
                 </Button>
               </div>
-              <nav className="grid gap-2" aria-label={t.settings.section}>
+              <nav className="grid grid-cols-2 gap-2" aria-label={t.settings.section}>
                 {settingsTabs.map((tab) => {
                   const isActive = activeTab === tab.value;
                   const Icon = tab.icon;
@@ -477,20 +483,31 @@ export function SettingsView({
                       type="button"
                       aria-current={isActive ? "page" : undefined}
                       onClick={() => selectSettingsTab(tab.value)}
-                      className={`app-focus flex h-11 items-center justify-between rounded-xl px-3 text-left text-sm font-medium active:scale-[0.98] ${
-                        isActive ? "app-selected-control text-foreground" : "text-muted hover:bg-elevated/70 hover:text-foreground"
+                      className={`app-focus relative flex min-h-20 min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border px-2 py-3 text-center text-xs font-medium active:scale-[0.98] ${
+                        isActive
+                          ? "app-selected-control border-accent/25 text-foreground"
+                          : "border-line/60 text-muted hover:bg-elevated/70 hover:text-foreground"
                       }`}
                     >
-                      <span className="flex min-w-0 items-center gap-3">
-                        <Icon className="h-[18px] w-[18px] shrink-0" />
-                        <span className="truncate">{t.settings.tabs[tab.value]}</span>
+                      <span
+                        className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${
+                          isActive ? "bg-accent-soft text-accent" : "bg-elevated/70"
+                        }`}
+                      >
+                        <Icon className="h-[18px] w-[18px]" />
                       </span>
-                      {isActive ? <span className="h-1.5 w-1.5 rounded-full bg-accent" /> : null}
+                      <span className="min-w-0 leading-4">{t.settings.tabs[tab.value]}</span>
+                      {isActive ? (
+                        <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-accent" />
+                      ) : null}
                     </button>
                   );
                 })}
               </nav>
-            </motion.aside>
+              <p className="border-t border-line/60 pt-3 text-center text-xs font-medium text-muted">
+                {t.settings.version} {appVersion}
+              </p>
+            </motion.section>
           </motion.div>
         ) : null}
       </AnimatePresence>
@@ -525,7 +542,7 @@ export function SettingsView({
         </aside>
 
         <div className="grid min-w-0 gap-5">
-          <div className="overflow-x-auto no-scrollbar -mx-4 px-4 pb-1 lg:hidden">
+          <div className="-mx-4 hidden overflow-x-auto px-4 pb-1 no-scrollbar md:block lg:hidden">
             <div className="app-control flex min-w-max gap-1 rounded-xl p-1">
               {settingsTabs.map((tab) => {
                 const isActive = activeTab === tab.value;
