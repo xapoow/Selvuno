@@ -145,6 +145,7 @@ export const transactionSchema = baseEntitySchema.extend({
   type: transactionTypeSchema,
   note: z.string().max(240).optional(),
   tags: z.array(transactionTagSchema).max(12).default([]),
+  attachmentCount: z.number().int().nonnegative().optional(),
   transactionDate: z.string().datetime(),
   recurringTransactionId: z.string().uuid().optional(),
   recurrenceDate: calendarDateSchema.optional()

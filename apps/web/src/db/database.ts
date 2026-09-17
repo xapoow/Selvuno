@@ -13,6 +13,7 @@ import type {
   WalletTransfer
 } from "@myfinances/types";
 import { DEFAULT_CURRENCY, detectDefaultLocaleSettings, inferCurrencyFromLocale } from "@myfinances/utils";
+import type { TransactionAttachment } from "./models";
 
 const DEFAULT_LOCALE = "ru-RU";
 
@@ -28,6 +29,7 @@ export class FinanceDatabase extends Dexie {
   savingsGoalContributions!: Table<SavingsGoalContribution, string>;
   walletTransfers!: Table<WalletTransfer, string>;
   backupSnapshots!: Table<BackupSnapshot, string>;
+  transactionAttachments!: Table<TransactionAttachment, string>;
 
   constructor(name = "myfinances") {
     super(name);
@@ -237,6 +239,23 @@ export class FinanceDatabase extends Dexie {
             }
           });
       });
+    this.version(12).stores({
+      wallets: "id, sortOrder, name, currency, kind, excludeFromTotals, archivedAt, deletedAt, updatedAt",
+      categories: "id, sortOrder, name, type, deletedAt, updatedAt",
+      transactions:
+        "id, walletId, categoryId, type, transactionDate, recurringTransactionId, &[recurringTransactionId+recurrenceDate], deletedAt, updatedAt",
+      transactionTemplates: "id, walletId, categoryId, type, sortOrder, deletedAt, updatedAt",
+      settings: "id",
+      budgets: "id, month, categoryId, [categoryId+month], deletedAt, updatedAt",
+      recurringTransactions:
+        "id, walletId, categoryId, type, frequency, nextRunDate, paused, deletedAt, updatedAt",
+      savingsGoals: "id, walletId, targetDate, deletedAt, updatedAt",
+      savingsGoalContributions: "id, goalId, contributionDate, deletedAt, updatedAt",
+      walletTransfers:
+        "id, fromWalletId, toWalletId, transferDate, deletedAt, updatedAt",
+      backupSnapshots: "id, createdAt, reason",
+      transactionAttachments: "id, transactionId, createdAt"
+    });
   }
 }
 

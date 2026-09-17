@@ -56,7 +56,8 @@ export const backupRepository: BackupRepository = {
         financeDb.recurringTransactions,
         financeDb.savingsGoals,
         financeDb.savingsGoalContributions,
-        financeDb.walletTransfers
+        financeDb.walletTransfers,
+        financeDb.transactionAttachments
       ],
       async () => {
         await financeDb.wallets.clear();
@@ -69,6 +70,7 @@ export const backupRepository: BackupRepository = {
         await financeDb.savingsGoals.clear();
         await financeDb.savingsGoalContributions.clear();
         await financeDb.walletTransfers.clear();
+        await financeDb.transactionAttachments.clear();
         await financeDb.wallets.bulkPut(
           parsed.wallets.map((wallet) => ({
             ...wallet,

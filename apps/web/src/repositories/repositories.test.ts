@@ -7,6 +7,7 @@ import { recurringTransactionRepository } from "./recurringTransactionRepository
 import { savingsGoalRepository } from "./savingsGoalRepository";
 import { settingsRepository } from "./settingsRepository";
 import { transactionRepository } from "./transactionRepository";
+import { transactionAttachmentRepository } from "./transactionAttachmentRepository";
 import { transactionTemplateRepository } from "./transactionTemplateRepository";
 import { walletRepository } from "./walletRepository";
 import { walletTransferRepository } from "./walletTransferRepository";
@@ -112,6 +113,35 @@ describe("finance repositories", () => {
     expect(
       (await walletRepository.listWallets()).find((item) => item.id === wallet.id)
     ).toMatchObject({ archivedAt: null, color: "#7b61ff", icon: "piggy-bank" });
+  });
+
+  it("stores receipt files separately and updates the transaction attachment count", async () => {
+    await seedLocalData();
+    const [wallet] = await walletRepository.listWallets();
+    const [category] = await categoryRepository.listCategories("expense");
+    const transaction = await transactionRepository.addTransaction({
+      walletId: wallet.id,
+      categoryId: category.id,
+      type: "expense",
+      amountMinor: 1590,
+      currency: wallet.currency,
+      transactionDate: "2026-09-17T12:00:00.000Z"
+    });
+    const receipt = new File(["receipt"], "receipt.jpg", { type: "image/jpeg" });
+
+    await transactionAttachmentRepository.applyChanges(transaction.id, [receipt], []);
+    const [stored] = await transactionAttachmentRepository.listByTransaction(transaction.id);
+
+    expect(stored).toMatchObject({
+      transactionId: transaction.id,
+      name: "receipt.jpg",
+      mimeType: "image/jpeg"
+    });
+    expect((await transactionRepository.listTransactions())[0].attachmentCount).toBe(1);
+
+    await transactionAttachmentRepository.applyChanges(transaction.id, [], [stored.id]);
+    expect(await transactionAttachmentRepository.listByTransaction(transaction.id)).toHaveLength(0);
+    expect((await transactionRepository.listTransactions())[0].attachmentCount).toBe(0);
   });
 
   it("does not archive the last active wallet", async () => {
