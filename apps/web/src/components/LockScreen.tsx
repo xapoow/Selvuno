@@ -17,7 +17,7 @@ export function LockScreen({ t, onUnlock }: LockScreenProps) {
   return (
     <main className="app-page-bg grid min-h-dvh place-items-center px-4 py-[calc(env(safe-area-inset-top)+1rem)] text-foreground">
       <form
-        className="app-surface grid w-full max-w-sm gap-5 rounded-app p-5 sm:p-6"
+        className="app-surface grid w-full max-w-sm gap-5 rounded-2xl p-5 sm:p-6"
         onSubmit={(event) => {
           event.preventDefault();
           setError("");
@@ -33,7 +33,7 @@ export function LockScreen({ t, onUnlock }: LockScreenProps) {
             .finally(() => setSubmitting(false));
         }}
       >
-        <span className="grid h-12 w-12 place-items-center rounded-app bg-accent-soft text-accent">
+        <span className="grid h-12 w-12 place-items-center rounded-xl bg-accent-soft text-accent">
           <LockKeyhole className="h-6 w-6" />
         </span>
         <div>

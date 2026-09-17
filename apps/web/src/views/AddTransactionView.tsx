@@ -89,7 +89,7 @@ export function AddTransactionView({
                 </span>
               </div>
             </div>
-            <div className="app-surface rounded-app p-3 sm:p-5">
+            <div className="app-surface rounded-2xl p-3 sm:p-5">
               <TransactionForm
                 wallets={wallets}
                 categories={categories}

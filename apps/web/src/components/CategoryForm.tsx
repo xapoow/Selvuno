@@ -75,7 +75,7 @@ export function CategoryForm({ initial, t, submitLabel, onSubmit }: CategoryForm
       <TextField label={t.common.name} value={name} onChange={(event) => setName(event.target.value)} maxLength={48} />
       <fieldset className="grid gap-2">
         <legend className="text-sm font-medium text-foreground">{t.categories.icon}</legend>
-        <label className="app-field app-focus flex h-10 items-center gap-2 rounded-app px-3">
+        <label className="app-field app-focus flex h-10 items-center gap-2 rounded-xl px-3">
           <Search className="h-4 w-4 text-muted" />
           <input
             value={iconSearch}
@@ -85,7 +85,7 @@ export function CategoryForm({ initial, t, submitLabel, onSubmit }: CategoryForm
             className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted"
           />
         </label>
-        <div className="app-field grid grid-cols-5 gap-2 rounded-app p-2 sm:grid-cols-10">
+        <div className="app-field grid grid-cols-5 gap-2 rounded-xl p-2 sm:grid-cols-10">
           {visibleIcons.map((iconName) => {
             const selected = icon === iconName;
             return (
@@ -96,7 +96,7 @@ export function CategoryForm({ initial, t, submitLabel, onSubmit }: CategoryForm
                 aria-pressed={selected}
                 title={iconName}
                 onClick={() => setIcon(iconName)}
-                className={`app-focus grid aspect-square place-items-center rounded-app ${
+                className={`app-focus grid aspect-square place-items-center rounded-lg ${
                   selected ? "app-navigation-active" : "text-muted hover:bg-surface hover:text-foreground"
                 }`}
               >
@@ -121,7 +121,7 @@ export function CategoryForm({ initial, t, submitLabel, onSubmit }: CategoryForm
               type="button"
               aria-label={swatch}
               onClick={() => setColor(swatch)}
-              className="app-swatch h-10 rounded-app transition active:scale-[0.98]"
+              className="app-swatch h-10 rounded-xl transition active:scale-[0.98]"
               style={{
                 backgroundColor: swatch,
                 outline: color === swatch ? "2px solid rgb(var(--color-foreground))" : "none"
@@ -129,7 +129,7 @@ export function CategoryForm({ initial, t, submitLabel, onSubmit }: CategoryForm
             />
           ))}
         </div>
-        <label className="app-field app-focus flex h-11 items-center justify-between rounded-app px-3 text-sm font-medium text-foreground">
+        <label className="app-field app-focus flex h-11 items-center justify-between rounded-xl px-3 text-sm font-medium text-foreground">
           <span>{color.toUpperCase()}</span>
           <input
             type="color"

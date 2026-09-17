@@ -12,7 +12,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       <input
         ref={ref}
         className={cn(
-          "app-field app-focus h-11 rounded-app px-3 text-base text-foreground outline-none",
+          "app-field app-focus h-11 rounded-xl px-3 text-base text-foreground outline-none",
           className
         )}
         {...props}

@@ -64,7 +64,7 @@ export function WalletTransfersView({
             return (
               <article
                 key={transfer.id}
-                className="app-surface grid gap-3 rounded-app p-4 sm:grid-cols-[1fr_auto] sm:items-center"
+                className="app-surface grid gap-3 rounded-2xl p-4 sm:grid-cols-[1fr_auto] sm:items-center"
               >
                 <div className="min-w-0">
                   <div className="flex min-w-0 items-center gap-2 font-semibold text-foreground">

@@ -207,7 +207,7 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
           onClick={() => setOpen((current) => !current)}
           onKeyDown={handleKeyDown}
           className={cn(
-            "app-field app-focus grid h-11 grid-cols-[1fr_auto] items-center gap-3 rounded-app px-3 text-left text-base text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-50",
+            "app-field app-focus grid h-11 grid-cols-[1fr_auto] items-center gap-3 rounded-xl px-3 text-left text-base text-foreground outline-none disabled:cursor-not-allowed disabled:opacity-50",
             className
           )}
         >
@@ -221,7 +221,7 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
               id={listboxId}
               role="listbox"
               aria-label={label}
-              className="app-surface absolute inset-x-0 top-[calc(100%+6px)] z-50 grid max-h-64 overflow-auto rounded-app p-1"
+              className="app-surface absolute inset-x-0 top-[calc(100%+6px)] z-50 grid max-h-64 overflow-auto rounded-xl p-1"
               initial={{ opacity: 0, y: -4, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -4, scale: 0.98 }}
@@ -239,7 +239,7 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
                     disabled={option.disabled}
                     onClick={() => selectValue(option.value)}
                     className={cn(
-                      "app-focus app-select-option grid grid-cols-[1fr_auto] items-center gap-3 rounded-[6px] px-3 text-left text-sm font-medium text-muted outline-none active:scale-[0.99] disabled:opacity-40",
+                      "app-focus app-select-option grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg px-3 text-left text-sm font-medium text-muted outline-none active:scale-[0.99] disabled:opacity-40",
                       selected ? "app-selected-control text-foreground" : "hover:bg-elevated/70 hover:text-foreground"
                     )}
                   >

@@ -85,7 +85,7 @@ export function RecurringTransactionsPanel({
         </Button>
       </div>
 
-      <div className="app-control flex items-start gap-3 rounded-app p-3 text-sm text-muted">
+      <div className="app-control flex items-start gap-3 rounded-xl p-3 text-sm text-muted">
         <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
         <p>{t.recurring.openAppHint}</p>
       </div>
@@ -97,10 +97,10 @@ export function RecurringTransactionsPanel({
             return (
               <article
                 key={schedule.id}
-                className="app-surface grid grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-app p-3 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center"
+                className="app-surface grid grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-2xl p-3 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center"
               >
                 <span
-                  className="grid h-11 w-11 place-items-center rounded-app text-white"
+                  className="grid h-11 w-11 place-items-center rounded-xl text-white"
                   style={{ backgroundColor: category?.color ?? "#676761" }}
                 >
                   <CategoryIcon name={category?.icon ?? "sparkles"} className="h-5 w-5" />

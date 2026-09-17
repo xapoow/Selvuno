@@ -19,10 +19,10 @@ const config: Config = {
         warning: "rgb(var(--color-warning) / <alpha-value>)"
       },
       borderRadius: {
-        app: "18px",
+        app: "16px",
         card: "20px",
-        control: "14px",
-        subtle: "10px",
+        control: "12px",
+        subtle: "8px",
         pill: "9999px"
       },
       boxShadow: {

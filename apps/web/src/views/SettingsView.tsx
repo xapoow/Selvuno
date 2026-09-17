@@ -108,7 +108,7 @@ function ReorderCategoryRow({
       dragListener={false}
       dragControls={dragControls}
       onDragEnd={onDragEnd}
-      className="app-surface grid grid-cols-[auto_auto_1fr_auto] items-center gap-3 rounded-app p-3"
+      className="app-surface grid grid-cols-[auto_auto_1fr_auto] items-center gap-3 rounded-xl p-3"
     >
       <button
         type="button"
@@ -119,7 +119,7 @@ function ReorderCategoryRow({
         <GripVertical className="h-4 w-4" />
       </button>
       <span
-        className="grid h-10 w-10 place-items-center rounded-app text-white"
+        className="grid h-10 w-10 place-items-center rounded-lg text-white"
         style={{ backgroundColor: category.color }}
       >
         <CategoryIcon name={category.icon} className="h-5 w-5" />
@@ -436,7 +436,7 @@ export function SettingsView({
       <AnimatePresence>
         {settingsMenuOpen ? (
           <motion.div
-            className="fixed inset-0 z-50 bg-black/28 backdrop-blur-[3px] md:hidden"
+            className="fixed inset-0 z-50 bg-black/50 md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -452,7 +452,7 @@ export function SettingsView({
               role="dialog"
               aria-modal="true"
               aria-label={t.settings.section}
-              className="app-surface relative grid h-full w-[min(86vw,320px)] content-start gap-4 overflow-y-auto rounded-r-[8px] px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+16px)]"
+              className="app-surface relative grid h-full w-[min(86vw,320px)] content-start gap-4 overflow-y-auto rounded-r-2xl px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+16px)]"
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
@@ -477,7 +477,7 @@ export function SettingsView({
                       type="button"
                       aria-current={isActive ? "page" : undefined}
                       onClick={() => selectSettingsTab(tab.value)}
-                      className={`app-focus flex h-11 items-center justify-between rounded-app px-3 text-left text-sm font-medium active:scale-[0.98] ${
+                      className={`app-focus flex h-11 items-center justify-between rounded-xl px-3 text-left text-sm font-medium active:scale-[0.98] ${
                         isActive ? "app-selected-control text-foreground" : "text-muted hover:bg-elevated/70 hover:text-foreground"
                       }`}
                     >
@@ -496,7 +496,7 @@ export function SettingsView({
       </AnimatePresence>
 
       <div className="grid min-w-0 gap-6 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start">
-        <aside className="app-surface sticky top-5 hidden rounded-app p-2 lg:block">
+        <aside className="app-surface sticky top-5 hidden rounded-2xl p-2 lg:block">
           <nav className="grid gap-1" aria-label={t.settings.section}>
             {settingsTabs.map((tab) => {
               const isActive = activeTab === tab.value;
@@ -507,7 +507,7 @@ export function SettingsView({
                   type="button"
                   aria-current={isActive ? "page" : undefined}
                   onClick={() => selectSettingsTab(tab.value)}
-                  className={`app-focus flex h-11 items-center gap-3 rounded-app px-3 text-left text-sm font-medium active:scale-[0.98] ${
+                  className={`app-focus flex h-11 items-center gap-3 rounded-xl px-3 text-left text-sm font-medium active:scale-[0.98] ${
                     isActive
                       ? "app-selected-control text-foreground"
                       : "text-muted hover:bg-elevated/70 hover:text-foreground"
@@ -525,8 +525,8 @@ export function SettingsView({
         </aside>
 
         <div className="grid min-w-0 gap-5">
-          <div className="hidden overflow-x-auto pb-1 md:block lg:hidden">
-            <div className="app-control flex min-w-max gap-1 rounded-app p-1">
+          <div className="overflow-x-auto no-scrollbar -mx-4 px-4 pb-1 lg:hidden">
+            <div className="app-control flex min-w-max gap-1 rounded-xl p-1">
               {settingsTabs.map((tab) => {
                 const isActive = activeTab === tab.value;
                 const Icon = tab.icon;
@@ -536,7 +536,7 @@ export function SettingsView({
                     type="button"
                     aria-current={isActive ? "page" : undefined}
                     onClick={() => selectSettingsTab(tab.value)}
-                    className={`app-focus flex h-10 items-center gap-2 whitespace-nowrap rounded-[6px] px-3 text-sm font-medium active:scale-[0.98] ${
+                    className={`app-focus flex h-10 items-center gap-2 whitespace-nowrap rounded-lg px-3 text-sm font-medium active:scale-[0.98] ${
                       isActive
                         ? "app-selected-control text-foreground"
                         : "text-muted hover:text-foreground"
@@ -552,14 +552,14 @@ export function SettingsView({
 
           <motion.div
             key={activeTab}
-            className="grid min-w-0 gap-5"
+            className="grid min-w-0 gap-5 gpu-layer"
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.16, ease: "easeOut" }}
           >
       {activeTab === "general" ? (
         <Section title={t.settings.general}>
-          <div className="app-surface grid gap-4 rounded-app p-4 sm:grid-cols-2">
+          <div className="app-surface grid gap-4 rounded-2xl p-4 sm:grid-cols-2">
             <SelectField
               label={t.common.language}
               value={settings.locale}
@@ -618,7 +618,7 @@ export function SettingsView({
 
       {activeTab === "appearance" ? (
         <Section title={t.settings.appearance}>
-          <div className="app-surface grid gap-4 rounded-app p-4">
+          <div className="app-surface grid gap-4 rounded-2xl p-4">
             <SegmentedControl
               value={visualTheme}
               onChange={handleThemeChange}
@@ -743,7 +743,7 @@ export function SettingsView({
       {activeTab === "backup" ? (
         <Section title={t.settings.backup}>
           <div className="grid gap-4">
-            <div className="app-surface grid gap-3 rounded-app p-4 sm:grid-cols-2">
+            <div className="app-surface grid gap-3 rounded-2xl p-4 sm:grid-cols-2">
               <Button variant="secondary" onClick={() => void handleExport()}>
                 <FileDown className="h-4 w-4" />
                 {t.settings.exportJson}
@@ -762,9 +762,9 @@ export function SettingsView({
               {importError ? <p className="text-sm font-medium text-expense sm:col-span-2">{importError}</p> : null}
             </div>
 
-            <div className="app-surface grid gap-3 rounded-app p-4">
+            <div className="app-surface grid gap-3 rounded-2xl p-4">
               <div className="flex items-start gap-3">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-app bg-accent-soft text-accent">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
                   <History className="h-5 w-5" />
                 </span>
                 <div>
@@ -780,7 +780,7 @@ export function SettingsView({
                   {backupSnapshots.map((snapshot) => (
                     <article
                       key={snapshot.id}
-                      className="app-control grid grid-cols-[1fr_auto] items-center gap-3 rounded-app p-3"
+                      className="app-control grid grid-cols-[1fr_auto] items-center gap-3 rounded-xl p-3"
                     >
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-foreground">
@@ -841,7 +841,7 @@ export function SettingsView({
                   ))}
                 </div>
               ) : (
-                <p className="app-control rounded-app p-4 text-center text-sm text-muted">
+                <p className="app-control rounded-xl p-4 text-center text-sm text-muted">
                   {t.settings.backupHistoryEmpty}
                 </p>
               )}
@@ -852,7 +852,7 @@ export function SettingsView({
 
       {activeTab === "sync" ? (
         <Section title={t.settings.sync}>
-          <div className="app-surface rounded-app p-5">
+          <div className="app-surface rounded-2xl p-5">
             <p className="text-sm font-semibold uppercase text-muted">{t.settings.comingSoon}</p>
             <h3 className="mt-2 text-xl font-semibold text-foreground">{t.settings.syncTitle}</h3>
             <p className="mt-2 text-sm leading-6 text-muted">

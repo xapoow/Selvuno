@@ -73,7 +73,7 @@ export function DatePicker({
       <span className="text-sm font-medium text-foreground">{label}</span>
       <button
         type="button"
-        className="app-field app-focus flex h-11 w-full items-center justify-between rounded-app px-3 text-left text-sm text-foreground"
+        className="app-field app-focus flex h-11 w-full items-center justify-between rounded-xl px-3 text-left text-sm text-foreground"
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         onClick={() => {
@@ -86,11 +86,11 @@ export function DatePicker({
       </button>
 
       {isOpen ? (
-        <div role="dialog" aria-label={label} className="app-surface absolute left-0 right-0 top-[calc(100%+6px)] z-40 rounded-app p-3">
+        <div role="dialog" aria-label={label} className="app-surface absolute left-0 right-0 top-[calc(100%+6px)] z-40 rounded-xl p-3">
           <div className="mb-3 flex items-center justify-between gap-2">
             <button
               type="button"
-              className="app-focus grid h-9 w-9 place-items-center rounded-app text-muted hover:bg-elevated hover:text-foreground"
+              className="app-focus grid h-9 w-9 place-items-center rounded-lg text-muted hover:bg-elevated hover:text-foreground"
               aria-label={previousMonthLabel}
               onClick={() => setVisibleMonth((month) => new Date(month.getFullYear(), month.getMonth() - 1, 1))}
             >
@@ -99,7 +99,7 @@ export function DatePicker({
             <span className="text-sm font-semibold capitalize text-foreground">{monthLabel}</span>
             <button
               type="button"
-              className="app-focus grid h-9 w-9 place-items-center rounded-app text-muted hover:bg-elevated hover:text-foreground"
+              className="app-focus grid h-9 w-9 place-items-center rounded-lg text-muted hover:bg-elevated hover:text-foreground"
               aria-label={nextMonthLabel}
               onClick={() => setVisibleMonth((month) => new Date(month.getFullYear(), month.getMonth() + 1, 1))}
             >
@@ -125,7 +125,7 @@ export function DatePicker({
                   key={day}
                   type="button"
                   className={cn(
-                    "app-focus grid h-8 place-items-center rounded-app text-sm font-medium text-foreground",
+                    "app-focus grid h-8 place-items-center rounded-lg text-sm font-medium text-foreground",
                     isSelected && "bg-accent text-white shadow-[0_6px_14px_rgb(var(--color-accent)/0.28)]",
                     !isSelected && isToday && "bg-accent-soft text-accent",
                     !isSelected && !isToday && "hover:bg-elevated"

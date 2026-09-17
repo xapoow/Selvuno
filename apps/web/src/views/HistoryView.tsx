@@ -348,7 +348,7 @@ export function HistoryView({
           </div>
         </div>
       </div>
-      <div className="app-surface grid gap-3 rounded-app p-3">
+      <div className="app-surface grid gap-3 rounded-2xl p-3">
         <SegmentedControl
           value={typeFilter}
           onChange={setTypeFilter}
@@ -389,7 +389,7 @@ export function HistoryView({
         </div>
       </div>
       {viewMode === "table" && selectedTransactions.length ? (
-        <div className="app-surface grid gap-3 rounded-app p-3 lg:grid-cols-[auto_minmax(220px,1fr)_auto_auto] lg:items-end">
+        <div className="app-surface grid gap-3 rounded-2xl p-3 lg:grid-cols-[auto_minmax(220px,1fr)_auto_auto] lg:items-end">
           <p className="self-center text-sm font-semibold text-foreground">
             {t.history.selected.replace("{count}", String(selectedTransactions.length))}
           </p>

@@ -13,11 +13,11 @@ export function StatPanel({ label, value, tone = "default", caption, icon: Icon 
     tone === "income" ? "text-income" : tone === "expense" ? "text-expense" : "text-foreground";
 
   return (
-    <div className="app-surface rounded-app p-4">
+    <div className="app-surface rounded-2xl p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-medium uppercase text-muted">{label}</p>
         {Icon ? (
-          <span className="app-control grid h-8 w-8 place-items-center rounded-app text-muted">
+          <span className="app-control grid h-8 w-8 place-items-center rounded-lg text-muted">
             <Icon className="h-4 w-4" />
           </span>
         ) : null}

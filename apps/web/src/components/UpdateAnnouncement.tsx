@@ -31,9 +31,9 @@ export function UpdateAnnouncement({ t }: { t: Dictionary }) {
 
   return (
     <BottomSheet open={open} title={t.updates.title} onClose={dismiss}>
-      <div className="overflow-hidden rounded-app border border-line/60 bg-elevated">
+      <div className="overflow-hidden rounded-2xl border border-line/60 bg-elevated">
         <div className="bg-gradient-to-br from-accent-soft via-elevated to-elevated p-5">
-          <span className="grid h-12 w-12 place-items-center rounded-app bg-accent text-white shadow-[0_10px_30px_rgb(0_0_0/0.12)]">
+          <span className="grid h-12 w-12 place-items-center rounded-xl bg-accent text-white shadow-[0_10px_30px_rgb(0_0_0/0.12)]">
             <Sparkles className="h-6 w-6" />
           </span>
           <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-accent">

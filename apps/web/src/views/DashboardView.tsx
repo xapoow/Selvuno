@@ -413,8 +413,8 @@ export function DashboardView({
         className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(330px,0.85fr)]"
       >
         <Section title={t.dashboard.cashFlow}>
-          <div className="app-surface grid min-h-[286px] gap-4 rounded-app p-4 sm:p-5">
-            <div className="app-control grid w-full max-w-sm grid-cols-2 justify-self-center rounded-app p-1">
+          <div className="app-surface grid min-h-[286px] gap-4 rounded-2xl p-4 sm:p-5">
+            <div className="app-control grid w-full max-w-sm grid-cols-2 justify-self-center rounded-xl p-1">
               {(["expense", "income"] as const).map((type) => {
                 const hasData = (type === "expense" ? expenseCategories : incomeCategories).length > 0;
                 return (
@@ -424,7 +424,7 @@ export function DashboardView({
                     disabled={!hasData}
                     onClick={() => setChartType(type)}
                     className={cn(
-                      "app-focus h-9 rounded-[6px] text-xs font-semibold text-muted outline-none disabled:cursor-not-allowed disabled:opacity-40",
+                      "app-focus h-9 rounded-lg text-xs font-semibold text-muted outline-none disabled:cursor-not-allowed disabled:opacity-40",
                       chartType === type && "app-selected-control text-foreground"
                     )}
                   >
@@ -483,7 +483,7 @@ export function DashboardView({
             ) : (
               <div className="grid min-h-[188px] place-items-center text-center">
                 <div className="grid justify-items-center gap-3">
-                  <span className="app-control grid h-10 w-10 place-items-center rounded-app text-muted">
+                  <span className="app-control grid h-10 w-10 place-items-center rounded-xl text-muted">
                     <BarChart3 className="h-5 w-5" />
                   </span>
                   <p className="max-w-56 text-sm font-medium text-muted">{t.dashboard.emptyChart}</p>

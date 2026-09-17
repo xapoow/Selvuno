@@ -207,11 +207,11 @@ export function ErrorScreen({
           : "min-h-dvh pb-[calc(env(safe-area-inset-bottom)+2.5rem)] pt-[calc(env(safe-area-inset-top)+2.5rem)]"
       )}
     >
-      <section className="app-surface w-full max-w-xl rounded-app p-5">
+      <section className="app-surface w-full max-w-xl rounded-2xl p-5">
         <div className="flex items-start gap-4">
           <span
             className={cn(
-              "grid h-12 w-12 shrink-0 place-items-center rounded-app",
+              "grid h-12 w-12 shrink-0 place-items-center rounded-xl",
               preset.tone === "danger" && "bg-expense/12 text-expense",
               preset.tone === "warning" && "bg-warning/12 text-warning",
               preset.tone === "accent" && "bg-accentSoft text-accent"
@@ -242,7 +242,7 @@ export function ErrorScreen({
         </div>
 
         {details ? (
-          <details className="app-control mt-5 rounded-app p-3">
+          <details className="app-control mt-5 rounded-xl p-3">
             <summary className="cursor-pointer text-sm font-semibold text-foreground">
               {copy?.actions.debugDetails ?? "Debug details"}
             </summary>

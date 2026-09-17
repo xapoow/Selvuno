@@ -114,7 +114,7 @@ export function SavingsGoalsView({
             return (
               <article
                 key={goal.id}
-                className="app-surface grid content-start gap-4 rounded-app border-l-4 p-4"
+                className="app-surface grid content-start gap-4 rounded-2xl border-l-4 p-4"
                 style={{ borderLeftColor: goal.color }}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -278,7 +278,7 @@ export function SavingsGoalsView({
             {historyContributions.map((contribution) => (
               <article
                 key={contribution.id}
-                className="app-control grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-app p-3"
+                className="app-control grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl p-3"
               >
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-foreground">

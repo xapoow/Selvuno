@@ -18,9 +18,9 @@ interface SmartInsightsCardProps {
 
 export function SmartInsightsCard({ insights, categories, t }: SmartInsightsCardProps) {
   return (
-    <section className="app-surface grid gap-4 rounded-app p-4 sm:p-5">
+    <section className="app-surface grid gap-4 rounded-2xl p-4 sm:p-5">
       <div className="flex items-start gap-3">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-app bg-accent-soft text-accent">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
           <Sparkles className="h-5 w-5" />
         </span>
         <div>
@@ -38,7 +38,7 @@ export function SmartInsightsCard({ insights, categories, t }: SmartInsightsCard
             return (
               <article
                 key={`${insight.kind}-${presentation.body}`}
-                className="app-control flex items-start gap-3 rounded-app p-3"
+                className="app-control flex items-start gap-3 rounded-xl p-3"
               >
                 <span className={`mt-0.5 ${presentation.tone}`}>
                   <Icon className="h-4 w-4" />
@@ -49,7 +49,7 @@ export function SmartInsightsCard({ insights, categories, t }: SmartInsightsCard
           })}
         </div>
       ) : (
-        <p className="app-control rounded-app p-4 text-center text-sm text-muted">
+        <p className="app-control rounded-xl p-4 text-center text-sm text-muted">
           {t.insights.empty}
         </p>
       )}

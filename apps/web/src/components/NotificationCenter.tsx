@@ -79,7 +79,7 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
     <>
       <button
         type="button"
-        className="app-focus app-surface relative grid h-11 w-11 place-items-center rounded-app text-muted transition-colors hover:text-foreground"
+        className="app-focus app-surface relative grid h-11 w-11 place-items-center rounded-xl text-muted transition-colors hover:text-foreground"
         aria-label={`${t.notifications.open}${unreadCount ? `, ${unreadCount} ${t.notifications.unread}` : ""}`}
         onClick={() => {
           setSelected(null);
@@ -104,7 +104,7 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
                     key={notification.id}
                     type="button"
                     className={cn(
-                      "app-focus app-control flex w-full gap-3 rounded-app p-3.5 text-left transition-opacity",
+                      "app-focus app-control flex w-full gap-3 rounded-xl p-3.5 text-left transition-opacity",
                       isRead && "opacity-60"
                     )}
                     onClick={() => {
@@ -134,7 +134,7 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
                 );
               })
             ) : (
-              <p className="app-control rounded-app p-5 text-center text-sm text-muted">
+              <p className="app-control rounded-xl p-5 text-center text-sm text-muted">
                 {t.notifications.empty}
               </p>
             )}
@@ -154,10 +154,10 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
       >
         {selected ? (
           <div className="grid gap-4">
-            <div className="app-control flex items-start gap-3 rounded-app p-4">
+            <div className="app-control flex items-start gap-3 rounded-xl p-4">
               <span
                 className={cn(
-                  "grid h-11 w-11 shrink-0 place-items-center rounded-app",
+                  "grid h-11 w-11 shrink-0 place-items-center rounded-lg",
                   toneStyles[selected.tone]
                 )}
               >
@@ -170,7 +170,7 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
                 {selected.details.map((detail) => (
                   <div
                     key={`${detail.label}:${detail.value}`}
-                    className="app-control grid gap-1 rounded-app p-3 sm:grid-cols-[140px_1fr] sm:gap-3"
+                    className="app-control grid gap-1 rounded-lg p-3 sm:grid-cols-[140px_1fr] sm:gap-3"
                   >
                     <dt className="text-xs font-semibold uppercase tracking-wide text-muted">
                       {detail.label}

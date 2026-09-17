@@ -30,9 +30,9 @@ export function CookieNotice() {
   }
 
   return (
-    <aside className="app-surface fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-50 mx-auto max-w-md rounded-app p-4 shadow-[0_18px_48px_rgb(0_0_0/0.18)] md:bottom-6" aria-label={t.cookieNotice.title}>
+    <aside className="app-surface fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+84px)] z-50 mx-auto max-w-md rounded-2xl p-4 shadow-[0_18px_48px_rgb(0_0_0/0.18)] md:bottom-6" aria-label={t.cookieNotice.title}>
       <div className="flex gap-3">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-app bg-accent-soft text-accent">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
           <ShieldCheck className="h-5 w-5" />
         </span>
         <div className="min-w-0">

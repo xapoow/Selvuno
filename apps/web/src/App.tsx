@@ -40,28 +40,25 @@ const viewOrder: Record<AppView, number> = {
 const pageVariants: Variants = {
   enter: (direction: number) => ({
     opacity: 0,
-    x: direction * 24,
-    scale: 0.995,
-    filter: "blur(4px)"
+    x: direction * 18,
+    scale: 0.998
   }),
   center: {
     opacity: 1,
     x: 0,
     scale: 1,
-    filter: "blur(0px)",
     transition: {
-      duration: 0.28,
-      ease: [0.16, 1, 0.3, 1] as const
+      duration: 0.22,
+      ease: [0.22, 1, 0.36, 1] as const
     }
   },
   exit: (direction: number) => ({
     opacity: 0,
-    x: -direction * 18,
-    scale: 0.995,
-    filter: "blur(4px)",
+    x: -direction * 12,
+    scale: 0.998,
     transition: {
-      duration: 0.16,
-      ease: [0.22, 1, 0.36, 1] as const
+      duration: 0.12,
+      ease: "easeOut"
     }
   })
 };
@@ -414,6 +411,7 @@ export function App() {
             initial="enter"
             animate="center"
             exit="exit"
+            className="gpu-layer"
           >
           {activeView === "dashboard" ? (
             <>

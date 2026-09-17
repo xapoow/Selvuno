@@ -283,7 +283,7 @@ export function AnalyticsView({
           <button
             type="button"
             onClick={onBack}
-            className="app-control app-focus grid h-10 w-10 place-items-center rounded-app text-muted hover:text-foreground"
+            className="app-control app-focus grid h-10 w-10 place-items-center rounded-xl text-muted hover:text-foreground"
             aria-label={t.dashboard.backToOverview}
           >
             <ArrowLeft className="h-5 w-5" />
@@ -309,7 +309,7 @@ export function AnalyticsView({
         </div>
       </div>
 
-      <section className="app-surface grid gap-4 rounded-app p-4 sm:p-5">
+      <section className="app-surface grid gap-4 rounded-2xl p-4 sm:p-5">
         <div className="grid gap-2">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
             {t.analytics.period}
@@ -376,7 +376,7 @@ export function AnalyticsView({
           </SelectField>
         </div>
 
-        <div className="app-control flex flex-wrap items-center justify-between gap-2 rounded-app px-3 py-2">
+        <div className="app-control flex flex-wrap items-center justify-between gap-2 rounded-xl px-3 py-2">
           <span className="inline-flex items-center gap-2 text-sm font-medium text-foreground">
             <CalendarRange className="h-4 w-4 text-accent" />
             {rangeLabel}
@@ -390,11 +390,11 @@ export function AnalyticsView({
 
       <section
         className={cn(
-          "app-control flex items-start gap-3 rounded-app p-4",
+          "app-control flex items-start gap-3 rounded-xl p-4",
           change !== null && change !== 0 && (changeIsPositive ? "text-income" : "text-expense")
         )}
       >
-        <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-app bg-elevated">
+        <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-elevated">
           {change !== null && change < 0 ? (
             <ArrowDownRight className="h-5 w-5" />
           ) : (
@@ -449,7 +449,7 @@ export function AnalyticsView({
       </div>
 
       <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
-        <section className="app-surface min-w-0 rounded-app p-4 sm:p-5">
+        <section className="app-surface min-w-0 rounded-2xl p-4 sm:p-5">
           <div className="mb-5 flex items-start justify-between gap-3">
             <div>
               <h3 className="text-base font-semibold text-foreground">{t.dashboard.trend}</h3>
@@ -520,7 +520,7 @@ export function AnalyticsView({
           )}
         </section>
 
-        <section className="app-surface min-w-0 rounded-app p-4 sm:p-5">
+        <section className="app-surface min-w-0 rounded-2xl p-4 sm:p-5">
           <div className="mb-5">
             <h3 className="text-base font-semibold text-foreground">
               {t.dashboard.categoriesBreakdown}

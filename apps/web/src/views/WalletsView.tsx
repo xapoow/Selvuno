@@ -71,7 +71,7 @@ function ReorderWalletItem({
       dragListener={false}
       dragControls={dragControls}
       onDragEnd={onDragEnd}
-      className="app-surface grid gap-3 rounded-app p-4"
+      className="app-surface grid gap-3 rounded-2xl p-4"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
@@ -86,7 +86,7 @@ function ReorderWalletItem({
             </button>
           ) : null}
           <span
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-app text-white shadow-[0_8px_18px_rgb(0_0_0/0.16)]"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white shadow-[0_8px_18px_rgb(0_0_0/0.16)]"
             style={{ backgroundColor: wallet.color }}
           >
             <WalletIcon name={wallet.icon} className="h-5 w-5" />
@@ -135,7 +135,7 @@ function ReorderWalletItem({
         </div>
       </div>
       {advanced && wallet.kind === "credit" ? (
-        <div className="app-control grid gap-2 rounded-app p-3">
+        <div className="app-control grid gap-2 rounded-xl p-3">
           <div className="flex items-center justify-between gap-3 text-xs">
             <span className="text-muted">{t.wallets.creditUsed}</span>
             <span className="font-semibold text-foreground">
@@ -247,7 +247,7 @@ export function WalletsView({
       </div>
 
       {operationError ? (
-        <p className="rounded-app bg-expense/10 px-3 py-2 text-sm font-medium text-expense">
+        <p className="rounded-xl bg-expense/10 px-3 py-2 text-sm font-medium text-expense">
           {operationError}
         </p>
       ) : null}
@@ -348,11 +348,11 @@ export function WalletsView({
             {archivedWallets.map((wallet) => (
               <article
                 key={wallet.id}
-                className="app-control flex items-center justify-between gap-3 rounded-app p-3"
+                className="app-control flex items-center justify-between gap-3 rounded-xl p-3"
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <span
-                    className="grid h-10 w-10 shrink-0 place-items-center rounded-app text-white"
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-white"
                     style={{ backgroundColor: wallet.color }}
                   >
                     <WalletIcon name={wallet.icon} className="h-4 w-4" />

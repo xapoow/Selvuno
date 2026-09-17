@@ -38,7 +38,7 @@ export function TransactionTable({
   const allSelected = items.length > 0 && items.every((item) => selectedIds.has(item.transaction.id));
 
   return (
-    <div className="app-surface overflow-x-auto rounded-app">
+    <div className="app-surface overflow-x-auto rounded-2xl">
       <table className="w-full min-w-[760px] border-collapse text-left text-sm">
         <thead className="border-b border-line/70 text-xs font-semibold uppercase tracking-wide text-muted">
           <tr>

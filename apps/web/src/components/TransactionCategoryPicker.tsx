@@ -52,12 +52,12 @@ export function TransactionCategoryPicker({
               aria-checked={selected}
               onClick={() => onChange(category.id)}
               className={cn(
-                "app-focus app-control grid min-h-20 place-items-center gap-1.5 rounded-app border border-transparent px-2 py-2.5 text-center active:scale-[0.98]",
+                "app-focus app-control grid min-h-20 place-items-center gap-1.5 rounded-xl border border-transparent px-2 py-2.5 text-center active:scale-[0.98]",
                 selected && "border-accent/60 bg-accent-soft ring-1 ring-accent/15"
               )}
             >
               <span
-                className="grid h-9 w-9 place-items-center rounded-app text-white shadow-sm"
+                className="grid h-9 w-9 place-items-center rounded-lg text-white shadow-sm"
                 style={{ backgroundColor: category.color }}
               >
                 <CategoryIcon name={category.icon} className="h-4 w-4" />
@@ -72,7 +72,7 @@ export function TransactionCategoryPicker({
       {categories.length > PREVIEW_LIMIT ? (
         <button
           type="button"
-          className="app-focus mx-auto flex items-center gap-1 rounded-app px-2 py-1 text-xs font-semibold text-muted hover:text-foreground"
+          className="app-focus mx-auto flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-muted hover:text-foreground"
           aria-expanded={expanded}
           onClick={() => setExpanded((current) => !current)}
         >

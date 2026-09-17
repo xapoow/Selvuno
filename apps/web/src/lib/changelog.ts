@@ -9,6 +9,15 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.8.4",
+      notes: [
+        "Гармонизирована концентрическая сетка border-radius (карточки 16px, элементы ввода 12px, сегменты и кнопки 8px)",
+        "Быстрая горизонтальная панель разделов настроек на смартфонах для мгновенного переключения в одно касание",
+        "Аппаратная оптимизация GPU (120 FPS): устранены тяжёлые фильтры размытия при переходе между экранами и в мастере настройки",
+        "Улучшенный рендеринг и плавность открытия бокового меню настроек на мобильных устройствах"
+      ]
+    },
+    {
       version: "0.8.3",
       notes: [
         "Устранены визуальные несостыковки в переключателе цветовых схем (убраны лишние точки и дублирующиеся иконки)",
@@ -116,6 +125,15 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.8.4",
+      notes: [
+        "Harmonized concentric border-radius hierarchy (16px cards, 12px controls, 8px pills and segments)",
+        "Quick horizontal settings navigation strip on mobile phones for instant one-tap category switching",
+        "120 FPS GPU compositor optimizations: eliminated heavy blur filters on page switches and onboarding",
+        "Optimized mobile settings drawer rendering and smooth transition performance"
+      ]
+    },
     {
       version: "0.8.3",
       notes: [

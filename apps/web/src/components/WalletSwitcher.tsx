@@ -103,7 +103,7 @@ export function WalletSwitcher({
               selectByOffset(1);
             }
           }}
-          className="app-surface app-focus touch-pan-y select-none rounded-app px-3 py-3 outline-none active:scale-[0.99]"
+          className="app-surface app-focus touch-pan-y select-none rounded-2xl px-3 py-3 outline-none active:scale-[0.99]"
           whileTap={canSwitch ? { scale: 0.99 } : undefined}
         >
           <div className="grid grid-cols-[24px_1fr_24px] items-center gap-2">
@@ -111,7 +111,7 @@ export function WalletSwitcher({
             <div className="grid justify-items-center gap-1 overflow-hidden text-center">
               <span
                 className={cn(
-                  "grid h-9 w-9 place-items-center rounded-app",
+                  "grid h-9 w-9 place-items-center rounded-xl",
                   activeOption.kind === "all" ? "app-control text-accent" : "text-white"
                 )}
                 style={
@@ -177,7 +177,7 @@ export function WalletSwitcher({
               selectByOffset(1);
             }
           }}
-          className="app-surface app-focus grid h-[72px] w-full max-w-[430px] cursor-grab touch-pan-y select-none grid-cols-[32px_1fr_32px] items-center rounded-app px-3 outline-none active:cursor-grabbing"
+          className="app-surface app-focus grid h-[72px] w-full max-w-[430px] cursor-grab touch-pan-y select-none grid-cols-[32px_1fr_32px] items-center rounded-2xl px-3 outline-none active:cursor-grabbing"
           whileDrag={{ scale: 0.985 }}
         >
           <ChevronLeft className={cn("h-4 w-4 justify-self-center text-muted", !canSwitch && "opacity-30")} />
@@ -194,7 +194,7 @@ export function WalletSwitcher({
             >
               <span
                 className={cn(
-                  "grid h-10 w-10 shrink-0 place-items-center rounded-app",
+                  "grid h-10 w-10 shrink-0 place-items-center rounded-xl",
                   activeOption.kind === "all" ? "app-control text-accent" : "text-white"
                 )}
                 style={

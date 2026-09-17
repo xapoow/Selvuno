@@ -93,7 +93,7 @@ export function SavingsGoalForm({
         />
       </div>
 
-      <div className="app-control grid gap-3 rounded-app p-3">
+      <div className="app-control grid gap-3 rounded-xl p-3">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-sm font-semibold text-foreground">{t.goals.targetDate}</p>
@@ -131,7 +131,7 @@ export function SavingsGoalForm({
               aria-label={swatch}
               aria-pressed={color === swatch}
               onClick={() => setColor(swatch)}
-              className="app-swatch h-10 rounded-app transition active:scale-[0.98]"
+              className="app-swatch h-10 rounded-xl transition active:scale-[0.98]"
               style={{
                 backgroundColor: swatch,
                 outline: color === swatch ? "2px solid rgb(var(--color-foreground))" : "none"
@@ -139,7 +139,7 @@ export function SavingsGoalForm({
             />
           ))}
         </div>
-        <label className="app-field app-focus flex h-11 items-center justify-between rounded-app px-3 text-sm font-medium text-foreground">
+        <label className="app-field app-focus flex h-11 items-center justify-between rounded-xl px-3 text-sm font-medium text-foreground">
           <span>{color.toUpperCase()}</span>
           <input
             type="color"

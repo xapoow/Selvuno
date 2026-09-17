@@ -116,7 +116,7 @@ export function MobileWalletPager({
     <div className="grid gap-4">
       <div className="[perspective:900px]">
         <motion.div
-          className="app-surface relative flex h-[76px] touch-pan-y items-center overflow-hidden rounded-app px-4 py-3 shadow-[0_14px_30px_rgb(var(--color-accent)/0.12)]"
+          className="app-surface relative flex h-[76px] touch-pan-y items-center overflow-hidden rounded-2xl px-4 py-3 shadow-[0_14px_30px_rgb(var(--color-accent)/0.12)]"
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.16}
@@ -134,7 +134,7 @@ export function MobileWalletPager({
               className="flex min-w-0 flex-1 items-center gap-3"
             >
               <span
-                className={`grid h-10 w-10 shrink-0 place-items-center rounded-app ${
+                className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${
                   activeOption.kind === "all" ? "bg-accent-soft text-accent" : "text-white"
                 }`}
                 style={

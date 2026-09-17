@@ -25,7 +25,7 @@ export function PinCodeField({ active = true, label, value, onActivate }: PinCod
         aria-label={label}
         onClick={onActivate}
         className={cn(
-          "app-field app-focus flex h-12 items-center justify-center gap-2 rounded-app px-3 outline-none transition-colors",
+          "app-field app-focus flex h-12 items-center justify-center gap-2 rounded-xl px-3 outline-none transition-colors",
           active && "border-accent ring-1 ring-accent/35"
         )}
       >
@@ -87,7 +87,7 @@ export function PinKeypad({
               aria-label={digit}
               disabled={disabled || value.length >= maxLength}
               onClick={() => appendDigit(digit)}
-              className="app-control app-focus h-12 rounded-app text-xl font-semibold text-foreground transition-colors hover:bg-surface/90 active:scale-[0.97] disabled:opacity-45"
+              className="app-control app-focus h-12 rounded-xl text-xl font-semibold text-foreground transition-colors hover:bg-surface/90 active:scale-[0.97] disabled:opacity-45"
             >
               {digit}
             </button>
@@ -101,7 +101,7 @@ export function PinKeypad({
           aria-label="0"
           disabled={disabled || value.length >= maxLength}
           onClick={() => appendDigit("0")}
-          className="app-control app-focus h-12 rounded-app text-xl font-semibold text-foreground transition-colors hover:bg-surface/90 active:scale-[0.97] disabled:opacity-45"
+          className="app-control app-focus h-12 rounded-xl text-xl font-semibold text-foreground transition-colors hover:bg-surface/90 active:scale-[0.97] disabled:opacity-45"
         >
           0
         </button>
@@ -110,7 +110,7 @@ export function PinKeypad({
           aria-label={deleteLabel}
           disabled={disabled || !value.length}
           onClick={deleteDigit}
-          className="app-focus grid h-12 place-items-center rounded-app text-muted transition-colors hover:bg-elevated/70 hover:text-foreground active:scale-[0.97] disabled:opacity-30"
+          className="app-focus grid h-12 place-items-center rounded-xl text-muted transition-colors hover:bg-elevated/70 hover:text-foreground active:scale-[0.97] disabled:opacity-30"
         >
           <DeleteIcon className="h-6 w-6" />
         </button>

@@ -35,12 +35,12 @@ export function SettingsToggleCard({
   return (
     <article
       className={cn(
-        "app-surface flex items-start gap-3 rounded-app p-4 transition-colors",
+        "app-surface flex items-start gap-3 rounded-2xl p-4 transition-colors",
         pending && "opacity-75"
       )}
       aria-busy={pending}
     >
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-app bg-accent-soft text-accent">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
         {icon}
       </span>
       <div className="min-w-0 flex-1">
@@ -54,7 +54,7 @@ export function SettingsToggleCard({
         aria-label={label}
         disabled={pending}
         onClick={() => void handleChange()}
-        className="app-focus -my-2 grid h-11 w-14 shrink-0 place-items-center rounded-app disabled:cursor-wait"
+        className="app-focus -my-2 grid h-11 w-14 shrink-0 place-items-center rounded-xl disabled:cursor-wait"
       >
         <span
           aria-hidden="true"

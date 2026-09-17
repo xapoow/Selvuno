@@ -138,7 +138,7 @@ export function FinancialCalendar({
 
   return (
     <div className="grid gap-4">
-      <section className="app-surface overflow-hidden rounded-app p-3 sm:p-4">
+      <section className="app-surface overflow-hidden rounded-2xl p-3 sm:p-4">
         <div className="flex items-center justify-between gap-2">
           <Button
             type="button"
@@ -171,19 +171,19 @@ export function FinancialCalendar({
         </div>
 
         <div className="my-3 grid grid-cols-3 gap-2">
-          <div className="app-control rounded-app p-2">
+          <div className="app-control rounded-xl p-2">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">{t.common.income}</p>
             <p className="mt-1 truncate text-xs font-semibold text-income sm:text-sm">
               {formatMoney(monthSummary.incomeMinor, displayCurrency, settings.locale, settings.hideAmounts)}
             </p>
           </div>
-          <div className="app-control rounded-app p-2">
+          <div className="app-control rounded-xl p-2">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">{t.common.expenses}</p>
             <p className="mt-1 truncate text-xs font-semibold text-expense sm:text-sm">
               {formatMoney(monthSummary.expenseMinor, displayCurrency, settings.locale, settings.hideAmounts)}
             </p>
           </div>
-          <div className="app-control rounded-app p-2">
+          <div className="app-control rounded-xl p-2">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">{t.common.balance}</p>
             <p className="mt-1 truncate text-xs font-semibold text-foreground sm:text-sm">
               {formatMoney(
@@ -230,7 +230,7 @@ export function FinancialCalendar({
                 }).format(new Date(`${date}T12:00:00Z`))}
                 aria-pressed={isSelected}
                 className={cn(
-                  "app-focus relative flex min-h-14 min-w-0 flex-col items-center rounded-app border border-transparent px-0.5 py-1 text-foreground sm:min-h-16 sm:px-1",
+                  "app-focus relative flex min-h-14 min-w-0 flex-col items-center rounded-lg border border-transparent px-0.5 py-1 text-foreground sm:min-h-16 sm:px-1",
                   isSelected && "border-accent/45 bg-accent-soft",
                   !isSelected && isToday && "bg-elevated",
                   !isSelected && "hover:bg-elevated/70"

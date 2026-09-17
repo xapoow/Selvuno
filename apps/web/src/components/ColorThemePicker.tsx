@@ -21,7 +21,7 @@ export function ColorThemePicker({ value, labels, onChange }: ColorThemePickerPr
             aria-pressed={selected}
             onClick={() => onChange(option.value)}
             className={cn(
-              "app-focus relative flex flex-col justify-between min-h-[80px] rounded-app p-3 text-left transition-all duration-150 active:scale-[0.98]",
+              "app-focus relative flex flex-col justify-between min-h-[80px] rounded-xl p-3 text-left transition-all duration-150 active:scale-[0.98]",
               selected
                 ? "app-selected-control text-foreground ring-2 ring-accent/60 shadow-sm"
                 : "app-control text-muted hover:bg-surface/80 hover:text-foreground"

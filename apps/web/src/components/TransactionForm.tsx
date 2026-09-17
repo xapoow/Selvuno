@@ -245,11 +245,11 @@ export function TransactionForm({
                 <button
                   key={`${isCustom ? "custom" : "recent"}-${template.id}-${index}`}
                   type="button"
-                  className="app-focus app-control flex shrink-0 items-center gap-2 rounded-app p-2 pr-3 text-left active:scale-[0.98]"
+                  className="app-focus app-control flex shrink-0 items-center gap-2 rounded-xl p-2 pr-3 text-left active:scale-[0.98]"
                   onClick={() => applyTemplate(template)}
                 >
                   <span
-                    className="grid h-9 w-9 place-items-center rounded-app text-white"
+                    className="grid h-9 w-9 place-items-center rounded-lg text-white"
                     style={{ backgroundColor: category?.color ?? "#676761" }}
                   >
                     <CategoryIcon name={category?.icon ?? "sparkles"} className="h-4 w-4" />
@@ -288,7 +288,7 @@ export function TransactionForm({
       />
       <label
         className={cn(
-          "app-control grid gap-2 rounded-app border p-4 sm:p-5",
+          "app-control grid gap-2 rounded-2xl border p-4 sm:p-5",
           type === "income" ? "border-income/25" : "border-expense/25"
         )}
       >
@@ -321,7 +321,7 @@ export function TransactionForm({
               key={operator.value}
               type="button"
               aria-label={`${t.transaction.calculatorOperator} ${operator.label}`}
-              className="app-focus app-field grid h-8 min-w-9 place-items-center rounded-[6px] px-2 text-sm font-semibold text-muted hover:text-foreground"
+              className="app-focus app-field grid h-8 min-w-9 place-items-center rounded-lg px-2 text-sm font-semibold text-muted hover:text-foreground"
               onClick={() => {
                 setAmount((current) => `${current.trimEnd()} ${operator.value} `);
                 setSaved(false);
@@ -334,7 +334,7 @@ export function TransactionForm({
             <>
               <button
                 type="button"
-                className="app-focus app-field ml-auto inline-flex h-8 items-center gap-1 rounded-[6px] px-2 text-xs font-semibold text-accent"
+                className="app-focus app-field ml-auto inline-flex h-8 items-center gap-1 rounded-lg px-2 text-xs font-semibold text-accent"
                 onClick={() => setAmount(String(Math.round(calculatedAmount * 100_000_000) / 100_000_000))}
               >
                 <Equal className="h-3.5 w-3.5" />
@@ -378,9 +378,9 @@ export function TransactionForm({
           aria-expanded={detailsOpen}
           aria-label={detailsOpen ? t.transaction.hideDetails : t.transaction.showDetails}
           onClick={() => setDetailsOpen((current) => !current)}
-          className="app-focus app-control grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-app p-3 text-left"
+          className="app-focus app-control grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-xl p-3 text-left"
         >
-          <span className="grid h-9 w-9 place-items-center rounded-app bg-accent-soft text-accent">
+          <span className="grid h-9 w-9 place-items-center rounded-lg bg-accent-soft text-accent">
             <CalendarDays className="h-4 w-4" />
           </span>
           <span className="min-w-0">
@@ -395,7 +395,7 @@ export function TransactionForm({
         </button>
 
         {detailsOpen ? (
-          <div className="app-control grid gap-4 rounded-app p-3 sm:p-4">
+          <div className="app-control grid gap-4 rounded-xl p-3 sm:p-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <DatePicker
                 label={t.common.date}
@@ -416,7 +416,7 @@ export function TransactionForm({
             {suggestion ? (
               <button
                 type="button"
-                className="app-focus app-field flex items-center gap-2 rounded-app px-3 py-2 text-left text-xs font-medium text-muted hover:text-foreground"
+                className="app-focus app-field flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-muted hover:text-foreground"
                 onClick={() => {
                   setCategoryId(suggestion.id);
                   setSaved(false);
@@ -451,7 +451,7 @@ export function TransactionForm({
       </div>
       {error ? <p className="text-sm font-medium text-expense">{error}</p> : null}
       {saved ? (
-        <div className="app-control flex items-center justify-between gap-3 rounded-app px-3 py-2">
+        <div className="app-control flex items-center justify-between gap-3 rounded-xl px-3 py-2">
           <p className="text-sm font-medium text-income">{t.common.saved}</p>
           {settings.addAnotherEnabled ? (
             <Button

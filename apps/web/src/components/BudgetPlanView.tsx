@@ -121,7 +121,7 @@ export function BudgetPlanView({
           <button
             type="button"
             onClick={onBack}
-            className="app-control app-focus grid h-10 w-10 place-items-center rounded-app text-muted outline-none hover:text-foreground"
+            className="app-control app-focus grid h-10 w-10 place-items-center rounded-xl text-muted outline-none hover:text-foreground"
             aria-label={t.budget.back}
           >
             <ArrowLeft className="h-5 w-5" />
@@ -131,10 +131,10 @@ export function BudgetPlanView({
             <h2 className="text-2xl font-semibold text-foreground">{t.budget.monthPlan}</h2>
           </div>
         </div>
-        <div className="app-control flex items-center gap-1 rounded-app p-1">
+        <div className="app-control flex items-center gap-1 rounded-xl p-1">
           <button
             type="button"
-            className="app-focus grid h-9 w-9 place-items-center rounded-[6px] text-muted outline-none hover:text-foreground"
+            className="app-focus grid h-9 w-9 place-items-center rounded-lg text-muted outline-none hover:text-foreground"
             aria-label={t.budget.previousMonth}
             onClick={() => setMonth((current) => offsetBudgetMonth(current, -1))}
           >
@@ -143,7 +143,7 @@ export function BudgetPlanView({
           <span className="min-w-40 px-2 text-center text-sm font-semibold capitalize text-foreground">{monthLabel}</span>
           <button
             type="button"
-            className="app-focus grid h-9 w-9 place-items-center rounded-[6px] text-muted outline-none hover:text-foreground"
+            className="app-focus grid h-9 w-9 place-items-center rounded-lg text-muted outline-none hover:text-foreground"
             aria-label={t.budget.nextMonth}
             onClick={() => setMonth((current) => offsetBudgetMonth(current, 1))}
           >
@@ -171,7 +171,7 @@ export function BudgetPlanView({
       </div>
 
       {progress.limitMinor > 0 ? (
-        <div className="app-surface grid gap-2 rounded-app p-4">
+        <div className="app-surface grid gap-2 rounded-2xl p-4">
           <div className="flex items-center justify-between gap-3 text-sm">
             <span className="font-medium text-muted">{t.budget.monthPlan}</span>
             <span className="font-semibold" style={{ color: progressTone }}>
@@ -188,7 +188,7 @@ export function BudgetPlanView({
       ) : null}
 
       {progress.missingConversions ? (
-        <div className="app-control flex items-center gap-2 rounded-app px-3 py-2 text-sm text-warning">
+        <div className="app-control flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-warning">
           <CircleAlert className="h-4 w-4 shrink-0" />
           {t.budget.missingRates}
         </div>
@@ -209,11 +209,11 @@ export function BudgetPlanView({
               return (
                 <article
                   key={item.category.id}
-                  className="app-surface grid gap-3 rounded-app p-3 sm:grid-cols-[minmax(0,1fr)_190px] sm:items-center sm:p-4"
+                  className="app-surface grid gap-3 rounded-2xl p-3 sm:grid-cols-[minmax(0,1fr)_190px] sm:items-center sm:p-4"
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <span
-                      className="grid h-11 w-11 shrink-0 place-items-center rounded-app text-white"
+                      className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white"
                       style={{ backgroundColor: item.category.color }}
                     >
                       <CategoryIcon name={item.category.icon} className="h-5 w-5" />
@@ -237,7 +237,7 @@ export function BudgetPlanView({
                   </div>
                   <label className="grid gap-1.5 text-xs font-medium text-muted">
                     <span>{t.budget.limit}</span>
-                    <span className="app-field app-focus grid h-11 grid-cols-[1fr_auto] items-center rounded-app px-3">
+                    <span className="app-field app-focus grid h-11 grid-cols-[1fr_auto] items-center rounded-xl px-3">
                       <input
                         value={drafts[item.category.id] ?? ""}
                         onChange={(event) => {

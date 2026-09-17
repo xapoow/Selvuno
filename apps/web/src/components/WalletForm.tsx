@@ -114,7 +114,7 @@ export function WalletForm({
       />
       <p className="-mt-2 text-xs text-muted">{t.wallets.initialBalanceHint}</p>
       {advancedWalletsEnabled ? (
-        <div className="app-control grid gap-4 rounded-app p-3 sm:p-4">
+        <div className="app-control grid gap-4 rounded-2xl p-3 sm:p-4">
           <SegmentedControl
             value={kind}
             onChange={setKind}
@@ -150,7 +150,7 @@ export function WalletForm({
       ) : null}
       <fieldset className="grid gap-2">
         <legend className="text-sm font-medium text-foreground">{t.wallets.icon}</legend>
-        <div className="app-field grid grid-cols-5 gap-2 rounded-app p-2 sm:grid-cols-9">
+        <div className="app-field grid grid-cols-5 gap-2 rounded-xl p-2 sm:grid-cols-9">
           {walletIconNames.map((iconName) => {
             const selected = icon === iconName;
             return (
@@ -161,7 +161,7 @@ export function WalletForm({
                 aria-pressed={selected}
                 title={iconName}
                 onClick={() => setIcon(iconName)}
-                className={`app-focus grid aspect-square place-items-center rounded-app ${
+                className={`app-focus grid aspect-square place-items-center rounded-lg ${
                   selected
                     ? "app-navigation-active"
                     : "text-muted hover:bg-surface hover:text-foreground"
@@ -183,7 +183,7 @@ export function WalletForm({
               aria-label={swatch}
               aria-pressed={color === swatch}
               onClick={() => setColor(swatch)}
-              className="app-swatch h-10 rounded-app transition active:scale-[0.98]"
+              className="app-swatch h-10 rounded-xl transition active:scale-[0.98]"
               style={{
                 backgroundColor: swatch,
                 outline:
@@ -194,7 +194,7 @@ export function WalletForm({
             />
           ))}
         </div>
-        <label className="app-field app-focus flex h-11 items-center justify-between rounded-app px-3 text-sm font-medium text-foreground">
+        <label className="app-field app-focus flex h-11 items-center justify-between rounded-xl px-3 text-sm font-medium text-foreground">
           <span>{color.toUpperCase()}</span>
           <input
             type="color"

@@ -16,9 +16,9 @@ describe("changelog", () => {
   it("returns builtin changelogs in descending order", () => {
     const list = getChangelogHistory("ru-RU");
     expect(list.length).toBeGreaterThanOrEqual(10);
-    expect(list[0].version).toBe("0.8.3");
-    expect(list[1].version).toBe("0.8.2");
-    expect(list[2].version).toBe("0.8.1");
+    expect(list[0].version).toBe("0.8.4");
+    expect(list[1].version).toBe("0.8.3");
+    expect(list[2].version).toBe("0.8.2");
   });
 
   it("preserves stored changelog history from previous versions", () => {

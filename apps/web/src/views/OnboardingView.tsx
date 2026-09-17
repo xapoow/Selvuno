@@ -115,16 +115,16 @@ export function OnboardingView({
             <motion.div
               key={step}
               custom={direction}
-              initial={{ opacity: 0, x: direction * 70, scale: 0.98, filter: "blur(8px)" }}
-              animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
+              initial={{ opacity: 0, x: direction * 48, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{
                 opacity: 0,
-                x: -direction * 50,
+                x: -direction * 36,
                 scale: 0.98,
-                filter: "blur(8px)",
-                transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] }
+                transition: { duration: 0.2, ease: [0.32, 0.72, 0, 1] }
               }}
-              transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.36, ease: [0.32, 0.72, 0, 1] }}
+              className="gpu-layer"
             >
               {step === 1 ? (
                 <div className="grid gap-6">

@@ -39,7 +39,7 @@ export function TransactionRow({
   const hideAmount = shouldHideWalletAmounts(settings, wallet);
 
   return (
-    <article className="app-surface grid grid-cols-[auto_1fr_auto] items-center gap-3.5 rounded-app p-3.5 transition-all">
+    <article className="app-surface grid grid-cols-[auto_1fr_auto] items-center gap-3.5 rounded-2xl p-3.5 transition-all">
       <span
         className="grid h-11 w-11 place-items-center rounded-control text-white shadow-sm"
         style={{ backgroundColor: category?.color ?? "#676761" }}

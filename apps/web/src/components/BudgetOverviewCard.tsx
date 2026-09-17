@@ -35,10 +35,10 @@ export function BudgetOverviewCard({
     <button
       type="button"
       onClick={onOpen}
-      className="app-surface app-focus group grid w-full gap-4 rounded-app p-4 text-left outline-none active:scale-[0.995] sm:grid-cols-[1fr_auto] sm:items-center sm:p-5"
+      className="app-surface app-focus group grid w-full gap-4 rounded-2xl p-4 text-left outline-none active:scale-[0.995] sm:grid-cols-[1fr_auto] sm:items-center sm:p-5"
     >
       <span className="flex min-w-0 items-start gap-3">
-        <span className="app-control grid h-11 w-11 shrink-0 place-items-center rounded-app text-accent">
+        <span className="app-control grid h-11 w-11 shrink-0 place-items-center rounded-xl text-accent">
           <PiggyBank className="h-5 w-5" />
         </span>
         <span className="min-w-0">

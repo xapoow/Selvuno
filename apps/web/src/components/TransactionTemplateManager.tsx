@@ -78,7 +78,7 @@ export function TransactionTemplateManager({
 
       {creating ? (
         <form
-          className="app-control grid gap-4 rounded-app p-3 sm:p-4"
+          className="app-control grid gap-4 rounded-2xl p-3 sm:p-4"
           onSubmit={(event) => {
             event.preventDefault();
             setError("");
@@ -173,10 +173,10 @@ export function TransactionTemplateManager({
             return (
               <article
                 key={template.id}
-                className="app-control grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-app p-3"
+                className="app-control grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-xl p-3"
               >
                 <span
-                  className="grid h-10 w-10 place-items-center rounded-app text-white"
+                  className="grid h-10 w-10 place-items-center rounded-lg text-white"
                   style={{ backgroundColor: category?.color ?? "#676761" }}
                 >
                   <CategoryIcon name={category?.icon ?? "sparkles"} className="h-5 w-5" />
