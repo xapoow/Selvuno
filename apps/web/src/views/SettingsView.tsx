@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, Reorder } from "framer-motion";
+import { AnimatePresence, motion, Reorder, useDragControls } from "framer-motion";
 import type {
   BackupSnapshot,
   Category,
@@ -83,6 +83,75 @@ const settingsTabs: Array<{ value: SettingsTab; icon: LucideIcon }> = [
 ];
 
 type SettingsSaveState = "idle" | "saving" | "saved" | "error";
+
+interface ReorderCategoryRowProps {
+  category: Category;
+  t: Dictionary;
+  onDragEnd: () => void;
+  onEdit: (category: Category) => void;
+  onDelete: (categoryId: string) => void;
+}
+
+function ReorderCategoryRow({
+  category,
+  t,
+  onDragEnd,
+  onEdit,
+  onDelete
+}: ReorderCategoryRowProps) {
+  const dragControls = useDragControls();
+
+  return (
+    <Reorder.Item
+      key={category.id}
+      value={category.id}
+      dragListener={false}
+      dragControls={dragControls}
+      onDragEnd={onDragEnd}
+      className="app-surface grid grid-cols-[auto_auto_1fr_auto] items-center gap-3 rounded-app p-3"
+    >
+      <button
+        type="button"
+        onPointerDown={(event) => dragControls.start(event)}
+        className="touch-none cursor-grab active:cursor-grabbing p-1 -ml-1 text-muted transition hover:text-foreground focus:outline-none"
+        aria-label="Drag to reorder"
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+      <span
+        className="grid h-10 w-10 place-items-center rounded-app text-white"
+        style={{ backgroundColor: category.color }}
+      >
+        <CategoryIcon name={category.icon} className="h-5 w-5" />
+      </span>
+      <span className="text-sm font-semibold text-foreground">
+        {getCategoryName(category.name, t)}
+      </span>
+      <span className="flex gap-1">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={() => onEdit(category)}
+          aria-label={t.categories.editTitle}
+        >
+          <Edit3 className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-expense"
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={() => onDelete(category.id)}
+          aria-label={t.common.delete}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </span>
+    </Reorder.Item>
+  );
+}
 
 export function SettingsView({
   settings,
@@ -644,52 +713,21 @@ export function SettingsView({
                         return null;
                       }
                       return (
-                        <Reorder.Item
+                        <ReorderCategoryRow
                           key={category.id}
-                          value={category.id}
+                          category={category}
+                          t={t}
                           onDragEnd={() => void saveCategoryOrder(type)}
-                          className="app-surface grid grid-cols-[auto_auto_1fr_auto] items-center gap-3 rounded-app p-3"
-                        >
-                          <GripVertical className="h-4 w-4 cursor-grab text-muted active:cursor-grabbing" />
-                          <span
-                            className="grid h-10 w-10 place-items-center rounded-app text-white"
-                            style={{ backgroundColor: category.color }}
-                          >
-                            <CategoryIcon name={category.icon} className="h-5 w-5" />
-                          </span>
-                          <span className="text-sm font-semibold text-foreground">
-                            {getCategoryName(category.name, t)}
-                          </span>
-                          <span className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onPointerDown={(event) => event.stopPropagation()}
-                              onClick={() => setEditingCategory(category)}
-                              aria-label={t.categories.editTitle}
-                            >
-                              <Edit3 className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-expense"
-                              onPointerDown={(event) => event.stopPropagation()}
-                              onClick={() => {
-                                if (window.confirm(t.categories.confirmDelete)) {
-                                  setCategoryListError("");
-                                  void onDeleteCategory(category.id).catch(() =>
-                                    setCategoryListError(t.categories.saveError)
-                                  );
-                                }
-                              }}
-                              aria-label={t.common.delete}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </span>
-                        </Reorder.Item>
+                          onEdit={setEditingCategory}
+                          onDelete={(id) => {
+                            if (window.confirm(t.categories.confirmDelete)) {
+                              setCategoryListError("");
+                              void onDeleteCategory(id).catch(() =>
+                                setCategoryListError(t.categories.saveError)
+                              );
+                            }
+                          }}
+                        />
                       );
                     })}
                   </Reorder.Group>

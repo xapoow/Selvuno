@@ -68,6 +68,7 @@ describe("transaction totals", () => {
       hideBalance: false,
       color: "#207a6f",
       icon: "wallet-cards",
+      sortOrder: 0,
       archivedAt: null
     };
     const transfers: WalletTransfer[] = [

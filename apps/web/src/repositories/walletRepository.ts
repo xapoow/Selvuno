@@ -7,6 +7,7 @@ export interface WalletRepository {
   updateWallet(id: string, input: Partial<WalletInput>): Promise<Wallet>;
   archiveWallet(id: string): Promise<void>;
   restoreWallet(id: string): Promise<Wallet>;
+  reorderWallets(orderedIds: string[]): Promise<void>;
   listWallets(options?: { includeArchived?: boolean }): Promise<Wallet[]>;
 }
 
@@ -16,6 +17,8 @@ export const walletRepository: WalletRepository = {
       ...input,
       currency: input.currency.toUpperCase()
     });
+    const existing = await financeDb.wallets.filter((w) => !w.deletedAt).toArray();
+    const maxOrder = existing.reduce((max, w) => Math.max(max, w.sortOrder ?? 0), -1);
     const wallet: Wallet = {
       ...createEntityBase(),
       ...parsed,
@@ -26,7 +29,8 @@ export const walletRepository: WalletRepository = {
       hideBalance: parsed.hideBalance ?? false,
       color: parsed.color ?? "#207a6f",
       icon: parsed.icon ?? "wallet-cards",
-      archivedAt: null
+      archivedAt: null,
+      sortOrder: parsed.sortOrder ?? maxOrder + 1
     };
     await financeDb.wallets.add(wallet);
     return wallet;
@@ -53,7 +57,8 @@ export const walletRepository: WalletRepository = {
       excludeFromTotals: next.excludeFromTotals,
       hideBalance: next.hideBalance,
       color: next.color,
-      icon: next.icon
+      icon: next.icon,
+      sortOrder: next.sortOrder
     });
     await financeDb.transaction(
       "rw",
@@ -190,16 +195,53 @@ export const walletRepository: WalletRepository = {
     return restored;
   },
 
-  async listWallets(options) {
-    const wallets = await financeDb.wallets.orderBy("updatedAt").reverse().toArray();
-    return wallets.filter((wallet) => {
-      if (wallet.deletedAt) {
-        return false;
-      }
-      if (!options?.includeArchived && wallet.archivedAt) {
-        return false;
-      }
-      return true;
+  async reorderWallets(orderedIds) {
+    const activeWallets = (await financeDb.wallets.toArray()).filter(
+      (wallet) => !wallet.deletedAt && !wallet.archivedAt
+    );
+    const activeIds = new Set(activeWallets.map((wallet) => wallet.id));
+    if (
+      orderedIds.length !== activeWallets.length ||
+      new Set(orderedIds).size !== orderedIds.length ||
+      orderedIds.some((id) => !activeIds.has(id))
+    ) {
+      throw new Error("Wallet order does not match the active wallet list.");
+    }
+
+    const now = nowIso();
+    await financeDb.transaction("rw", financeDb.wallets, async () => {
+      await Promise.all(
+        orderedIds.map(async (id, sortOrder) => {
+          const wallet = await financeDb.wallets.get(id);
+          if (wallet) {
+            await financeDb.wallets.put({
+              ...wallet,
+              sortOrder,
+              updatedAt: now,
+              syncStatus: "pending"
+            });
+          }
+        })
+      );
     });
+  },
+
+  async listWallets(options) {
+    const wallets = await financeDb.wallets.toArray();
+    return wallets
+      .filter((wallet) => {
+        if (wallet.deletedAt) {
+          return false;
+        }
+        if (!options?.includeArchived && wallet.archivedAt) {
+          return false;
+        }
+        return true;
+      })
+      .sort(
+        (left, right) =>
+          (left.sortOrder ?? 0) - (right.sortOrder ?? 0) ||
+          left.createdAt.localeCompare(right.createdAt)
+      );
   }
 };

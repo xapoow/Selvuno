@@ -10,3 +10,4 @@ Thumbs.db
 *.tsbuildinfo
 .idea
 *.log
+.codex-remote-attachments

@@ -38,6 +38,7 @@ interface WalletsHubViewProps {
   onDeleteContribution: (id: string) => Promise<void>;
   onCreateTransfer: (input: WalletTransferInput) => Promise<void>;
   onDeleteTransfer: (id: string) => Promise<void>;
+  onReorderWallet?: (orderedIds: string[]) => Promise<void>;
 }
 
 export function WalletsHubView({
@@ -53,6 +54,7 @@ export function WalletsHubView({
   onUpdateWallet,
   onArchiveWallet,
   onRestoreWallet,
+  onReorderWallet,
   onCreateGoal,
   onUpdateGoal,
   onDeleteGoal,
@@ -91,6 +93,7 @@ export function WalletsHubView({
               onUpdate={onUpdateWallet}
               onArchive={onArchiveWallet}
               onRestore={onRestoreWallet}
+              onReorder={onReorderWallet}
             />
           </div>
           <div className="hidden md:block">
@@ -105,6 +108,7 @@ export function WalletsHubView({
               onUpdate={onUpdateWallet}
               onArchive={onArchiveWallet}
               onRestore={onRestoreWallet}
+              onReorder={onReorderWallet}
             />
           </div>
         </>

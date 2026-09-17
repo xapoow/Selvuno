@@ -180,6 +180,10 @@ export function useFinanceMutations() {
       mutationFn: (id: string) => walletRepository.restoreWallet(id),
       onSuccess: invalidate
     }),
+    reorderWallets: useMutation({
+      mutationFn: (orderedIds: string[]) => walletRepository.reorderWallets(orderedIds),
+      onSuccess: invalidate
+    }),
     createWalletTransfer: useMutation({
       mutationFn: (input: WalletTransferInput) =>
         walletTransferRepository.createTransfer(input),

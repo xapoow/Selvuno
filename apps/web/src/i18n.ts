@@ -2,10 +2,10 @@ import type { ColorThemePreference } from "@myfinances/types";
 import type { AppView } from "./state/appStore";
 
 export type Language = "en" | "ru";
-export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync";
+export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.8.1";
+export const appVersion = "0.8.2";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -354,6 +354,7 @@ export interface Dictionary {
     create: string;
     update: string;
     saveError: string;
+    reorderHint: string;
     swipeHint: string;
     initialBalance: string;
     initialBalanceHint: string;
@@ -842,6 +843,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       create: "Create wallet",
       update: "Update wallet",
       saveError: "Unable to save wallet.",
+      reorderHint: "Drag by the left handle to change order.",
       swipeHint: "Swipe this card to switch wallets",
       initialBalance: "Initial balance",
       initialBalanceHint: "The amount already in this wallet. It is not counted as income.",
@@ -969,9 +971,10 @@ export const dictionaries: Record<Language, Dictionary> = {
       intro: "More control on every device, with privacy and productivity features that stay optional.",
       gotIt: "Explore the update",
       notes: [
-        "Fixed runaway wallet card sizing on narrow mobile screens",
-        "Restored stable swipe bounds without stretching the page",
-        "Refreshed PWA status bar colors and safe-area startup background"
+        "Reorder wallets via drag-and-drop handles in the Wallets tab",
+        "Refined category drag on mobile: items only move when grabbed by the left edge",
+        "Smooth, fluid page transitions and animated onboarding setup wizard",
+        "Consistent wallet switching: card carousel on Dashboard, classic switcher on other pages"
       ]
     },
     categories: {
@@ -981,7 +984,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       iconSearchEmpty: "No icons match this search.",
       recentColors: "Recently used",
       organize: "Organize",
-      reorderHint: "Drag categories to change their order.",
+      reorderHint: "Drag by the left handle to change order.",
       actionReplace: "Replace",
       actionMerge: "Merge",
       source: "Category to replace",
@@ -1012,7 +1015,8 @@ export const dictionaries: Record<Language, Dictionary> = {
         privacy: "Privacy",
         categories: "Categories",
         backup: "Backup",
-        sync: "Sync"
+        sync: "Sync",
+        debug: "Debug"
       },
       general: "General",
       appearance: "Appearance",
@@ -1452,6 +1456,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       create: "Создать кошелек",
       update: "Обновить кошелек",
       saveError: "Не удалось сохранить кошелек.",
+      reorderHint: "Перетаскивайте за левый край, чтобы изменить порядок.",
       swipeHint: "Свайпни карточку, чтобы сменить кошелек",
       initialBalance: "Начальный баланс",
       initialBalanceHint: "Сумма, которая уже была в кошельке. Она не считается доходом.",
@@ -1579,9 +1584,10 @@ export const dictionaries: Record<Language, Dictionary> = {
       intro: "Больше контроля на любом устройстве — приватность и дополнительные возможности остаются опциональными.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Исправлен неконтролируемый рост карточек кошельков на узких экранах",
-        "Восстановлены стабильные границы свайпа без растягивания страницы",
-        "Обновлены цвета status bar PWA и фон безопасной области при запуске"
+        "Изменение порядка кошельков перетаскиванием за левый край во вкладке «Кошельки»",
+        "Перетаскивание категорий на смартфонах теперь срабатывает только за левую ручку",
+        "Плавные переходы между страницами и анимированный мастер первого запуска",
+        "Карточки карусели на главной и классический компактный переключатель на остальных экранах"
       ]
     },
     categories: {
@@ -1591,7 +1597,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       iconSearchEmpty: "Подходящих иконок не найдено.",
       recentColors: "Недавние цвета",
       organize: "Управление",
-      reorderHint: "Перетаскивай категории, чтобы изменить порядок.",
+      reorderHint: "Перетаскивай за левый край, чтобы изменить порядок.",
       actionReplace: "Заменить",
       actionMerge: "Объединить",
       source: "Категория для замены",
@@ -1622,7 +1628,8 @@ export const dictionaries: Record<Language, Dictionary> = {
         privacy: "Приватность",
         categories: "Категории",
         backup: "Бэкап",
-        sync: "Синхронизация"
+        sync: "Синхронизация",
+        debug: "Дебаг"
       },
       general: "Общее",
       appearance: "Внешний вид",

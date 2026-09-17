@@ -9,6 +9,15 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.8.2",
+      notes: [
+        "Изменение порядка кошельков перетаскиванием за левый край во вкладке «Кошельки»",
+        "Перетаскивание категорий на смартфонах теперь срабатывает только за левую ручку",
+        "Плавные переходы между страницами и анимированный мастер первого запуска",
+        "Карточки карусели на главной и классический компактный переключатель на остальных экранах"
+      ]
+    },
+    {
       version: "0.8.1",
       notes: [
         "Исправлен неконтролируемый рост карточек кошельков на узких экранах",
@@ -98,6 +107,15 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.8.2",
+      notes: [
+        "Reorder wallets via drag-and-drop handles in the Wallets tab",
+        "Refined category drag on mobile: items only move when grabbed by the left edge",
+        "Smooth, fluid page transitions and animated onboarding setup wizard",
+        "Consistent wallet switching: card carousel on Dashboard, classic switcher on other pages"
+      ]
+    },
     {
       version: "0.8.1",
       notes: [

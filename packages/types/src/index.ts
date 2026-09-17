@@ -55,7 +55,8 @@ export const walletSchema = baseEntitySchema.extend({
   hideBalance: z.boolean().default(false),
   color: z.string().min(4).max(32).default("#207a6f"),
   icon: z.string().min(1).max(32).default("wallet-cards"),
-  archivedAt: z.string().datetime().nullable()
+  archivedAt: z.string().datetime().nullable(),
+  sortOrder: z.number().int().nonnegative().default(0)
 });
 export type Wallet = z.infer<typeof walletSchema>;
 
@@ -68,7 +69,8 @@ export const walletInputSchema = z.object({
   excludeFromTotals: z.boolean().optional(),
   hideBalance: z.boolean().optional(),
   color: z.string().min(4).max(32).optional(),
-  icon: z.string().min(1).max(32).optional()
+  icon: z.string().min(1).max(32).optional(),
+  sortOrder: z.number().int().nonnegative().optional()
 });
 export type WalletInput = z.infer<typeof walletInputSchema>;
 
