@@ -5,7 +5,6 @@ import type {
   RecurringTransactionInput,
   Settings,
   Transaction,
-  TransactionInput,
   TransactionTemplate,
   TransactionTemplateInput,
   Wallet
@@ -19,6 +18,7 @@ import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
 import { SegmentedControl } from "../components/ui/SegmentedControl";
 import type { Dictionary } from "../i18n";
+import type { TransactionSubmission } from "../lib/transactionAttachments";
 
 interface AddTransactionViewProps {
   wallets: Wallet[];
@@ -28,7 +28,7 @@ interface AddTransactionViewProps {
   templates: TransactionTemplate[];
   settings: Settings;
   t: Dictionary;
-  onSubmit: (input: TransactionInput) => Promise<void>;
+  onSubmit: (submission: TransactionSubmission) => Promise<void>;
   onCreateTemplate: (input: TransactionTemplateInput) => Promise<void>;
   onDeleteTemplate: (id: string) => Promise<void>;
   onCreateRecurring: (input: RecurringTransactionInput) => Promise<void>;

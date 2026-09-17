@@ -20,10 +20,12 @@ import { recurringTransactionRepository } from "../repositories/recurringTransac
 import { savingsGoalRepository } from "../repositories/savingsGoalRepository";
 import { settingsRepository } from "../repositories/settingsRepository";
 import { transactionRepository } from "../repositories/transactionRepository";
+import { transactionAttachmentRepository } from "../repositories/transactionAttachmentRepository";
 import { transactionTemplateRepository } from "../repositories/transactionTemplateRepository";
 import { walletRepository } from "../repositories/walletRepository";
 import { walletTransferRepository } from "../repositories/walletTransferRepository";
 import { queryKeys } from "../lib/queryKeys";
+import type { TransactionSubmission } from "../lib/transactionAttachments";
 
 export function useFinanceData() {
   const bootstrap = useQuery({
@@ -145,9 +147,39 @@ export function useFinanceMutations() {
       mutationFn: (input: TransactionInput) => transactionRepository.addTransaction(input),
       onSuccess: invalidate
     }),
+    addTransactionWithAttachments: useMutation({
+      mutationFn: async ({ input, newFiles }: TransactionSubmission) => {
+        const transaction = await transactionRepository.addTransaction(input);
+        if (newFiles.length) {
+          await transactionAttachmentRepository.applyChanges(transaction.id, newFiles, []);
+        }
+        return transaction;
+      },
+      onSuccess: invalidate
+    }),
     updateTransaction: useMutation({
       mutationFn: ({ id, input }: { id: string; input: Partial<TransactionInput> }) =>
         transactionRepository.updateTransaction(id, input),
+      onSuccess: invalidate
+    }),
+    updateTransactionWithAttachments: useMutation({
+      mutationFn: async ({
+        id,
+        submission
+      }: {
+        id: string;
+        submission: TransactionSubmission;
+      }) => {
+        const transaction = await transactionRepository.updateTransaction(id, submission.input);
+        if (submission.newFiles.length || submission.removedAttachmentIds.length) {
+          await transactionAttachmentRepository.applyChanges(
+            id,
+            submission.newFiles,
+            submission.removedAttachmentIds
+          );
+        }
+        return transaction;
+      },
       onSuccess: invalidate
     }),
     deleteTransaction: useMutation({

@@ -1,5 +1,5 @@
 import type { Category, Settings, Transaction, Wallet } from "@myfinances/types";
-import { Edit3, Trash2 } from "lucide-react";
+import { Edit3, Paperclip, Trash2 } from "lucide-react";
 import { formatDate, formatSignedMoney } from "@myfinances/utils";
 import { CategoryIcon } from "../lib/icons";
 import { Button } from "./ui/Button";
@@ -57,13 +57,19 @@ export function TransactionRow({
           {formatDate(transaction.transactionDate, settings.locale, settings.dateFormat, settings.timeZone)}
           {transaction.note ? ` · ${transaction.note}` : ""}
         </p>
-        {tags.length ? (
+        {tags.length || transaction.attachmentCount ? (
           <div className="mt-1.5 flex flex-wrap gap-1">
             {tags.map((tag) => (
               <span key={tag} className="app-control rounded-full px-2 py-0.5 text-[11px] font-medium text-muted">
                 #{tag}
               </span>
             ))}
+            {transaction.attachmentCount ? (
+              <span className="app-control inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium text-muted">
+                <Paperclip className="h-3 w-3" />
+                {transaction.attachmentCount}
+              </span>
+            ) : null}
           </div>
         ) : null}
       </div>

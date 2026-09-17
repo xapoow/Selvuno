@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.8.4";
+export const appVersion = "0.9.0";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -222,6 +222,25 @@ export interface Dictionary {
     save: string;
     update: string;
     saveError: string;
+    attachments: string;
+    attachmentsHint: string;
+    addAttachment: string;
+    sourceTitle: string;
+    sourceHint: string;
+    cameraSource: string;
+    photoLibrary: string;
+    pdfDocument: string;
+    receiptGuide: string;
+    takePhoto: string;
+    chooseFile: string;
+    cameraTitle: string;
+    cameraUnavailable: string;
+    attachmentTypeError: string;
+    attachmentSizeError: string;
+    attachmentLimitError: string;
+    attachmentLocalOnly: string;
+    removeAttachment: string;
+    openAttachment: string;
   };
   recurring: {
     tabSingle: string;
@@ -760,7 +779,26 @@ export const dictionaries: Record<Language, Dictionary> = {
       fewerCategories: "Show fewer",
       save: "Save transaction",
       update: "Update transaction",
-      saveError: "Unable to save transaction."
+      saveError: "Unable to save transaction.",
+      attachments: "Receipts and files",
+      attachmentsHint: "Take a receipt photo or attach a PDF.",
+      addAttachment: "Add receipt or document",
+      sourceTitle: "Add attachment",
+      sourceHint: "Camera, photo library, or PDF document",
+      cameraSource: "Camera",
+      photoLibrary: "Photo library",
+      pdfDocument: "PDF document",
+      receiptGuide: "Keep the receipt inside the frame",
+      takePhoto: "Take photo",
+      chooseFile: "Choose file",
+      cameraTitle: "Receipt camera",
+      cameraUnavailable: "The camera is unavailable. Opening the system camera instead.",
+      attachmentTypeError: "Choose a JPG, PNG, WebP, or PDF file.",
+      attachmentSizeError: "Each file must be smaller than 10 MB.",
+      attachmentLimitError: "Up to 5 files can be attached to one transaction.",
+      attachmentLocalOnly: "Attachments stay on this device and are not included in backups yet.",
+      removeAttachment: "Remove attachment",
+      openAttachment: "Open attachment"
     },
     recurring: {
       tabSingle: "One-time",
@@ -968,13 +1006,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "More control on every device, with privacy and productivity features that stay optional.",
+      intro: "Receipts and documents now stay together with the transaction they belong to.",
       gotIt: "Explore the update",
       notes: [
-        "Refined color theme picker UI: eliminated redundant dots and balanced item layout",
-        "Interactive animated indicator for segmented controls with equal column sizing",
-        "Silky-smooth spatial page transitions with soft depth blur and Apple-style curves",
-        "Fluid iPhone Setup Assistant-style transitions and spring physics in onboarding wizard"
+        "Attach receipt photos and PDF documents directly to a transaction",
+        "Capture receipts in a custom full-screen camera with an alignment frame",
+        "Preview photos and PDFs without leaving MyFinances",
+        "Redesigned responsive settings navigation for phone, tablet, and desktop"
       ]
     },
     categories: {
@@ -1373,7 +1411,26 @@ export const dictionaries: Record<Language, Dictionary> = {
       fewerCategories: "Свернуть",
       save: "Сохранить операцию",
       update: "Обновить операцию",
-      saveError: "Не удалось сохранить операцию."
+      saveError: "Не удалось сохранить операцию.",
+      attachments: "Чеки и файлы",
+      attachmentsHint: "Сфотографируй чек или прикрепи PDF.",
+      addAttachment: "Добавить чек или документ",
+      sourceTitle: "Добавить вложение",
+      sourceHint: "Камера, галерея или PDF-документ",
+      cameraSource: "Камера",
+      photoLibrary: "Галерея",
+      pdfDocument: "PDF-документ",
+      receiptGuide: "Размести чек внутри рамки",
+      takePhoto: "Сфотографировать",
+      chooseFile: "Выбрать файл",
+      cameraTitle: "Камера для чека",
+      cameraUnavailable: "Камера недоступна. Открываю системную камеру.",
+      attachmentTypeError: "Выбери файл JPG, PNG, WebP или PDF.",
+      attachmentSizeError: "Размер каждого файла должен быть меньше 10 МБ.",
+      attachmentLimitError: "К одной операции можно прикрепить до 5 файлов.",
+      attachmentLocalOnly: "Вложения остаются на этом устройстве и пока не входят в резервные копии.",
+      removeAttachment: "Удалить вложение",
+      openAttachment: "Открыть вложение"
     },
     recurring: {
       tabSingle: "Разовая",
@@ -1581,13 +1638,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Больше контроля на любом устройстве — приватность и дополнительные возможности остаются опциональными.",
+      intro: "Теперь чеки и документы хранятся вместе с операцией, к которой относятся.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Устранены визуальные несостыковки в переключателе цветовых схем (убраны лишние точки и дублирующиеся иконки)",
-        "Плавный скользящий индикатор для переключателей режимов с равным распределением колонок",
-        "Сверхплавные кинематические переходы между страницами с пространственной ориентацией и размытием",
-        "Анимация мастера первого запуска в стиле iOS Setup Assistant с мягким размытием и пружинной физикой"
+        "Фотографии чеков и PDF-документы можно прикреплять прямо к операции",
+        "Собственная полноэкранная камера с рамкой для удобной съёмки чеков",
+        "Встроенный просмотр фотографий и PDF без выхода из MyFinances",
+        "Переработанная навигация настроек для телефона, планшета и ПК"
       ]
     },
     categories: {

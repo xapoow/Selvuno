@@ -472,8 +472,8 @@ export function App() {
                 hideAmounts: shouldHideWalletAmounts(settings, addWallet)
               }}
               t={t}
-              onSubmit={async (input) => {
-                await mutations.addTransaction.mutateAsync(input);
+              onSubmit={async (submission) => {
+                await mutations.addTransactionWithAttachments.mutateAsync(submission);
               }}
               onCreateTemplate={async (input) => {
                 await mutations.createTransactionTemplate.mutateAsync(input);
@@ -516,6 +516,9 @@ export function App() {
                   searchFocusRequest={historySearchRequest}
                   onUpdate={async (id, input) => {
                     await mutations.updateTransaction.mutateAsync({ id, input });
+                  }}
+                  onUpdateWithAttachments={async (id, submission) => {
+                    await mutations.updateTransactionWithAttachments.mutateAsync({ id, submission });
                   }}
                   onDelete={(id) => mutations.deleteTransaction.mutateAsync(id)}
                 />
