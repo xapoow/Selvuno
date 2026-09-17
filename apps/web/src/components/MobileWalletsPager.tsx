@@ -19,6 +19,7 @@ interface MobileWalletsPagerProps {
   onUpdate: (id: string, input: Partial<WalletInput>) => Promise<void>;
   onArchive: (id: string) => Promise<void>;
   onRestore: (id: string) => Promise<void>;
+  onReorder?: (orderedIds: string[]) => Promise<void>;
 }
 
 export function MobileWalletsPager({
@@ -31,7 +32,8 @@ export function MobileWalletsPager({
   onCreate,
   onUpdate,
   onArchive,
-  onRestore
+  onRestore,
+  onReorder
 }: MobileWalletsPagerProps) {
   return (
     <WalletsView
@@ -45,6 +47,7 @@ export function MobileWalletsPager({
       onUpdate={onUpdate}
       onArchive={onArchive}
       onRestore={onRestore}
+      onReorder={onReorder}
     />
   );
 }

@@ -124,6 +124,30 @@ describe("finance repositories", () => {
     expect(await walletRepository.listWallets()).toHaveLength(1);
   });
 
+  it("reorders wallets and maintains custom sort order", async () => {
+    await seedLocalData();
+    const [first] = await walletRepository.listWallets();
+    const second = await walletRepository.createWallet({
+      name: "Second",
+      currency: "usd",
+      color: "#207a6f",
+      icon: "wallet-cards"
+    });
+    const third = await walletRepository.createWallet({
+      name: "Third",
+      currency: "eur",
+      color: "#3f73c9",
+      icon: "wallet-cards"
+    });
+
+    const initialList = await walletRepository.listWallets();
+    expect(initialList.map((w) => w.id)).toEqual([first.id, second.id, third.id]);
+
+    await walletRepository.reorderWallets([third.id, first.id, second.id]);
+    const reorderedList = await walletRepository.listWallets();
+    expect(reorderedList.map((w) => w.id)).toEqual([third.id, first.id, second.id]);
+  });
+
   it("updates settings without clearing existing currency", async () => {
     await seedLocalData();
     const before = await settingsRepository.getSettings();

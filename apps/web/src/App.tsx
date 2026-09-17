@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import type { WalletView } from "@myfinances/types";
 import { Eye, EyeOff, LockKeyhole } from "lucide-react";
 import { BottomNavigation } from "./components/BottomNavigation";
 import { CookieNotice } from "./components/CookieNotice";
 import { HeaderNavigation } from "./components/HeaderNavigation";
 import { MobileWalletDashboardPager } from "./components/MobileWalletDashboardPager";
-import { MobileWalletHistoryPager } from "./components/MobileWalletHistoryPager";
 import { NotificationCenter } from "./components/NotificationCenter";
 import { OfflineIndicator } from "./components/OfflineIndicator";
 import { LockScreen } from "./components/LockScreen";
@@ -339,7 +338,7 @@ export function App() {
           <NotificationCenter notifications={notifications} t={t} />
         </div>
         {showsWalletContext ? (
-          <div className={activeView === "add" ? "mb-6" : "mb-6 hidden md:block"}>
+          <div className={activeView === "dashboard" ? "mb-6 hidden md:block" : "mb-6"}>
             {activeView === "dashboard" ? (
               <MonobankWalletCarousel
                 wallets={wallets}
@@ -364,12 +363,14 @@ export function App() {
             )}
           </div>
         ) : null}
-        <motion.div
-          key={activeView}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.18, ease: "easeOut" }}
-        >
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={activeView}
+            initial={{ opacity: 0, y: 10, scale: 0.995 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.995 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+          >
           {activeView === "dashboard" ? (
             <>
               <div className="md:hidden">
@@ -453,49 +454,31 @@ export function App() {
             />
           ) : null}
           {activeView === "history" ? (
-            <>
-              <div className="md:hidden">
-                <MobileWalletHistoryPager
+            <div className="overflow-hidden">
+              <motion.div
+                key={activeWalletId}
+                initial={{ opacity: 0, x: walletTransitionDirection * 18 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <HistoryView
                   wallets={wallets}
                   categories={categories}
                   transactions={transactions}
                   settings={settings}
                   activeWalletId={activeWalletId}
-                  allLabel={t.wallets.allWallets}
+                  displayCurrency={displayCurrency}
+                  exchangeRates={exchangeRates.data}
                   t={t}
-                  onChange={handleWalletChange}
+                  desktopTools
+                  searchFocusRequest={historySearchRequest}
                   onUpdate={async (id, input) => {
                     await mutations.updateTransaction.mutateAsync({ id, input });
                   }}
                   onDelete={(id) => mutations.deleteTransaction.mutateAsync(id)}
                 />
-              </div>
-              <div className="hidden overflow-hidden md:block">
-                <motion.div
-                  key={activeWalletId}
-                  initial={{ opacity: 0, x: walletTransitionDirection * 18 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <HistoryView
-                    wallets={wallets}
-                    categories={categories}
-                    transactions={transactions}
-                    settings={settings}
-                    activeWalletId={activeWalletId}
-                    displayCurrency={displayCurrency}
-                    exchangeRates={exchangeRates.data}
-                    t={t}
-                    desktopTools
-                    searchFocusRequest={historySearchRequest}
-                    onUpdate={async (id, input) => {
-                      await mutations.updateTransaction.mutateAsync({ id, input });
-                    }}
-                    onDelete={(id) => mutations.deleteTransaction.mutateAsync(id)}
-                  />
-                </motion.div>
-              </div>
-            </>
+              </motion.div>
+            </div>
           ) : null}
           {activeView === "wallets" ? (
             <WalletsHubView
@@ -516,6 +499,9 @@ export function App() {
               onArchiveWallet={(id) => mutations.archiveWallet.mutateAsync(id)}
               onRestoreWallet={async (id) => {
                 await mutations.restoreWallet.mutateAsync(id);
+              }}
+              onReorderWallet={async (orderedIds) => {
+                await mutations.reorderWallets.mutateAsync(orderedIds);
               }}
               onCreateGoal={async (input) => {
                 await mutations.createSavingsGoal.mutateAsync(input);
@@ -572,6 +558,7 @@ export function App() {
             />
           ) : null}
         </motion.div>
+      </AnimatePresence>
       </main>
 
       <BottomNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />

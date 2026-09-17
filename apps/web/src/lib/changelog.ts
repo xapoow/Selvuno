@@ -11,9 +11,10 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     {
       version: "0.8.1",
       notes: [
-        "Исправлен неконтролируемый рост карточек кошельков на узких экранах",
-        "Восстановлены стабильные границы свайпа без растягивания страницы",
-        "Обновлены цвета status bar PWA и фон безопасной области при запуске"
+        "Изменение порядка кошельков перетаскиванием за левый край во вкладке «Кошельки»",
+        "Перетаскивание категорий на смартфонах теперь срабатывает только за левую ручку",
+        "Плавные переходы между страницами и анимированный мастер первого запуска",
+        "Карточки карусели на главной и классический компактный переключатель на остальных экранах"
       ]
     },
     {
@@ -101,9 +102,10 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     {
       version: "0.8.1",
       notes: [
-        "Fixed runaway wallet card sizing on narrow mobile screens",
-        "Restored stable swipe bounds without stretching the page",
-        "Refreshed PWA status bar colors and safe-area startup background"
+        "Reorder wallets via drag-and-drop handles in the Wallets tab",
+        "Refined category drag on mobile: items only move when grabbed by the left edge",
+        "Smooth, fluid page transitions and animated onboarding setup wizard",
+        "Consistent wallet switching: card carousel on Dashboard, classic switcher on other pages"
       ]
     },
     {

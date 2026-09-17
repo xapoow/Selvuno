@@ -209,6 +209,34 @@ export class FinanceDatabase extends Dexie {
             }
           })
       );
+    this.version(11)
+      .stores({
+        wallets: "id, sortOrder, name, currency, kind, excludeFromTotals, archivedAt, deletedAt, updatedAt",
+        categories: "id, sortOrder, name, type, deletedAt, updatedAt",
+        transactions:
+          "id, walletId, categoryId, type, transactionDate, recurringTransactionId, &[recurringTransactionId+recurrenceDate], deletedAt, updatedAt",
+        transactionTemplates: "id, walletId, categoryId, type, sortOrder, deletedAt, updatedAt",
+        settings: "id",
+        budgets: "id, month, categoryId, [categoryId+month], deletedAt, updatedAt",
+        recurringTransactions:
+          "id, walletId, categoryId, type, frequency, nextRunDate, paused, deletedAt, updatedAt",
+        savingsGoals: "id, walletId, targetDate, deletedAt, updatedAt",
+        savingsGoalContributions: "id, goalId, contributionDate, deletedAt, updatedAt",
+        walletTransfers:
+          "id, fromWalletId, toWalletId, transferDate, deletedAt, updatedAt",
+        backupSnapshots: "id, createdAt, reason"
+      })
+      .upgrade(async (transaction) => {
+        let order = 0;
+        await transaction
+          .table("wallets")
+          .toCollection()
+          .modify((wallet: Partial<Wallet>) => {
+            if (!Number.isInteger(wallet.sortOrder)) {
+              wallet.sortOrder = order++;
+            }
+          });
+      });
   }
 }
 
@@ -356,7 +384,8 @@ export async function seedLocalData(db = financeDb): Promise<void> {
       hideBalance: false,
       color: "#207a6f",
       icon: "wallet-cards",
-      archivedAt: null
+      archivedAt: null,
+      sortOrder: 0
     });
   }
 
@@ -373,6 +402,7 @@ export async function seedLocalData(db = financeDb): Promise<void> {
           typeof wallet.hideBalance !== "boolean" ||
           !wallet.color ||
           !wallet.icon ||
+          !Number.isInteger(wallet.sortOrder) ||
           (shouldMigrateDefaultCurrency &&
             wallet.name === "Everyday" &&
             (wallet.currency === previousAutoCurrency || wallet.currency !== DEFAULT_CURRENCY))
@@ -398,6 +428,7 @@ export async function seedLocalData(db = financeDb): Promise<void> {
           hideBalance: typeof wallet.hideBalance === "boolean" ? wallet.hideBalance : false,
           color: wallet.color || "#207a6f",
           icon: wallet.icon || "wallet-cards",
+          sortOrder: Number.isInteger(wallet.sortOrder) ? wallet.sortOrder : 0,
           updatedAt: now
         })
       )
