@@ -222,6 +222,18 @@ export interface Dictionary {
     save: string;
     update: string;
     saveError: string;
+    attachments: string;
+    attachmentsHint: string;
+    takePhoto: string;
+    chooseFile: string;
+    cameraTitle: string;
+    cameraUnavailable: string;
+    attachmentTypeError: string;
+    attachmentSizeError: string;
+    attachmentLimitError: string;
+    attachmentLocalOnly: string;
+    removeAttachment: string;
+    openAttachment: string;
   };
   recurring: {
     tabSingle: string;
@@ -760,7 +772,19 @@ export const dictionaries: Record<Language, Dictionary> = {
       fewerCategories: "Show fewer",
       save: "Save transaction",
       update: "Update transaction",
-      saveError: "Unable to save transaction."
+      saveError: "Unable to save transaction.",
+      attachments: "Receipts and files",
+      attachmentsHint: "Take a receipt photo or attach a PDF.",
+      takePhoto: "Take photo",
+      chooseFile: "Choose file",
+      cameraTitle: "Receipt camera",
+      cameraUnavailable: "The camera is unavailable. Opening the system camera instead.",
+      attachmentTypeError: "Choose a JPG, PNG, WebP, or PDF file.",
+      attachmentSizeError: "Each file must be smaller than 10 MB.",
+      attachmentLimitError: "Up to 5 files can be attached to one transaction.",
+      attachmentLocalOnly: "Attachments stay on this device and are not included in backups yet.",
+      removeAttachment: "Remove attachment",
+      openAttachment: "Open attachment"
     },
     recurring: {
       tabSingle: "One-time",
@@ -1373,7 +1397,19 @@ export const dictionaries: Record<Language, Dictionary> = {
       fewerCategories: "Свернуть",
       save: "Сохранить операцию",
       update: "Обновить операцию",
-      saveError: "Не удалось сохранить операцию."
+      saveError: "Не удалось сохранить операцию.",
+      attachments: "Чеки и файлы",
+      attachmentsHint: "Сфотографируй чек или прикрепи PDF.",
+      takePhoto: "Сфотографировать",
+      chooseFile: "Выбрать файл",
+      cameraTitle: "Камера для чека",
+      cameraUnavailable: "Камера недоступна. Открываю системную камеру.",
+      attachmentTypeError: "Выбери файл JPG, PNG, WebP или PDF.",
+      attachmentSizeError: "Размер каждого файла должен быть меньше 10 МБ.",
+      attachmentLimitError: "К одной операции можно прикрепить до 5 файлов.",
+      attachmentLocalOnly: "Вложения остаются на этом устройстве и пока не входят в резервные копии.",
+      removeAttachment: "Удалить вложение",
+      openAttachment: "Открыть вложение"
     },
     recurring: {
       tabSingle: "Разовая",

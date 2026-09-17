@@ -24,6 +24,7 @@ import { getCategoryName, type Dictionary } from "../i18n";
 import { convertMinorToBaseCurrency, type ExchangeRateTable } from "../lib/exchangeRates";
 import { createCsv, downloadCsv } from "../lib/csv";
 import { shouldHideWalletAmounts } from "../lib/walletFeatures";
+import type { TransactionSubmission } from "../lib/transactionAttachments";
 
 interface HistoryViewProps {
   wallets: Wallet[];
@@ -38,6 +39,7 @@ interface HistoryViewProps {
   desktopTools?: boolean;
   searchFocusRequest?: number;
   onUpdate: (id: string, input: Partial<TransactionInput>) => Promise<void>;
+  onUpdateWithAttachments: (id: string, submission: TransactionSubmission) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 }
 
@@ -65,6 +67,7 @@ export function HistoryView({
   desktopTools = false,
   searchFocusRequest = 0,
   onUpdate,
+  onUpdateWithAttachments,
   onDelete
 }: HistoryViewProps) {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
@@ -513,8 +516,8 @@ export function HistoryView({
             activeWalletId={activeWalletId}
             initial={editing}
             submitLabel={t.transaction.update}
-            onSubmit={async (input) => {
-              await onUpdate(editing.id, input);
+            onSubmit={async (submission) => {
+              await onUpdateWithAttachments(editing.id, submission);
               setEditing(null);
             }}
           />

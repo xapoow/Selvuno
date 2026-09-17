@@ -3,7 +3,6 @@ import type {
   Category,
   Settings,
   Transaction,
-  TransactionInput,
   TransactionTemplate,
   TransactionType,
   Wallet,
@@ -19,11 +18,15 @@ import { fromDateInputValue, toDateInputValue } from "../lib/dates";
 import { formatTagsInput, parseTagsInput } from "../lib/tags";
 import { CategoryIcon } from "../lib/icons";
 import { TransactionCategoryPicker } from "./TransactionCategoryPicker";
+import { TransactionAttachments } from "./TransactionAttachments";
 import { Button } from "./ui/Button";
 import { DatePicker } from "./ui/DatePicker";
 import { SelectField } from "./ui/SelectField";
 import { SegmentedControl } from "./ui/SegmentedControl";
 import { TextField } from "./ui/TextField";
+import type { TransactionAttachment } from "../db/models";
+import { transactionAttachmentRepository } from "../repositories/transactionAttachmentRepository";
+import type { TransactionSubmission } from "../lib/transactionAttachments";
 
 interface TransactionFormProps {
   wallets: Wallet[];
@@ -36,7 +39,7 @@ interface TransactionFormProps {
   activeWalletId: WalletView;
   lockWalletToActive?: boolean;
   submitLabel: string;
-  onSubmit: (input: TransactionInput) => Promise<void>;
+  onSubmit: (submission: TransactionSubmission) => Promise<void>;
 }
 
 export function TransactionForm({
@@ -66,6 +69,9 @@ export function TransactionForm({
   const [detailsOpen, setDetailsOpen] = useState(Boolean(initial));
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const [existingAttachments, setExistingAttachments] = useState<TransactionAttachment[]>([]);
+  const [newAttachments, setNewAttachments] = useState<File[]>([]);
+  const [removedAttachmentIds, setRemovedAttachmentIds] = useState<string[]>([]);
   const amountInputRef = useRef<HTMLInputElement | null>(null);
   const selectedWallet = wallets.find((wallet) => wallet.id === walletId);
   const currency = selectedWallet?.currency ?? initial?.currency ?? settings.currency;
@@ -152,6 +158,22 @@ export function TransactionForm({
     }
   }, [activeWalletId, initial, lockWalletToActive]);
 
+  useEffect(() => {
+    let cancelled = false;
+    if (!initial) {
+      setExistingAttachments([]);
+      return;
+    }
+    void transactionAttachmentRepository.listByTransaction(initial.id).then((attachments) => {
+      if (!cancelled) {
+        setExistingAttachments(attachments);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [initial]);
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
@@ -171,20 +193,25 @@ export function TransactionForm({
         throw new Error(t.transaction.calculatorError);
       }
       await onSubmit({
-        walletId,
-        categoryId,
-        type,
-        amountMinor,
-        currency,
-        transactionDate: fromDateInputValue(date),
-        note: note.trim() || undefined,
-        tags: parseTagsInput(tagsInput)
+        input: {
+          walletId,
+          categoryId,
+          type,
+          amountMinor,
+          currency,
+          transactionDate: fromDateInputValue(date),
+          note: note.trim() || undefined,
+          tags: parseTagsInput(tagsInput)
+        },
+        newFiles: newAttachments,
+        removedAttachmentIds
       });
       if (!initial) {
         setAmount("");
         setNote("");
         setTagsInput("");
         setDetailsOpen(false);
+        setNewAttachments([]);
       }
       setSaved(true);
     } catch (cause) {
@@ -368,6 +395,25 @@ export function TransactionForm({
         t={t}
         onChange={(nextCategoryId) => {
           setCategoryId(nextCategoryId);
+          setSaved(false);
+        }}
+      />
+
+      <TransactionAttachments
+        existing={existingAttachments}
+        pending={newAttachments}
+        t={t}
+        onAdd={(files) => {
+          setNewAttachments((current) => [...current, ...files]);
+          setSaved(false);
+        }}
+        onRemoveExisting={(id) => {
+          setExistingAttachments((current) => current.filter((attachment) => attachment.id !== id));
+          setRemovedAttachmentIds((current) => [...current, id]);
+          setSaved(false);
+        }}
+        onRemovePending={(index) => {
+          setNewAttachments((current) => current.filter((_, itemIndex) => itemIndex !== index));
           setSaved(false);
         }}
       />

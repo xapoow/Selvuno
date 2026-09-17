@@ -3,6 +3,7 @@ import { HistoryView } from "../views/HistoryView";
 import { type Dictionary } from "../i18n";
 import { useExchangeRates } from "../lib/exchangeRates";
 import { MobileWalletPager } from "./MobileWalletPager";
+import type { TransactionSubmission } from "../lib/transactionAttachments";
 
 interface MobileWalletHistoryPagerProps {
   wallets: Wallet[];
@@ -14,6 +15,7 @@ interface MobileWalletHistoryPagerProps {
   t: Dictionary;
   onChange: (value: WalletView) => void;
   onUpdate: (id: string, input: Partial<TransactionInput>) => Promise<void>;
+  onUpdateWithAttachments: (id: string, submission: TransactionSubmission) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 }
 
@@ -25,6 +27,7 @@ function MobileWalletHistorySlide({
   settings,
   t,
   onUpdate,
+  onUpdateWithAttachments,
   onDelete
 }: Omit<MobileWalletHistoryPagerProps, "activeWalletId" | "allLabel" | "onChange"> & {
   walletView: WalletView;
@@ -51,6 +54,7 @@ function MobileWalletHistorySlide({
       t={t}
       showTitle={false}
       onUpdate={onUpdate}
+      onUpdateWithAttachments={onUpdateWithAttachments}
       onDelete={onDelete}
     />
   );
@@ -66,6 +70,7 @@ export function MobileWalletHistoryPager({
   t,
   onChange,
   onUpdate,
+  onUpdateWithAttachments,
   onDelete
 }: MobileWalletHistoryPagerProps) {
   return (
@@ -87,6 +92,7 @@ export function MobileWalletHistoryPager({
           settings={settings}
           t={t}
           onUpdate={onUpdate}
+          onUpdateWithAttachments={onUpdateWithAttachments}
           onDelete={onDelete}
         />
       )}
