@@ -224,6 +224,13 @@ export interface Dictionary {
     saveError: string;
     attachments: string;
     attachmentsHint: string;
+    addAttachment: string;
+    sourceTitle: string;
+    sourceHint: string;
+    cameraSource: string;
+    photoLibrary: string;
+    pdfDocument: string;
+    receiptGuide: string;
     takePhoto: string;
     chooseFile: string;
     cameraTitle: string;
@@ -775,6 +782,13 @@ export const dictionaries: Record<Language, Dictionary> = {
       saveError: "Unable to save transaction.",
       attachments: "Receipts and files",
       attachmentsHint: "Take a receipt photo or attach a PDF.",
+      addAttachment: "Add receipt or document",
+      sourceTitle: "Add attachment",
+      sourceHint: "Camera, photo library, or PDF document",
+      cameraSource: "Camera",
+      photoLibrary: "Photo library",
+      pdfDocument: "PDF document",
+      receiptGuide: "Keep the receipt inside the frame",
       takePhoto: "Take photo",
       chooseFile: "Choose file",
       cameraTitle: "Receipt camera",
@@ -1400,6 +1414,13 @@ export const dictionaries: Record<Language, Dictionary> = {
       saveError: "Не удалось сохранить операцию.",
       attachments: "Чеки и файлы",
       attachmentsHint: "Сфотографируй чек или прикрепи PDF.",
+      addAttachment: "Добавить чек или документ",
+      sourceTitle: "Добавить вложение",
+      sourceHint: "Камера, галерея или PDF-документ",
+      cameraSource: "Камера",
+      photoLibrary: "Галерея",
+      pdfDocument: "PDF-документ",
+      receiptGuide: "Размести чек внутри рамки",
       takePhoto: "Сфотографировать",
       chooseFile: "Выбрать файл",
       cameraTitle: "Камера для чека",
