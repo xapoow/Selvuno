@@ -185,6 +185,7 @@ export interface Dictionary {
   transaction: {
     addTitle: string;
     editTitle: string;
+    detailsTitle: string;
     amount: string;
     quickHint: string;
     quickTemplates: string;
@@ -241,6 +242,7 @@ export interface Dictionary {
     attachmentLocalOnly: string;
     removeAttachment: string;
     openAttachment: string;
+    noAttachments: string;
   };
   recurring: {
     tabSingle: string;
@@ -743,6 +745,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     transaction: {
       addTitle: "Add transaction",
       editTitle: "Edit transaction",
+      detailsTitle: "Transaction details",
       amount: "Amount",
       quickHint: "Amount and category are enough — the rest is optional.",
       quickTemplates: "Quick templates",
@@ -798,7 +801,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       attachmentLimitError: "Up to 5 files can be attached to one transaction.",
       attachmentLocalOnly: "Attachments stay on this device and are not included in backups yet.",
       removeAttachment: "Remove attachment",
-      openAttachment: "Open attachment"
+      openAttachment: "Open attachment",
+      noAttachments: "No receipts or files attached."
     },
     recurring: {
       tabSingle: "One-time",
@@ -1082,7 +1086,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       currentPin: "Current PIN",
       newPin: "New PIN",
       confirmPin: "Confirm PIN",
-      pinRequirements: "Use 4 to 12 digits. The PIN cannot be recovered if you forget it.",
+      pinRequirements: "Use exactly 6 digits. The PIN cannot be recovered if you forget it.",
       pinMismatch: "The PIN values do not match.",
       pinIncorrect: "Incorrect PIN. Try again.",
       pinSaveError: "Unable to update PIN protection.",
@@ -1375,6 +1379,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     transaction: {
       addTitle: "Добавить операцию",
       editTitle: "Редактировать операцию",
+      detailsTitle: "Детали операции",
       amount: "Сумма",
       quickHint: "Достаточно суммы и категории — остальное необязательно.",
       quickTemplates: "Быстрые шаблоны",
@@ -1430,7 +1435,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       attachmentLimitError: "К одной операции можно прикрепить до 5 файлов.",
       attachmentLocalOnly: "Вложения остаются на этом устройстве и пока не входят в резервные копии.",
       removeAttachment: "Удалить вложение",
-      openAttachment: "Открыть вложение"
+      openAttachment: "Открыть вложение",
+      noAttachments: "К операции не прикреплены чеки или файлы."
     },
     recurring: {
       tabSingle: "Разовая",
@@ -1714,7 +1720,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       currentPin: "Текущий PIN",
       newPin: "Новый PIN",
       confirmPin: "Повтори PIN",
-      pinRequirements: "От 4 до 12 цифр. Забытый PIN восстановить нельзя.",
+      pinRequirements: "Ровно 6 цифр. Забытый PIN восстановить нельзя.",
       pinMismatch: "Введённые PIN-коды не совпадают.",
       pinIncorrect: "Неверный PIN. Попробуй ещё раз.",
       pinSaveError: "Не удалось изменить защиту PIN-кодом.",

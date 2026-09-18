@@ -11,12 +11,12 @@ describe("LockScreen", () => {
     render(<LockScreen t={getDictionary("en-US")} onUnlock={onUnlock} />);
 
     const pinField = screen.getByRole("button", { name: "PIN" });
-    for (let index = 0; index < 4; index += 1) {
+    for (let index = 0; index < 6; index += 1) {
       await user.click(screen.getByRole("button", { name: "1" }));
     }
     await user.click(screen.getByRole("button", { name: "Unlock" }));
 
-    expect(onUnlock).toHaveBeenCalledWith("1111");
+    expect(onUnlock).toHaveBeenCalledWith("111111");
     expect(await screen.findByText("Incorrect PIN. Try again.")).toBeInTheDocument();
     expect(pinField).toHaveTextContent("0");
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();

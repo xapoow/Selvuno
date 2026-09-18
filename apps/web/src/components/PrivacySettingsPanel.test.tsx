@@ -66,17 +66,17 @@ describe("PrivacySettingsPanel", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Enable PIN" }));
-    for (const digit of ["4", "8", "2", "6"]) {
+    for (const digit of ["4", "8", "2", "6", "0", "1"]) {
       await user.click(screen.getByRole("button", { name: digit }));
     }
-    await user.click(screen.getByRole("button", { name: "Confirm PIN" }));
-    for (const digit of ["4", "8", "2", "6"]) {
+    expect(screen.getByRole("button", { name: "New PIN" })).toHaveTextContent("6");
+    for (const digit of ["4", "8", "2", "6", "0", "1"]) {
       await user.click(screen.getByRole("button", { name: digit }));
     }
     const enableButtons = screen.getAllByRole("button", { name: "Enable PIN" });
     await user.click(enableButtons.at(-1)!);
 
-    expect(privacy.enablePin).toHaveBeenCalledWith("4826");
+    expect(privacy.enablePin).toHaveBeenCalledWith("482601");
   });
 
   it("updates the independent amount visibility preference", async () => {

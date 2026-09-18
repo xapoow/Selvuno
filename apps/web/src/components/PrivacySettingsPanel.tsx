@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Eye, EyeOff, LockKeyhole, ShieldCheck } from "lucide-react";
 import type { Settings, SettingsUpdate } from "@myfinances/types";
 import type { Dictionary } from "../i18n";
-import { autoLockOptions, isValidPin, type AutoLockMinutes } from "../lib/privacy";
+import { autoLockOptions, isValidPin, PIN_LENGTH, type AutoLockMinutes } from "../lib/privacy";
 import type { PrivacyLockController } from "../state/usePrivacyLock";
 import { BottomSheet } from "./ui/BottomSheet";
 import { Button } from "./ui/Button";
@@ -53,7 +53,7 @@ export function PrivacySettingsPanel({ settings, privacy, t, onUpdateSettings }:
   return (
     <>
       <div className="grid gap-4">
-        <article className="app-surface grid gap-4 rounded-2xl p-4">
+        <article className="app-surface relative z-20 grid gap-4 rounded-2xl p-4">
           <div className="flex items-start gap-3">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
               <ShieldCheck className="h-5 w-5" />
@@ -205,8 +205,14 @@ export function PrivacySettingsPanel({ settings, privacy, t, onUpdateSettings }:
               setError("");
               if (activePinField === "current") {
                 setCurrentPin(value);
+                if (pinAction === "change" && value.length === PIN_LENGTH) {
+                  setActivePinField("next");
+                }
               } else if (activePinField === "next") {
                 setNextPin(value);
+                if (value.length === PIN_LENGTH) {
+                  setActivePinField("confirm");
+                }
               } else {
                 setConfirmPin(value);
               }

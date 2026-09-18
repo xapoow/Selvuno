@@ -15,12 +15,11 @@ describe("privacy preferences", () => {
     clearPrivacyData();
   });
 
-  it("accepts only numeric PIN values between 4 and 12 digits", () => {
-    expect(isValidPin("1234")).toBe(true);
-    expect(isValidPin("123456789012")).toBe(true);
-    expect(isValidPin("123")).toBe(false);
-    expect(isValidPin("1234567890123")).toBe(false);
-    expect(isValidPin("12a4")).toBe(false);
+  it("accepts only an exact six-digit PIN", () => {
+    expect(isValidPin("123456")).toBe(true);
+    expect(isValidPin("12345")).toBe(false);
+    expect(isValidPin("1234567")).toBe(false);
+    expect(isValidPin("12a456")).toBe(false);
   });
 
   it("uses opt-in defaults and persists a supported auto-lock interval", () => {
@@ -37,12 +36,12 @@ describe("privacy preferences", () => {
   });
 
   it("stores a derived credential and verifies the PIN locally", async () => {
-    await savePinCredential("4826");
+    await savePinCredential("482601");
 
     expect(hasPinCredential()).toBe(true);
-    expect(localStorage.getItem("myfinances:privacy-credential:v1")).not.toContain("4826");
-    await expect(verifyPinCredential("4826")).resolves.toBe(true);
-    await expect(verifyPinCredential("4827")).resolves.toBe(false);
+    expect(localStorage.getItem("myfinances:privacy-credential:v1")).not.toContain("482601");
+    await expect(verifyPinCredential("482601")).resolves.toBe(true);
+    await expect(verifyPinCredential("482602")).resolves.toBe(false);
 
     removePinCredential();
     expect(hasPinCredential()).toBe(false);

@@ -1,5 +1,6 @@
 import { Delete as DeleteIcon } from "lucide-react";
 import { cn } from "../../lib/cn";
+import { PIN_LENGTH } from "../../lib/privacy";
 
 const keypadRows = [
   ["1", "2", "3"],
@@ -15,7 +16,7 @@ interface PinCodeFieldProps {
 }
 
 export function PinCodeField({ active = true, label, value, onActivate }: PinCodeFieldProps) {
-  const dotCount = Math.max(4, value.length);
+  const dotCount = PIN_LENGTH;
 
   return (
     <label className="grid gap-2 text-sm font-medium text-foreground">
@@ -61,7 +62,7 @@ export function PinKeypad({
   label,
   deleteLabel,
   disabled = false,
-  maxLength = 12,
+  maxLength = PIN_LENGTH,
   onChange
 }: PinKeypadProps) {
   const appendDigit = (digit: string) => {
