@@ -28,6 +28,7 @@ interface FinancialCalendarProps {
   settings: Settings;
   displayCurrency: string;
   t: Dictionary;
+  onOpen: (transaction: Transaction) => void;
   onEdit: (transaction: Transaction) => void;
   onDelete: (transaction: Transaction) => void;
 }
@@ -55,6 +56,7 @@ export function FinancialCalendar({
   settings,
   displayCurrency,
   t,
+  onOpen,
   onEdit,
   onDelete
 }: FinancialCalendarProps) {
@@ -312,6 +314,7 @@ export function FinancialCalendar({
               displayCurrency={item.currency}
               conversionMissing={item.conversionMissing}
               t={t}
+              onOpen={onOpen}
               onEdit={onEdit}
               onDelete={onDelete}
             />

@@ -20,13 +20,13 @@ describe("usePrivacyLock", () => {
   });
 
   it("locks after the selected period of inactivity", async () => {
-    await savePinCredential("4826");
+    await savePinCredential("482601");
     vi.useFakeTimers();
     const { result } = renderHook(() => usePrivacyLock());
 
     expect(result.current.locked).toBe(true);
     await act(async () => {
-      expect(await result.current.unlock("4826")).toBe(true);
+      expect(await result.current.unlock("482601")).toBe(true);
     });
     act(() => result.current.setAutoLockMinutes(1));
     expect(result.current.locked).toBe(false);

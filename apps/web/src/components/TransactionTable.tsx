@@ -21,6 +21,7 @@ interface TransactionTableProps {
   selectedIds: Set<string>;
   onToggle: (id: string) => void;
   onToggleAll: () => void;
+  onOpen: (transaction: Transaction) => void;
   onEdit: (transaction: Transaction) => void;
 }
 
@@ -33,6 +34,7 @@ export function TransactionTable({
   selectedIds,
   onToggle,
   onToggleAll,
+  onOpen,
   onEdit
 }: TransactionTableProps) {
   const allSelected = items.length > 0 && items.every((item) => selectedIds.has(item.transaction.id));
@@ -68,7 +70,15 @@ export function TransactionTable({
             return (
               <tr
                 key={transaction.id}
-                className={`border-b border-line/45 last:border-0 ${selected ? "bg-accent-soft/50" : ""}`}
+                tabIndex={0}
+                className={`cursor-pointer border-b border-line/45 transition-colors last:border-0 hover:bg-elevated/60 ${selected ? "bg-accent-soft/50" : ""}`}
+                onClick={() => onOpen(transaction)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onOpen(transaction);
+                  }
+                }}
               >
                 <td className="px-4 py-3">
                   <input
@@ -78,6 +88,7 @@ export function TransactionTable({
                       "{category}",
                       getCategoryName(category?.name, t)
                     )}
+                    onClick={(event) => event.stopPropagation()}
                     onChange={() => onToggle(transaction.id)}
                     className="h-4 w-4 accent-[rgb(var(--color-accent))]"
                   />
@@ -115,7 +126,7 @@ export function TransactionTable({
                     size="icon"
                     className="h-8 w-8"
                     aria-label={t.common.edit}
-                    onClick={() => onEdit(transaction)}
+                    onClick={(event) => { event.stopPropagation(); onEdit(transaction); }}
                   >
                     <Edit3 className="h-4 w-4" />
                   </Button>

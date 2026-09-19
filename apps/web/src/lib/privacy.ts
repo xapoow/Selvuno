@@ -1,6 +1,7 @@
 const PRIVACY_CREDENTIAL_KEY = "myfinances:privacy-credential:v1";
 const PRIVACY_CONFIG_KEY = "myfinances:privacy-config:v1";
 const PIN_ITERATIONS = 210_000;
+export const PIN_LENGTH = 6;
 
 export const autoLockOptions = [0, 1, 5, 15, 30] as const;
 export type AutoLockMinutes = (typeof autoLockOptions)[number];
@@ -77,7 +78,7 @@ function readCredential(): StoredPinCredential | null {
 }
 
 export function isValidPin(pin: string): boolean {
-  return /^\d{4,12}$/.test(pin);
+  return new RegExp(`^\\d{${PIN_LENGTH}}$`).test(pin);
 }
 
 export function hasPinCredential(): boolean {
@@ -86,7 +87,7 @@ export function hasPinCredential(): boolean {
 
 export async function savePinCredential(pin: string): Promise<void> {
   if (!isValidPin(pin)) {
-    throw new Error("PIN must contain 4 to 12 digits.");
+    throw new Error(`PIN must contain exactly ${PIN_LENGTH} digits.`);
   }
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const credential: StoredPinCredential = {

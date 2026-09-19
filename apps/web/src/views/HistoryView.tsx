@@ -12,6 +12,7 @@ import { minorToDecimal } from "@myfinances/utils";
 import { Download, ReceiptText, Tags, Trash2 } from "lucide-react";
 import { FinancialCalendar } from "../components/FinancialCalendar";
 import { TransactionForm } from "../components/TransactionForm";
+import { TransactionDetailsSheet } from "../components/TransactionDetailsSheet";
 import { TransactionRow } from "../components/TransactionRow";
 import { TransactionTable } from "../components/TransactionTable";
 import { BottomSheet } from "../components/ui/BottomSheet";
@@ -25,6 +26,7 @@ import { convertMinorToBaseCurrency, type ExchangeRateTable } from "../lib/excha
 import { createCsv, downloadCsv } from "../lib/csv";
 import { shouldHideWalletAmounts } from "../lib/walletFeatures";
 import type { TransactionSubmission } from "../lib/transactionAttachments";
+import { compareTransactionsNewestFirst, compareTransactionsOldestFirst } from "../lib/transactions";
 
 interface HistoryViewProps {
   wallets: Wallet[];
@@ -76,6 +78,7 @@ export function HistoryView({
   const [sortBy, setSortBy] = useState<HistorySort>("date-desc");
   const [viewMode, setViewMode] = useState<"list" | "table" | "calendar">("list");
   const [editing, setEditing] = useState<Transaction | null>(null);
+  const [details, setDetails] = useState<Transaction | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkCategoryId, setBulkCategoryId] = useState("");
   const [bulkActionError, setBulkActionError] = useState("");
@@ -158,8 +161,7 @@ export function HistoryView({
   );
   const displayTransactions = useMemo(() => {
     const collator = new Intl.Collator(settings.locale, { numeric: true, sensitivity: "base" });
-    const byNewest = (left: Transaction, right: Transaction) =>
-      Date.parse(right.transactionDate) - Date.parse(left.transactionDate);
+    const byNewest = compareTransactionsNewestFirst;
     const getCategoryLabel = (transaction: Transaction) =>
       getCategoryName(categories.find((category) => category.id === transaction.categoryId)?.name, t);
     const getWalletLabel = (transaction: Transaction) =>
@@ -171,7 +173,7 @@ export function HistoryView({
           return byNewest(left.transaction, right.transaction);
         }
         if (sortBy === "date-asc") {
-          return byNewest(right.transaction, left.transaction);
+          return compareTransactionsOldestFirst(left.transaction, right.transaction);
         }
         if (sortBy === "amount-desc") {
           return right.amountMinor - left.amountMinor || byNewest(left.transaction, right.transaction);
@@ -444,6 +446,7 @@ export function HistoryView({
           settings={calendarSettings}
           displayCurrency={displayCurrency}
           t={t}
+          onOpen={setDetails}
           onEdit={setEditing}
           onDelete={handleDelete}
         />
@@ -477,6 +480,7 @@ export function HistoryView({
             })
           }
           onEdit={setEditing}
+          onOpen={setDetails}
         />
       ) : displayTransactions.length ? (
         <div className="grid gap-2">
@@ -491,6 +495,7 @@ export function HistoryView({
               displayCurrency={item.currency}
               conversionMissing={item.conversionMissing}
               t={t}
+              onOpen={setDetails}
               onEdit={setEditing}
               onDelete={handleDelete}
             />
@@ -523,6 +528,18 @@ export function HistoryView({
           />
         ) : null}
       </BottomSheet>
+      <TransactionDetailsSheet
+        open={Boolean(details)}
+        transaction={details}
+        category={categories.find((category) => category.id === details?.categoryId)}
+        wallet={wallets.find((wallet) => wallet.id === details?.walletId)}
+        settings={settings}
+        t={t}
+        displayAmountMinor={displayTransactions.find((item) => item.transaction.id === details?.id)?.amountMinor}
+        displayCurrency={displayTransactions.find((item) => item.transaction.id === details?.id)?.currency}
+        conversionMissing={displayTransactions.find((item) => item.transaction.id === details?.id)?.conversionMissing}
+        onClose={() => setDetails(null)}
+      />
     </div>
   );
 }

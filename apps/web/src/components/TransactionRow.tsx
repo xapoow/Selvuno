@@ -15,6 +15,7 @@ interface TransactionRowProps {
   displayAmountMinor?: number;
   displayCurrency?: string;
   conversionMissing?: boolean;
+  onOpen?: (transaction: Transaction) => void;
   onEdit?: (transaction: Transaction) => void;
   onDelete?: (transaction: Transaction) => void;
 }
@@ -28,6 +29,7 @@ export function TransactionRow({
   displayAmountMinor,
   displayCurrency,
   conversionMissing,
+  onOpen,
   onEdit,
   onDelete
 }: TransactionRowProps) {
@@ -39,7 +41,18 @@ export function TransactionRow({
   const hideAmount = shouldHideWalletAmounts(settings, wallet);
 
   return (
-    <article className="app-surface grid grid-cols-[auto_1fr_auto] items-center gap-3.5 rounded-2xl p-3.5 transition-all">
+    <article
+      className={`app-surface grid grid-cols-[auto_1fr_auto] items-center gap-3.5 rounded-2xl p-3.5 transition-all ${onOpen ? "app-focus cursor-pointer hover:bg-elevated/70" : ""}`}
+      role={onOpen ? "button" : undefined}
+      tabIndex={onOpen ? 0 : undefined}
+      onClick={() => onOpen?.(transaction)}
+      onKeyDown={(event) => {
+        if (onOpen && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          onOpen(transaction);
+        }
+      }}
+    >
       <span
         className="grid h-11 w-11 place-items-center rounded-control text-white shadow-sm"
         style={{ backgroundColor: category?.color ?? "#676761" }}
@@ -87,7 +100,7 @@ export function TransactionRow({
         {(onEdit || onDelete) && (
           <div className="flex gap-1">
             {onEdit ? (
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(transaction)} aria-label={t?.common.edit ?? "Edit"}>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(event) => { event.stopPropagation(); onEdit(transaction); }} aria-label={t?.common.edit ?? "Edit"}>
                 <Edit3 className="h-4 w-4" />
               </Button>
             ) : null}
@@ -96,7 +109,7 @@ export function TransactionRow({
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-expense"
-                onClick={() => onDelete(transaction)}
+                onClick={(event) => { event.stopPropagation(); onDelete(transaction); }}
                 aria-label={t?.common.delete ?? "Delete"}
               >
                 <Trash2 className="h-4 w-4" />

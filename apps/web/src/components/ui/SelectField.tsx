@@ -164,7 +164,7 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
     return (
       <label
         ref={containerRef}
-        className="relative grid gap-2 text-sm font-medium text-foreground"
+        className={cn("relative grid gap-2 text-sm font-medium text-foreground", open && "z-[70]")}
         onBlur={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
             setOpen(false);

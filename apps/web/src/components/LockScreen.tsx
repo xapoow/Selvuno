@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { LockKeyhole } from "lucide-react";
 import type { Dictionary } from "../i18n";
+import { PIN_LENGTH } from "../lib/privacy";
 import { Button } from "./ui/Button";
 import { PinCodeField, PinKeypad } from "./ui/PinKeypad";
 
@@ -53,7 +54,7 @@ export function LockScreen({ t, onUnlock }: LockScreenProps) {
           }}
         />
         {error ? <p className="text-sm font-medium text-expense">{error}</p> : null}
-        <Button type="submit" disabled={pin.length < 4 || submitting}>
+        <Button type="submit" disabled={pin.length !== PIN_LENGTH || submitting}>
           {submitting ? t.settings.checkingPin : t.settings.unlock}
         </Button>
       </form>

@@ -20,6 +20,7 @@ import { BudgetOverviewCard } from "../components/BudgetOverviewCard";
 import { SmartInsightsCard } from "../components/SmartInsightsCard";
 import { BudgetPlanView } from "../components/BudgetPlanView";
 import { TransactionRow } from "../components/TransactionRow";
+import { TransactionDetailsSheet } from "../components/TransactionDetailsSheet";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Section } from "../components/ui/Section";
 import { StatPanel } from "../components/ui/StatPanel";
@@ -34,6 +35,7 @@ import {
   getIncludedWalletIds,
   shouldHideWalletAmounts
 } from "../lib/walletFeatures";
+import { compareTransactionsNewestFirst } from "../lib/transactions";
 
 interface DashboardViewProps {
   wallets: Wallet[];
@@ -75,6 +77,7 @@ export function DashboardView({
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [chartType, setChartType] = useState<"expense" | "income">("expense");
+  const [details, setDetails] = useState<Transaction | null>(null);
   const advancedWalletsEnabled = settings.advancedWalletsEnabled;
   const includedWalletIds = useMemo(
     () =>
@@ -117,7 +120,7 @@ export function DashboardView({
   const visibleTransactions = filterTransactionsByWallet(sourceTransactions, activeWalletId).filter(
     (transaction) => !transaction.deletedAt
   );
-  const displayTransactions = visibleTransactions.map((transaction) => {
+  const displayTransactions = [...visibleTransactions].sort(compareTransactionsNewestFirst).map((transaction) => {
     const convertedAmountMinor = convertMinorToBaseCurrency(
       transaction.amountMinor,
       transaction.currency,
@@ -507,6 +510,7 @@ export function DashboardView({
                   displayCurrency={item.currency}
                   conversionMissing={item.conversionMissing}
                   t={t}
+                  onOpen={setDetails}
                 />
               ))}
             </div>
@@ -523,6 +527,18 @@ export function DashboardView({
             />
           )}
         </Section>
+        <TransactionDetailsSheet
+          open={Boolean(details)}
+          transaction={details}
+          category={categories.find((category) => category.id === details?.categoryId)}
+          wallet={wallets.find((wallet) => wallet.id === details?.walletId)}
+          settings={{ ...settings, hideAmounts }}
+          t={t}
+          displayAmountMinor={displayTransactions.find((item) => item.transaction.id === details?.id)?.amountMinor}
+          displayCurrency={displayTransactions.find((item) => item.transaction.id === details?.id)?.currency}
+          conversionMissing={displayTransactions.find((item) => item.transaction.id === details?.id)?.conversionMissing}
+          onClose={() => setDetails(null)}
+        />
       </motion.div>
     </motion.div>
   );
