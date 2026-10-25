@@ -17,6 +17,7 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
+      "@myfinances/api-contracts": ["packages/api-contracts/src/index.ts"],
       "@myfinances/types": ["packages/types/src/index.ts"],
       "@myfinances/utils": ["packages/utils/src/index.ts"]
     }

@@ -7,7 +7,9 @@ import { cn } from "../lib/cn";
 import { WalletIcon } from "../lib/icons";
 import { getCurrencyLabel } from "../lib/currencies";
 import { getIncludedWalletIds } from "../lib/walletFeatures";
-import { convertMinorToBaseCurrency, type ExchangeRateTable, useExchangeRates } from "../lib/exchangeRates";
+import { useExchangeRates } from "../lib/exchangeRates";
+import { selectCombinedWalletBalance } from "../state/financeSelectors";
+import { useAppSelector } from "../state/hooks";
 import type { Dictionary } from "../i18n";
 
 interface MonobankWalletCarouselProps {
@@ -34,35 +36,7 @@ export interface MonobankCardData {
   conversionMissing?: boolean;
 }
 
-export function calculateCombinedWalletBalance(
-  wallets: Wallet[],
-  transactions: Transaction[],
-  transfers: WalletTransfer[],
-  includedWalletIds: Set<string>,
-  baseCurrency: string,
-  exchangeRates?: ExchangeRateTable
-): { balanceMinor: number; conversionMissing: boolean } {
-  return wallets
-    .filter((wallet) => !wallet.deletedAt && includedWalletIds.has(wallet.id))
-    .reduce<{ balanceMinor: number; conversionMissing: boolean }>(
-      (result, wallet) => {
-        const totals = calculateWalletTotals(wallet, transactions, transfers);
-        const converted = convertMinorToBaseCurrency(
-          totals.balanceMinor,
-          wallet.currency,
-          baseCurrency,
-          exchangeRates
-        );
-        if (converted === null) {
-          result.conversionMissing = true;
-        } else {
-          result.balanceMinor += converted;
-        }
-        return result;
-      },
-      { balanceMinor: 0, conversionMissing: false }
-    );
-}
+export { calculateCombinedWalletBalance } from "../lib/walletBalances";
 
 const GAP = 14;
 const MAX_CAROUSEL_WIDTH = 576;
@@ -290,18 +264,11 @@ export function MonobankWalletCarousel({
       ),
     [includedWalletIds, settings.currency, wallets]
   );
-  const combinedBalanceRates = useExchangeRates(settings.currency, combinedBalanceNeedsRates);
+  useExchangeRates(settings.currency, combinedBalanceNeedsRates);
+  const combinedBalance = useAppSelector(selectCombinedWalletBalance);
 
   const cardItems = useMemo<MonobankCardData[]>(() => {
     // 1. Calculate for "all"
-    const combinedBalance = calculateCombinedWalletBalance(
-      wallets,
-      transactions,
-      transfers,
-      includedWalletIds,
-      settings.currency,
-      combinedBalanceRates.data
-    );
 
     const allCard: MonobankCardData = {
       id: "all",
@@ -332,7 +299,7 @@ export function MonobankWalletCarousel({
       });
 
     return [allCard, ...individualCards];
-  }, [wallets, transactions, transfers, settings.currency, includedWalletIds, t.wallets.allWallets, combinedBalanceRates.data]);
+  }, [wallets, transactions, transfers, settings.currency, t.wallets.allWallets, combinedBalance]);
 
   const rawIndex = cardItems.findIndex((item) => item.id === internalActiveId);
   const resolvedIndex = rawIndex >= 0 ? rawIndex : 0;

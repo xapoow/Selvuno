@@ -17,10 +17,14 @@ import { getDictionary } from "./i18n";
 import { applyRootVisualTheme } from "./lib/colorThemes";
 import { useExchangeRates } from "./lib/exchangeRates";
 import { buildAppNotifications } from "./lib/notifications";
-import { useAppStore, type AppView } from "./state/appStore";
-import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
+import type { AppView } from "./state/uiSlice";
+import { uiActions } from "./state/uiSlice";
+import { useAppDispatch, useAppSelector, useAppServices } from "./state/hooks";
+import { selectWalletContext } from "./state/financeSelectors";
+import { loadFinance } from "./state/financeActions";
+import { useFinanceData, useFinanceCommands } from "./state/useFinance";
 import { usePrivacyLock } from "./state/usePrivacyLock";
-import { getIncludedWalletIds, shouldHideWalletAmounts } from "./lib/walletFeatures";
+import { shouldHideWalletAmounts } from "./lib/walletFeatures";
 import { getDesktopShortcut } from "./lib/desktopShortcuts";
 import { AddTransactionView } from "./views/AddTransactionView";
 import { DashboardView } from "./views/DashboardView";
@@ -64,8 +68,10 @@ const pageVariants: Variants = {
 };
 
 export function App() {
-  const activeView = useAppStore((state) => state.activeView);
-  const setActiveView = useAppStore((state) => state.setActiveView);
+  const dataMode = useAppServices().finance.mode;
+  const dispatch = useAppDispatch();
+  const activeView = useAppSelector((state) => state.ui.activeView);
+  const setActiveView = (view: AppView) => { dispatch(uiActions.viewChanged(view)); };
   const prevViewRef = useRef<AppView>(activeView);
   const viewTransitionDirection = (viewOrder[activeView] ?? 0) >= (viewOrder[prevViewRef.current] ?? 0) ? 1 : -1;
 
@@ -73,68 +79,17 @@ export function App() {
     prevViewRef.current = activeView;
   }, [activeView]);
   const [walletTransitionDirection, setWalletTransitionDirection] = useState(1);
-  const [historySearchRequest, setHistorySearchRequest] = useState(0);
+  const historySearchRequest = useAppSelector((state) => state.ui.historySearchRequest);
   const privacy = usePrivacyLock();
   const data = useFinanceData();
-  const mutations = useFinanceMutations();
+  const mutations = useFinanceCommands();
 
-  const settings = data.settings.data;
-  const wallets = data.wallets.data ?? [];
-  const archivedWallets = data.archivedWallets.data ?? [];
-  const categories = data.categories.data ?? [];
-  const transactions = data.transactions.data ?? [];
-  const transactionTemplates = data.transactionTemplates.data ?? [];
-  const budgets = data.budgets.data ?? [];
-  const recurringTransactions = data.recurringTransactions.data ?? [];
-  const savingsGoals = data.savingsGoals.data ?? [];
-  const savingsGoalContributions = data.savingsGoalContributions.data ?? [];
-  const walletTransfers = data.walletTransfers.data ?? [];
-  const backupSnapshots = data.backupSnapshots.data ?? [];
-  const isLoading =
-    data.bootstrap.isLoading ||
-    data.settings.isLoading ||
-    data.wallets.isLoading ||
-    data.archivedWallets.isLoading ||
-    data.categories.isLoading ||
-    data.transactions.isLoading ||
-    data.transactionTemplates.isLoading ||
-    data.budgets.isLoading ||
-    data.recurringTransactions.isLoading ||
-    data.savingsGoals.isLoading ||
-    data.savingsGoalContributions.isLoading ||
-    data.walletTransfers.isLoading ||
-    data.backupSnapshots.isLoading;
-  const isError =
-    data.bootstrap.isError ||
-    data.settings.isError ||
-    data.wallets.isError ||
-    data.archivedWallets.isError ||
-    data.categories.isError ||
-    data.transactions.isError ||
-    data.transactionTemplates.isError ||
-    data.budgets.isError ||
-    data.recurringTransactions.isError ||
-    data.savingsGoals.isError ||
-    data.savingsGoalContributions.isError ||
-    data.walletTransfers.isError ||
-    data.backupSnapshots.isError;
+  const {
+    settings, wallets, archivedWallets, categories, transactions, transactionTemplates,
+    budgets, recurringTransactions, savingsGoals, savingsGoalContributions,
+    walletTransfers, backupSnapshots, isLoading
+  } = data;
   const fallbackT = getDictionary(settings?.locale ?? (typeof navigator === "undefined" ? "en-US" : navigator.language));
-  const lastBackupRevision = useRef("");
-  const backupRevision = [
-    wallets,
-    archivedWallets,
-    categories,
-    transactions,
-    transactionTemplates,
-    budgets,
-    recurringTransactions,
-    savingsGoals,
-    savingsGoalContributions,
-    walletTransfers
-  ]
-    .flatMap((items) => items.map((item) => `${item.id}:${item.updatedAt}`))
-    .sort()
-    .join("|");
 
   useEffect(() => {
     if (!settings) {
@@ -168,108 +123,30 @@ export function App() {
         setActiveView("add");
         return;
       }
-      setHistorySearchRequest((request) => request + 1);
-      setActiveView("history");
+      dispatch(uiActions.historySearchRequested());
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [privacy.locked, setActiveView, settings?.onboardingCompleted]);
+  }, [privacy.locked, dispatch, settings?.onboardingCompleted]);
 
-  useEffect(() => {
-    if (
-      isLoading ||
-      !settings?.onboardingCompleted ||
-      !backupRevision ||
-      lastBackupRevision.current === backupRevision
-    ) {
-      return;
-    }
-    lastBackupRevision.current = backupRevision;
-    const timer = window.setTimeout(() => {
-      void mutations.createBackupSnapshot.mutateAsync().catch(() => {
-        lastBackupRevision.current = "";
-      });
-    }, 2200);
-    return () => window.clearTimeout(timer);
-  }, [backupRevision, isLoading, settings?.onboardingCompleted]);
-
-  const [selectedWalletId, setSelectedWalletId] = useState<WalletView | null>(null);
-
-  const activeWalletId: WalletView =
-    selectedWalletId !== null && (selectedWalletId === "all" || wallets.some((wallet) => wallet.id === selectedWalletId))
-      ? selectedWalletId
-      : settings && (settings.activeWalletId === "all" || wallets.some((wallet) => wallet.id === settings.activeWalletId))
-        ? settings.activeWalletId
-        : "all";
-  const activeWallet = activeWalletId === "all" ? undefined : wallets.find((wallet) => wallet.id === activeWalletId);
-  const displayCurrency = settings ? activeWallet?.currency ?? settings.currency : "USD";
-  const includedWalletIds = getIncludedWalletIds(
-    wallets,
-    settings?.advancedWalletsEnabled ?? false
-  );
-  const walletIsInCurrentStatistics = (walletId: string) =>
-    activeWalletId === "all" ? includedWalletIds.has(walletId) : walletId === activeWalletId;
-  const conversionNeeded = Boolean(
-    settings &&
-      (transactions.some(
-        (transaction) =>
-          !transaction.deletedAt &&
-          walletIsInCurrentStatistics(transaction.walletId) &&
-          transaction.currency.toUpperCase() !== displayCurrency
-      ) ||
-        wallets.some(
-          (wallet) =>
-            !wallet.deletedAt &&
-            walletIsInCurrentStatistics(wallet.id) &&
-            wallet.currency.toUpperCase() !== displayCurrency &&
-            wallet.initialBalanceMinor !== 0
-        ) ||
-        walletTransfers.some(
-          (transfer) =>
-            !transfer.deletedAt &&
-            ((walletIsInCurrentStatistics(transfer.fromWalletId) &&
-              transfer.fromCurrency.toUpperCase() !== displayCurrency) ||
-              (walletIsInCurrentStatistics(transfer.toWalletId) &&
-                transfer.toCurrency.toUpperCase() !== displayCurrency))
-        ))
-  );
+  const { activeWalletId, activeWallet, displayCurrency, conversionNeeded } = useAppSelector(selectWalletContext);
   const exchangeRates = useExchangeRates(displayCurrency, conversionNeeded);
   const handleWalletChange = (nextWalletId: WalletView, direction = 1) => {
-    setSelectedWalletId(nextWalletId);
     setWalletTransitionDirection(direction);
-    void mutations.updateSettings.mutateAsync({ activeWalletId: nextWalletId });
+    void mutations.updateSettings({ activeWalletId: nextWalletId }).catch(() => undefined);
   };
   const addWalletId: WalletView = activeWalletId === "all" ? wallets[0]?.id ?? "all" : activeWalletId;
   const addWallet = wallets.find((wallet) => wallet.id === addWalletId);
   const showsWalletContext = activeView === "dashboard" || activeView === "history" || activeView === "add";
 
-  if (isError) {
+  if (data.error) {
     return (
       <ErrorScreen
-        kind="storage"
+        kind={data.error.status === 401 ? "unauthorized" : data.error.status === 403 ? "forbidden" :
+          dataMode === "local" ? "storage" : data.error.code === "network_error" ? "unavailable" : "server"}
         copy={fallbackT.errors}
-        details={[
-          data.bootstrap.error instanceof Error ? data.bootstrap.error.message : null,
-          data.settings.error instanceof Error ? data.settings.error.message : null,
-          data.wallets.error instanceof Error ? data.wallets.error.message : null,
-          data.archivedWallets.error instanceof Error ? data.archivedWallets.error.message : null,
-          data.categories.error instanceof Error ? data.categories.error.message : null,
-          data.transactions.error instanceof Error ? data.transactions.error.message : null,
-          data.transactionTemplates.error instanceof Error
-            ? data.transactionTemplates.error.message
-            : null,
-          data.budgets.error instanceof Error ? data.budgets.error.message : null,
-          data.recurringTransactions.error instanceof Error ? data.recurringTransactions.error.message : null,
-          data.savingsGoals.error instanceof Error ? data.savingsGoals.error.message : null,
-          data.savingsGoalContributions.error instanceof Error
-            ? data.savingsGoalContributions.error.message
-            : null,
-          data.walletTransfers.error instanceof Error ? data.walletTransfers.error.message : null,
-          data.backupSnapshots.error instanceof Error ? data.backupSnapshots.error.message : null
-        ]
-          .filter(Boolean)
-          .join("\n")}
+        details={data.error.message}
       />
     );
   }
@@ -305,12 +182,12 @@ export function App() {
         <OnboardingView
           settings={settings}
           wallets={wallets}
-          onUpdateSettings={async (input) => mutations.updateSettings.mutateAsync(input)}
-          onCreateWallet={(input) => mutations.createWallet.mutateAsync(input)}
-          onUpdateWallet={(id, input) => mutations.updateWallet.mutateAsync({ id, input })}
+          onUpdateSettings={async (input) => mutations.updateSettings(input)}
+          onCreateWallet={(input) => mutations.createWallet(input)}
+          onUpdateWallet={(id, input) => mutations.updateWallet({ id, input })}
         />
         <CookieNotice />
-        <OfflineIndicator t={fallbackT} />
+        <OfflineIndicator t={fallbackT} mode={dataMode} />
       </>
     );
   }
@@ -352,11 +229,19 @@ export function App() {
       </aside>
 
       <main className="mx-auto w-full min-w-0 max-w-[1180px] overflow-x-hidden px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:px-8 md:pb-10 md:pt-7 lg:px-10">
+        {data.refreshError ? (
+          <div role="status" className="app-surface mb-3 flex items-center justify-between gap-3 rounded-xl p-3 text-sm text-muted">
+            <span>{data.refreshError.message}</span>
+            <button type="button" className="app-focus shrink-0 rounded-lg px-2 py-1 font-semibold text-accent" disabled={data.isRefreshing} onClick={() => { void dispatch(loadFinance({ force: true })); }}>
+              {t.common.reload}
+            </button>
+          </div>
+        ) : null}
         <div className="mb-3 flex justify-end gap-1">
           <button
             type="button"
             onClick={() =>
-              void mutations.updateSettings.mutateAsync({ hideAmounts: !settings.hideAmounts })
+              void mutations.updateSettings({ hideAmounts: !settings.hideAmounts }).catch(() => undefined)
             }
             className="app-focus grid h-10 w-10 place-items-center rounded-app text-muted transition hover:bg-elevated/70 hover:text-foreground"
             aria-label={settings.hideAmounts ? t.settings.showAmounts : t.settings.hideAmounts}
@@ -428,7 +313,7 @@ export function App() {
                   t={t}
                   onChange={handleWalletChange}
                   onAdd={() => setActiveView("add")}
-                  onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
+                  onSetBudget={(input) => mutations.setBudget(input)}
                 />
               </div>
               <div className="hidden overflow-hidden md:block">
@@ -453,7 +338,7 @@ export function App() {
                     direction={walletTransitionDirection}
                     t={t}
                     onAdd={() => setActiveView("add")}
-                    onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
+                    onSetBudget={(input) => mutations.setBudget(input)}
                   />
                 </motion.div>
               </div>
@@ -473,25 +358,25 @@ export function App() {
               }}
               t={t}
               onSubmit={async (submission) => {
-                await mutations.addTransactionWithAttachments.mutateAsync(submission);
+                await mutations.addTransactionWithAttachments(submission);
               }}
               onCreateTemplate={async (input) => {
-                await mutations.createTransactionTemplate.mutateAsync(input);
+                await mutations.createTransactionTemplate(input);
               }}
               onDeleteTemplate={async (id) => {
-                await mutations.deleteTransactionTemplate.mutateAsync(id);
+                await mutations.deleteTransactionTemplate(id);
               }}
               onCreateRecurring={async (input) => {
-                await mutations.createRecurringTransaction.mutateAsync(input);
+                await mutations.createRecurringTransaction(input);
               }}
               onUpdateRecurring={async (id, input) => {
-                await mutations.updateRecurringTransaction.mutateAsync({ id, input });
+                await mutations.updateRecurringTransaction({ id, input });
               }}
               onSetRecurringPaused={async (id, paused) => {
-                await mutations.setRecurringTransactionPaused.mutateAsync({ id, paused });
+                await mutations.setRecurringTransactionPaused({ id, paused });
               }}
               onDeleteRecurring={async (id) => {
-                await mutations.deleteRecurringTransaction.mutateAsync(id);
+                await mutations.deleteRecurringTransaction(id);
               }}
             />
           ) : null}
@@ -515,12 +400,12 @@ export function App() {
                   desktopTools
                   searchFocusRequest={historySearchRequest}
                   onUpdate={async (id, input) => {
-                    await mutations.updateTransaction.mutateAsync({ id, input });
+                    await mutations.updateTransaction({ id, input });
                   }}
                   onUpdateWithAttachments={async (id, submission) => {
-                    await mutations.updateTransactionWithAttachments.mutateAsync({ id, submission });
+                    await mutations.updateTransactionWithAttachments({ id, submission });
                   }}
-                  onDelete={(id) => mutations.deleteTransaction.mutateAsync(id)}
+                  onDelete={(id) => mutations.deleteTransaction(id)}
                 />
               </motion.div>
             </div>
@@ -536,35 +421,35 @@ export function App() {
               settings={settings}
               t={t}
               onCreateWallet={async (input) => {
-                await mutations.createWallet.mutateAsync(input);
+                await mutations.createWallet(input);
               }}
               onUpdateWallet={async (id, input) => {
-                await mutations.updateWallet.mutateAsync({ id, input });
+                await mutations.updateWallet({ id, input });
               }}
-              onArchiveWallet={(id) => mutations.archiveWallet.mutateAsync(id)}
+              onArchiveWallet={(id) => mutations.archiveWallet(id)}
               onRestoreWallet={async (id) => {
-                await mutations.restoreWallet.mutateAsync(id);
+                await mutations.restoreWallet(id);
               }}
               onReorderWallet={async (orderedIds) => {
-                await mutations.reorderWallets.mutateAsync(orderedIds);
+                await mutations.reorderWallets(orderedIds);
               }}
               onCreateGoal={async (input) => {
-                await mutations.createSavingsGoal.mutateAsync(input);
+                await mutations.createSavingsGoal(input);
               }}
               onUpdateGoal={async (id, input) => {
-                await mutations.updateSavingsGoal.mutateAsync({ id, input });
+                await mutations.updateSavingsGoal({ id, input });
               }}
-              onDeleteGoal={(id) => mutations.deleteSavingsGoal.mutateAsync(id)}
+              onDeleteGoal={(id) => mutations.deleteSavingsGoal(id)}
               onContribute={async (input) => {
-                await mutations.addSavingsGoalContribution.mutateAsync(input);
+                await mutations.addSavingsGoalContribution(input);
               }}
               onDeleteContribution={(id) =>
-                mutations.deleteSavingsGoalContribution.mutateAsync(id)
+                mutations.deleteSavingsGoalContribution(id)
               }
               onCreateTransfer={async (input) => {
-                await mutations.createWalletTransfer.mutateAsync(input);
+                await mutations.createWalletTransfer(input);
               }}
-              onDeleteTransfer={(id) => mutations.deleteWalletTransfer.mutateAsync(id)}
+              onDeleteTransfer={(id) => mutations.deleteWalletTransfer(id)}
             />
           ) : null}
           {activeView === "settings" ? (
@@ -575,30 +460,30 @@ export function App() {
               privacy={privacy}
               t={t}
               onUpdateSettings={async (input) => {
-                await mutations.updateSettings.mutateAsync(input);
+                await mutations.updateSettings(input);
               }}
               onCreateCategory={async (input) => {
-                await mutations.createCategory.mutateAsync(input);
+                await mutations.createCategory(input);
               }}
               onUpdateCategory={async (id, input) => {
-                await mutations.updateCategory.mutateAsync({ id, input });
+                await mutations.updateCategory({ id, input });
               }}
-              onDeleteCategory={(id) => mutations.deleteCategory.mutateAsync(id)}
+              onDeleteCategory={(id) => mutations.deleteCategory(id)}
               onReorderCategories={(type, orderedIds) =>
-                mutations.reorderCategories.mutateAsync({ type, orderedIds })
+                mutations.reorderCategories({ type, orderedIds })
               }
               onReplaceCategory={(sourceId, targetId, deleteSource) =>
-                mutations.replaceCategory.mutateAsync({ sourceId, targetId, deleteSource })
+                mutations.replaceCategory({ sourceId, targetId, deleteSource })
               }
-              onExportBackup={() => mutations.exportBackup.mutateAsync()}
+              onExportBackup={() => mutations.exportBackup()}
               onImportBackup={async (backup) => {
-                await mutations.importBackup.mutateAsync(backup);
+                await mutations.importBackup(backup);
               }}
               onRestoreBackupSnapshot={async (id) => {
-                await mutations.restoreBackupSnapshot.mutateAsync(id);
+                await mutations.restoreBackupSnapshot(id);
               }}
               onDeleteBackupSnapshot={(id) =>
-                mutations.deleteBackupSnapshot.mutateAsync(id)
+                mutations.deleteBackupSnapshot(id)
               }
             />
           ) : null}
@@ -609,7 +494,7 @@ export function App() {
       <BottomNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
       <UpdateAnnouncement t={t} />
       <CookieNotice />
-      <OfflineIndicator t={t} />
+      <OfflineIndicator t={t} mode={dataMode} />
     </div>
   );
 }

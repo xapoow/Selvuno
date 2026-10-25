@@ -11,11 +11,8 @@ import type {
   WalletView
 } from "@myfinances/types";
 import { BarChart3, PlusCircle } from "lucide-react";
-import { filterTransactionsByWallet, formatMoney } from "@myfinances/utils";
-import {
-  AnalyticsView,
-  type AnalyticsCategoryItem
-} from "../components/AnalyticsView";
+import { formatMoney } from "@myfinances/utils";
+import { AnalyticsView } from "../components/AnalyticsView";
 import { BudgetOverviewCard } from "../components/BudgetOverviewCard";
 import { SmartInsightsCard } from "../components/SmartInsightsCard";
 import { BudgetPlanView } from "../components/BudgetPlanView";
@@ -24,18 +21,14 @@ import { TransactionDetailsSheet } from "../components/TransactionDetailsSheet";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Section } from "../components/ui/Section";
 import { StatPanel } from "../components/ui/StatPanel";
-import { getCategoryName, type Dictionary } from "../i18n";
+import type { Dictionary } from "../i18n";
 import { cn } from "../lib/cn";
-import { calculateMonthlyBudgetProgress, formatBudgetMonth, getBudgetMonth } from "../lib/budgets";
-import { convertMinorToBaseCurrency, type ExchangeRateTable, useExchangeRates } from "../lib/exchangeRates";
+import { formatBudgetMonth } from "../lib/budgets";
+import { type ExchangeRateTable, useExchangeRates } from "../lib/exchangeRates";
 import { getTimeGreeting } from "../lib/greetings";
-import { buildSmartInsights } from "../lib/insights";
-import {
-  filterTransactionsForTotals,
-  getIncludedWalletIds,
-  shouldHideWalletAmounts
-} from "../lib/walletFeatures";
-import { compareTransactionsNewestFirst } from "../lib/transactions";
+import { shouldHideWalletAmounts } from "../lib/walletFeatures";
+import { makeSelectWalletOverview } from "../state/overviewSelectors";
+import { useAppSelector } from "../state/hooks";
 
 interface DashboardViewProps {
   wallets: Wallet[];
@@ -78,195 +71,21 @@ export function DashboardView({
   const [budgetOpen, setBudgetOpen] = useState(false);
   const [chartType, setChartType] = useState<"expense" | "income">("expense");
   const [details, setDetails] = useState<Transaction | null>(null);
-  const advancedWalletsEnabled = settings.advancedWalletsEnabled;
-  const includedWalletIds = useMemo(
-    () =>
-      getIncludedWalletIds(wallets, advancedWalletsEnabled),
-    [advancedWalletsEnabled, wallets]
-  );
-  const statisticsTransactions = useMemo(
-    () =>
-      filterTransactionsForTotals(transactions, includedWalletIds),
-    [includedWalletIds, transactions]
-  );
-  const activeWallet =
-    activeWalletId === "all" ? undefined : wallets.find((wallet) => wallet.id === activeWalletId);
+  const overviewSelector = useMemo(makeSelectWalletOverview, []);
+  const now = `${new Date().toISOString().slice(0, 16)}:00.000Z`;
+  const {
+    displayTransactions, recentTransactions, totals, statisticsTransactions,
+    budgetConversionNeeded, currentBudgetMonth, budgetProgress, smartInsights,
+    expenseCategories, incomeCategories, hasMissingRates, hasCurrencyConversion
+  } = useAppSelector((state) => overviewSelector(state, activeWalletId, now));
+  const activeWallet = wallets.find((wallet) => wallet.id === activeWalletId);
   const hideAmounts = shouldHideWalletAmounts(settings, activeWallet);
+  const budgetExchangeRates = useExchangeRates(settings.currency, budgetConversionNeeded);
+  const greeting = getTimeGreeting(new Date(), settings.timeZone, t);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
   }, [analyticsOpen, budgetOpen]);
-
-  const budgetConversionNeeded =
-    statisticsTransactions.some(
-      (transaction) =>
-        !transaction.deletedAt &&
-        transaction.type === "expense" &&
-        transaction.currency.toUpperCase() !== settings.currency
-    ) || budgets.some((budget) => !budget.deletedAt && budget.currency.toUpperCase() !== settings.currency);
-  const budgetExchangeRates = useExchangeRates(settings.currency, budgetConversionNeeded);
-  const currentBudgetMonth = getBudgetMonth(new Date(), settings.timeZone);
-  const budgetProgress = calculateMonthlyBudgetProgress({
-    month: currentBudgetMonth,
-    timeZone: settings.timeZone,
-    currency: settings.currency,
-    categories,
-    budgets,
-    transactions: statisticsTransactions,
-    exchangeRates: budgetExchangeRates.data
-  });
-  const sourceTransactions =
-    activeWalletId === "all" ? statisticsTransactions : transactions;
-  const visibleTransactions = filterTransactionsByWallet(sourceTransactions, activeWalletId).filter(
-    (transaction) => !transaction.deletedAt
-  );
-  const displayTransactions = [...visibleTransactions].sort(compareTransactionsNewestFirst).map((transaction) => {
-    const convertedAmountMinor = convertMinorToBaseCurrency(
-      transaction.amountMinor,
-      transaction.currency,
-      displayCurrency,
-      exchangeRates
-    );
-    return {
-      transaction,
-      amountMinor: convertedAmountMinor ?? transaction.amountMinor,
-      currency: convertedAmountMinor === null ? transaction.currency : displayCurrency,
-      conversionMissing: convertedAmountMinor === null && transaction.currency.toUpperCase() !== displayCurrency
-    };
-  });
-  const visibleWallets =
-    activeWalletId === "all"
-      ? wallets.filter((wallet) => includedWalletIds.has(wallet.id))
-      : wallets.filter((wallet) => wallet.id === activeWalletId);
-  const visibleWalletIds = new Set(visibleWallets.map((wallet) => wallet.id));
-  const rawBalanceAdjustments: Array<{
-    amountMinor: number;
-    currency: string;
-    direction: -1 | 1;
-  }> = [
-    ...visibleWallets
-      .filter((wallet) => !wallet.deletedAt && wallet.initialBalanceMinor !== 0)
-      .map((wallet) => ({
-        amountMinor: wallet.initialBalanceMinor,
-        currency: wallet.currency,
-        direction: 1 as const
-      })),
-    ...transfers
-      .filter(
-        (transfer) =>
-          !transfer.deletedAt &&
-          (visibleWalletIds.has(transfer.fromWalletId) ||
-            visibleWalletIds.has(transfer.toWalletId))
-      )
-      .flatMap((transfer): Array<{
-        amountMinor: number;
-        currency: string;
-        direction: -1 | 1;
-      }> => {
-        const adjustments: Array<{
-          amountMinor: number;
-          currency: string;
-          direction: -1 | 1;
-        }> = [];
-        if (visibleWalletIds.has(transfer.fromWalletId)) {
-          adjustments.push({
-            amountMinor: transfer.fromAmountMinor,
-            currency: transfer.fromCurrency,
-            direction: -1 as const
-          });
-        }
-        if (visibleWalletIds.has(transfer.toWalletId)) {
-          adjustments.push({
-            amountMinor: transfer.toAmountMinor,
-            currency: transfer.toCurrency,
-            direction: 1 as const
-          });
-        }
-        return adjustments;
-      })
-  ];
-  const normalizedBalanceAdjustments = rawBalanceAdjustments.map((adjustment) => {
-    const convertedAmountMinor = convertMinorToBaseCurrency(
-      adjustment.amountMinor,
-      adjustment.currency,
-      displayCurrency,
-      exchangeRates
-    );
-    return {
-      ...adjustment,
-      convertedAmountMinor,
-      conversionMissing:
-        convertedAmountMinor === null && adjustment.currency.toUpperCase() !== displayCurrency
-    };
-  });
-  const hasMissingRates =
-    displayTransactions.some((transaction) => transaction.conversionMissing) ||
-    normalizedBalanceAdjustments.some((adjustment) => adjustment.conversionMissing);
-  const totals = displayTransactions.reduce(
-    (result, item) => {
-      if (item.conversionMissing) {
-        return result;
-      }
-      if (item.transaction.type === "income") {
-        result.incomeMinor += item.amountMinor;
-        result.balanceMinor += item.amountMinor;
-      } else {
-        result.expenseMinor += item.amountMinor;
-        result.balanceMinor -= item.amountMinor;
-      }
-      return result;
-    },
-    { incomeMinor: 0, expenseMinor: 0, balanceMinor: 0 }
-  );
-  normalizedBalanceAdjustments.forEach((adjustment) => {
-    if (!adjustment.conversionMissing && adjustment.convertedAmountMinor !== null) {
-      totals.balanceMinor += adjustment.direction * adjustment.convertedAmountMinor;
-    }
-  });
-  const recentTransactions = displayTransactions.slice(0, 4);
-  const smartInsights = settings.smartInsightsEnabled
-    ? buildSmartInsights({
-        transactions: displayTransactions
-          .filter((item) => !item.conversionMissing)
-          .map((item) => ({
-            type: item.transaction.type,
-            amountMinor: item.amountMinor,
-            categoryId: item.transaction.categoryId,
-            transactionDate: item.transaction.transactionDate,
-            recurringTransactionId: item.transaction.recurringTransactionId
-          })),
-        now: new Date(),
-        timeZone: settings.timeZone
-      })
-    : [];
-  const greeting = getTimeGreeting(new Date(), settings.timeZone, t);
-  const hasCurrencyConversion =
-    displayTransactions.some(
-      (item) => item.transaction.currency.toUpperCase() !== displayCurrency
-    ) ||
-    normalizedBalanceAdjustments.some(
-      (item) => item.currency.toUpperCase() !== displayCurrency
-    );
-  const buildCategoryTotals = (type: "expense" | "income"): AnalyticsCategoryItem[] =>
-    categories
-      .filter((category) => category.type === type)
-      .map((category) => ({
-        id: category.id,
-        name: getCategoryName(category.name, t),
-        color: category.color,
-        value: displayTransactions
-          .filter(
-            (item) =>
-              item.transaction.type === type &&
-              item.transaction.categoryId === category.id &&
-              !item.conversionMissing
-          )
-          .reduce((sum, item) => sum + item.amountMinor, 0)
-      }))
-      .filter((item) => item.value > 0)
-      .sort((left, right) => right.value - left.value);
-  const expenseCategories = buildCategoryTotals("expense");
-  const incomeCategories = buildCategoryTotals("income");
   const categoryTotals = chartType === "expense" ? expenseCategories : incomeCategories;
   const summaryCategories = categoryTotals.slice(0, 6);
   const chartTotal = summaryCategories.reduce((sum, item) => sum + item.value, 0);

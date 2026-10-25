@@ -8,7 +8,7 @@ import type { TransactionAttachment } from "../db/models";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { CategoryIcon } from "../lib/icons";
 import { shouldHideWalletAmounts } from "../lib/walletFeatures";
-import { transactionAttachmentRepository } from "../repositories/transactionAttachmentRepository";
+import { useAppServices } from "../state/hooks";
 import { BottomSheet } from "./ui/BottomSheet";
 import { Button } from "./ui/Button";
 
@@ -47,9 +47,11 @@ export function TransactionDetailsSheet({
   conversionMissing,
   onClose
 }: TransactionDetailsSheetProps) {
+  const services = useAppServices();
   const [attachments, setAttachments] = useState<TransactionAttachment[]>([]);
   const [loading, setLoading] = useState(false);
   const [viewer, setViewer] = useState<AttachmentPreview | null>(null);
+  const [attachmentError, setAttachmentError] = useState(false);
 
   useEffect(() => {
     if (!open || !transaction) {
@@ -58,19 +60,24 @@ export function TransactionDetailsSheet({
       return;
     }
     let cancelled = false;
+    const controller = new AbortController();
+    setAttachments([]);
+    setAttachmentError(false);
     setLoading(true);
-    void transactionAttachmentRepository
-      .listByTransaction(transaction.id)
+    void services.finance
+      .listAttachments(transaction.id, { signal: controller.signal })
       .then((items) => {
         if (!cancelled) setAttachments(items);
       })
+      .catch(() => { if (!cancelled) setAttachmentError(true); })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
     return () => {
       cancelled = true;
+      controller.abort();
     };
-  }, [open, transaction]);
+  }, [open, transaction, services]);
 
   const previews = useMemo<AttachmentPreview[]>(
     () => attachments.map((attachment) => ({ ...attachment, url: URL.createObjectURL(attachment.blob) })),
@@ -198,6 +205,8 @@ export function TransactionDetailsSheet({
             </div>
             {loading ? (
               <div className="app-control h-28 animate-pulse rounded-2xl" />
+            ) : attachmentError ? (
+              <p className="text-sm text-expense">{t.transaction.attachmentsLoadError}</p>
             ) : previews.length ? (
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {previews.map((preview) => (

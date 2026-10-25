@@ -1,0 +1,9 @@
+{
+  "name": "@myfinances/api-contracts",
+  "private": true,
+  "version": "0.9.0",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "typecheck": "tsc -p tsconfig.json" },
+  "dependencies": { "@myfinances/types": "workspace:*", "zod": "^3.25.32" }
+}

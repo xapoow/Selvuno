@@ -13,7 +13,8 @@ import { DashboardView } from "../views/DashboardView";
 import { type Dictionary } from "../i18n";
 import { useExchangeRates } from "../lib/exchangeRates";
 import { MonobankWalletCarousel } from "./MonobankWalletCarousel";
-import { getIncludedWalletIds } from "../lib/walletFeatures";
+import { selectWalletContext } from "../state/financeSelectors";
+import { useAppSelector } from "../state/hooks";
 
 interface MobileWalletDashboardPagerProps {
   wallets: Wallet[];
@@ -46,33 +47,7 @@ function MobileWalletDashboardSlide({
   walletView: WalletView;
   direction?: number;
 }) {
-  const activeWallet = walletView === "all" ? undefined : wallets.find((wallet) => wallet.id === walletView);
-  const displayCurrency = activeWallet?.currency ?? settings.currency;
-  const includedWalletIds = getIncludedWalletIds(wallets, settings.advancedWalletsEnabled);
-  const walletIsInCurrentStatistics = (walletId: string) =>
-    walletView === "all" ? includedWalletIds.has(walletId) : walletId === walletView;
-  const conversionNeeded =
-    transactions.some(
-      (transaction) =>
-        !transaction.deletedAt &&
-        walletIsInCurrentStatistics(transaction.walletId) &&
-        transaction.currency.toUpperCase() !== displayCurrency
-    ) ||
-    wallets.some(
-      (wallet) =>
-        !wallet.deletedAt &&
-        walletIsInCurrentStatistics(wallet.id) &&
-        wallet.initialBalanceMinor !== 0 &&
-        wallet.currency.toUpperCase() !== displayCurrency
-    ) ||
-    transfers.some(
-      (transfer) =>
-        !transfer.deletedAt &&
-        ((walletIsInCurrentStatistics(transfer.fromWalletId) &&
-          transfer.fromCurrency.toUpperCase() !== displayCurrency) ||
-          (walletIsInCurrentStatistics(transfer.toWalletId) &&
-            transfer.toCurrency.toUpperCase() !== displayCurrency))
-    );
+  const { displayCurrency, conversionNeeded } = useAppSelector(selectWalletContext);
   const exchangeRates = useExchangeRates(displayCurrency, conversionNeeded);
 
   return (

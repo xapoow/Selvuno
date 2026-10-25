@@ -25,7 +25,7 @@ import { SelectField } from "./ui/SelectField";
 import { SegmentedControl } from "./ui/SegmentedControl";
 import { TextField } from "./ui/TextField";
 import type { TransactionAttachment } from "../db/models";
-import { transactionAttachmentRepository } from "../repositories/transactionAttachmentRepository";
+import { useAppServices } from "../state/hooks";
 import type { TransactionSubmission } from "../lib/transactionAttachments";
 
 interface TransactionFormProps {
@@ -55,6 +55,7 @@ export function TransactionForm({
   submitLabel,
   onSubmit
 }: TransactionFormProps) {
+  const services = useAppServices();
   const defaultWalletId =
     initial?.walletId ?? (activeWalletId !== "all" ? activeWalletId : wallets[0]?.id ?? "");
   const [type, setType] = useState<TransactionType>(initial?.type ?? "expense");
@@ -164,15 +165,17 @@ export function TransactionForm({
       setExistingAttachments([]);
       return;
     }
-    void transactionAttachmentRepository.listByTransaction(initial.id).then((attachments) => {
+    const controller = new AbortController();
+    void services.finance.listAttachments(initial.id, { signal: controller.signal }).then((attachments) => {
       if (!cancelled) {
         setExistingAttachments(attachments);
       }
-    });
+    }).catch(() => { if (!cancelled) setError(t.transaction.attachmentsLoadError); });
     return () => {
       cancelled = true;
+      controller.abort();
     };
-  }, [initial]);
+  }, [initial, services, t.transaction.attachmentsLoadError]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

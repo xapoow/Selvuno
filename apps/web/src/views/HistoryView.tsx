@@ -22,11 +22,12 @@ import { SegmentedControl } from "../components/ui/SegmentedControl";
 import { SelectField } from "../components/ui/SelectField";
 import { TextField } from "../components/ui/TextField";
 import { getCategoryName, type Dictionary } from "../i18n";
-import { convertMinorToBaseCurrency, type ExchangeRateTable } from "../lib/exchangeRates";
+import type { ExchangeRateTable } from "../lib/exchangeRates";
 import { createCsv, downloadCsv } from "../lib/csv";
 import { shouldHideWalletAmounts } from "../lib/walletFeatures";
 import type { TransactionSubmission } from "../lib/transactionAttachments";
-import { compareTransactionsNewestFirst, compareTransactionsOldestFirst } from "../lib/transactions";
+import { makeSelectHistory, type HistorySort } from "../state/historySelectors";
+import { useAppSelector } from "../state/hooks";
 
 interface HistoryViewProps {
   wallets: Wallet[];
@@ -46,15 +47,6 @@ interface HistoryViewProps {
 }
 
 type TypeFilter = TransactionType | "all";
-type HistorySort =
-  | "date-desc"
-  | "date-asc"
-  | "amount-desc"
-  | "amount-asc"
-  | "category-asc"
-  | "category-desc"
-  | "wallet-asc"
-  | "wallet-desc";
 
 export function HistoryView({
   wallets,
@@ -95,116 +87,13 @@ export function HistoryView({
     hideAmounts: settings.hideAmounts || calendarContainsHiddenWallet
   };
 
-  const visibleTransactions = useMemo(
-    () => {
-      const searchTerms = searchQuery
-        .toLocaleLowerCase(settings.locale)
-        .split(/[\s,;]+/)
-        .map((term) => term.trim().replace(/^#+/, ""))
-        .filter(Boolean);
-
-      return transactions.filter((transaction) => {
-        if (transaction.deletedAt) {
-          return false;
-        }
-        if (activeWalletId !== "all" && transaction.walletId !== activeWalletId) {
-          return false;
-        }
-        if (typeFilter !== "all" && transaction.type !== typeFilter) {
-          return false;
-        }
-        if (categoryFilter !== "all" && transaction.categoryId !== categoryFilter) {
-          return false;
-        }
-        if (searchTerms.length) {
-          const category = categories.find((item) => item.id === transaction.categoryId);
-          const wallet = wallets.find((item) => item.id === transaction.walletId);
-          const tags = Array.isArray(transaction.tags) ? transaction.tags : [];
-          const searchable = [
-            transaction.note,
-            category?.name,
-            getCategoryName(category?.name, t),
-            wallet?.name,
-            ...tags,
-            ...tags.map((tag) => `#${tag}`)
-          ]
-            .filter(Boolean)
-            .join(" ")
-            .toLocaleLowerCase(settings.locale);
-
-          if (!searchTerms.every((term) => searchable.includes(term))) {
-            return false;
-          }
-        }
-        return true;
-      });
-    },
-    [activeWalletId, categories, categoryFilter, searchQuery, settings.locale, t, transactions, typeFilter, wallets]
+  const historySelector = useMemo(makeSelectHistory, []);
+  const { convertedTransactions, displayTransactions } = useAppSelector((state) =>
+    historySelector(state, {
+      walletId: activeWalletId, type: typeFilter, categoryId: categoryFilter,
+      search: searchQuery, sort: sortBy, currency: displayCurrency
+    })
   );
-  const convertedTransactions = useMemo(
-    () =>
-      visibleTransactions.map((transaction) => {
-        const convertedAmountMinor = convertMinorToBaseCurrency(
-          transaction.amountMinor,
-          transaction.currency,
-          displayCurrency,
-          exchangeRates
-        );
-        return {
-          transaction,
-          amountMinor: convertedAmountMinor ?? transaction.amountMinor,
-          currency: convertedAmountMinor === null ? transaction.currency : displayCurrency,
-          conversionMissing: convertedAmountMinor === null && transaction.currency.toUpperCase() !== displayCurrency
-        };
-      }),
-    [displayCurrency, exchangeRates, visibleTransactions]
-  );
-  const displayTransactions = useMemo(() => {
-    const collator = new Intl.Collator(settings.locale, { numeric: true, sensitivity: "base" });
-    const byNewest = compareTransactionsNewestFirst;
-    const getCategoryLabel = (transaction: Transaction) =>
-      getCategoryName(categories.find((category) => category.id === transaction.categoryId)?.name, t);
-    const getWalletLabel = (transaction: Transaction) =>
-      wallets.find((wallet) => wallet.id === transaction.walletId)?.name ?? "";
-
-    return [...convertedTransactions]
-      .sort((left, right) => {
-        if (sortBy === "date-desc") {
-          return byNewest(left.transaction, right.transaction);
-        }
-        if (sortBy === "date-asc") {
-          return compareTransactionsOldestFirst(left.transaction, right.transaction);
-        }
-        if (sortBy === "amount-desc") {
-          return right.amountMinor - left.amountMinor || byNewest(left.transaction, right.transaction);
-        }
-        if (sortBy === "amount-asc") {
-          return left.amountMinor - right.amountMinor || byNewest(left.transaction, right.transaction);
-        }
-        if (sortBy === "category-asc") {
-          return (
-            collator.compare(getCategoryLabel(left.transaction), getCategoryLabel(right.transaction)) ||
-            byNewest(left.transaction, right.transaction)
-          );
-        }
-        if (sortBy === "category-desc") {
-          return (
-            collator.compare(getCategoryLabel(right.transaction), getCategoryLabel(left.transaction)) ||
-            byNewest(left.transaction, right.transaction)
-          );
-        }
-        if (sortBy === "wallet-asc") {
-          return (
-            collator.compare(getWalletLabel(left.transaction), getWalletLabel(right.transaction)) ||
-            byNewest(left.transaction, right.transaction)
-          );
-        }
-        return (
-          collator.compare(getWalletLabel(right.transaction), getWalletLabel(left.transaction)) ||
-          byNewest(left.transaction, right.transaction)
-        );
-      });
-  }, [categories, convertedTransactions, settings.locale, sortBy, t, wallets]);
   const selectedTransactions = useMemo(
     () =>
       displayTransactions

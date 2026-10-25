@@ -44,7 +44,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          react: ["react", "react-dom", "@tanstack/react-query", "zustand"],
+          react: ["react", "react-dom", "react-redux", "@reduxjs/toolkit"],
           motion: ["framer-motion"],
           charts: ["recharts"],
           storage: ["dexie", "zod"]

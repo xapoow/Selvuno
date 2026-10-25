@@ -243,6 +243,7 @@ export interface Dictionary {
     removeAttachment: string;
     openAttachment: string;
     noAttachments: string;
+    attachmentsLoadError: string;
   };
   recurring: {
     tabSingle: string;
@@ -277,6 +278,7 @@ export interface Dictionary {
   };
   connectivity: {
     offline: string;
+    offlineRemote: string;
     online: string;
   };
   notifications: {
@@ -802,7 +804,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       attachmentLocalOnly: "Attachments stay on this device and are not included in backups yet.",
       removeAttachment: "Remove attachment",
       openAttachment: "Open attachment",
-      noAttachments: "No receipts or files attached."
+      noAttachments: "No receipts or files attached.",
+      attachmentsLoadError: "Unable to load attachments. Close and reopen the transaction to try again."
     },
     recurring: {
       tabSingle: "One-time",
@@ -971,6 +974,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     },
     connectivity: {
       offline: "Offline — changes stay safely on this device",
+      offlineRemote: "Offline — reconnect to save changes",
       online: "Connection restored"
     },
     notifications: {
@@ -1436,7 +1440,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       attachmentLocalOnly: "Вложения остаются на этом устройстве и пока не входят в резервные копии.",
       removeAttachment: "Удалить вложение",
       openAttachment: "Открыть вложение",
-      noAttachments: "К операции не прикреплены чеки или файлы."
+      noAttachments: "К операции не прикреплены чеки или файлы.",
+      attachmentsLoadError: "Не удалось загрузить вложения. Закрой и открой операцию, чтобы попробовать снова."
     },
     recurring: {
       tabSingle: "Разовая",
@@ -1605,6 +1610,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     },
     connectivity: {
       offline: "Нет сети — изменения сохраняются на устройстве",
+      offlineRemote: "Нет сети — для сохранения изменений нужно подключение",
       online: "Соединение восстановлено"
     },
     notifications: {

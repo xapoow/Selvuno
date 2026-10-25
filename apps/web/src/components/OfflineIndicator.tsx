@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { CloudOff, Wifi } from "lucide-react";
 import type { Dictionary } from "../i18n";
 
-export function OfflineIndicator({ t }: { t: Dictionary }) {
+export function OfflineIndicator({ t, mode = "local" }: { t: Dictionary; mode?: "local" | "remote" }) {
   const [online, setOnline] = useState(() => navigator.onLine);
   const [showRestored, setShowRestored] = useState(false);
   const wasOffline = useRef(!navigator.onLine);
@@ -48,7 +48,7 @@ export function OfflineIndicator({ t }: { t: Dictionary }) {
           exit={{ opacity: 0, y: -12 }}
         >
           {online ? <Wifi className="h-4 w-4" /> : <CloudOff className="h-4 w-4" />}
-          {online ? t.connectivity.online : t.connectivity.offline}
+          {online ? t.connectivity.online : mode === "remote" ? t.connectivity.offlineRemote : t.connectivity.offline}
         </motion.div>
       ) : null}
     </AnimatePresence>
