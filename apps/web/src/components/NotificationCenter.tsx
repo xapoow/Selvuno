@@ -44,13 +44,12 @@ interface NotificationCenterProps {
 function NotificationMetadata({ notification, t, locale }: { notification: AppNotification; t: Dictionary; locale: string }) {
   const date = notification.date ? formatNotificationDate(notification.date, locale) : "";
   return (
-    <span className="-ml-2 flex max-w-full flex-wrap items-center justify-start gap-x-2 gap-y-1 text-left text-xs text-muted">
-      <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold", toneStyles[notification.tone])}>
+    <span className="flex max-w-full flex-wrap items-center justify-start gap-x-2 gap-y-1 text-left text-[11px] leading-4 text-muted">
+      <span className={cn("inline-flex items-center rounded-md px-1.5 py-0.5 font-semibold", toneStyles[notification.tone])}>
         {t.notifications.kinds[notification.kind]}
       </span>
       {date || notification.kind !== "reminder" ? <>
-        <span aria-hidden="true">·</span>
-        {date ? <time dateTime={notification.date}>{date}</time> : <span>{t.notifications.unknownDate}</span>}
+        {date ? <time className="whitespace-nowrap" dateTime={notification.date}>{date}</time> : <span>{t.notifications.unknownDate}</span>}
       </> : null}
     </span>
   );
@@ -147,12 +146,12 @@ export function NotificationCenter({ notifications, t, locale }: NotificationCen
                     >
                       <NotificationIcon tone={notification.tone} kind={notification.kind} />
                     </span>
-                    <span className="min-w-0 flex-1">
+                    <span className="grid min-w-0 flex-1 content-start gap-1">
                       <NotificationMetadata notification={notification} t={t} locale={locale} />
-                      <span className="mt-1.5 block text-sm font-semibold text-foreground">
+                      <span className="block text-sm font-semibold text-foreground">
                         {notification.title}
                       </span>
-                      <span className="mt-1 block text-sm leading-5 text-muted">
+                      <span className="block text-sm leading-5 text-muted">
                         {notification.body}
                       </span>
                     </span>
