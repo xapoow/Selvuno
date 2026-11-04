@@ -1014,7 +1014,9 @@ export const dictionaries: Record<Language, Dictionary> = {
         "Fixed a crash when opening Wallets with a single wallet",
         "Desktop sidebar stays in place while the page scrolls",
         "Removed app hotkeys that conflicted with browser shortcuts",
-        "Aligned switch thumbs with consistent spacing in both states"
+        "Aligned switch thumbs with consistent spacing in both states",
+        "Recent transactions keep their natural height even with only a few entries",
+        "Removed the green amount field frame; calculator buttons replace the pending operator"
       ]
     },
     categories: {
@@ -1648,7 +1650,9 @@ export const dictionaries: Record<Language, Dictionary> = {
         "Исправлено падение вкладки «Кошельки», когда кошелёк один",
         "Боковая панель на ПК остаётся на месте при прокрутке страницы",
         "Убраны горячие клавиши приложения, конфликтовавшие с браузером",
-        "Бегунки переключателей выровнены по центру с одинаковыми отступами"
+        "Бегунки переключателей выровнены по центру с одинаковыми отступами",
+        "Последние операции больше не растягиваются по высоте, когда записей мало",
+        "Убрана зелёная рамка поля суммы, кнопки калькулятора заменяют последний знак операции"
       ]
     },
     categories: {

@@ -17,7 +17,9 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
         "Исправлено падение вкладки «Кошельки», когда кошелёк один или недоступно перетаскивание",
         "Боковая панель на ПК остаётся на месте при прокрутке страницы",
         "Убраны горячие клавиши приложения, конфликтовавшие с браузером",
-        "Бегунки переключателей выровнены по центру с одинаковыми отступами"
+        "Бегунки переключателей выровнены по центру с одинаковыми отступами",
+        "Последние операции больше не растягиваются по высоте, когда записей мало",
+        "Убрана зелёная рамка поля суммы, кнопки калькулятора заменяют последний знак операции"
       ]
     },
     {
@@ -155,7 +157,9 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
         "Fixed a Wallets crash with a single wallet or when reordering is unavailable",
         "Desktop sidebar stays in place while the page scrolls",
         "Removed app hotkeys that conflicted with browser shortcuts",
-        "Aligned switch thumbs with consistent spacing in both states"
+        "Aligned switch thumbs with consistent spacing in both states",
+        "Recent transactions keep their natural height even with only a few entries",
+        "Removed the green amount field frame; calculator buttons replace the pending operator"
       ]
     },
     {
