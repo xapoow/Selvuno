@@ -11,7 +11,7 @@ import type {
 import { decimalToMinor, formatMoney, minorToDecimal } from "@myfinances/utils";
 import { CalendarDays, ChevronDown, Equal, Hash, RotateCcw, Sparkles, StickyNote } from "lucide-react";
 import { getCategoryName, type Dictionary } from "../i18n";
-import { evaluateAmountExpression } from "../lib/amountExpression";
+import { evaluateAmountExpression, setAmountOperator } from "../lib/amountExpression";
 import { suggestCategoryId } from "../lib/categorySuggestions";
 import { cn } from "../lib/cn";
 import { fromDateInputValue, toDateInputValue } from "../lib/dates";
@@ -69,6 +69,8 @@ export function TransactionForm({
   const [detailsOpen, setDetailsOpen] = useState(Boolean(initial));
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   const [existingAttachments, setExistingAttachments] = useState<TransactionAttachment[]>([]);
   const [newAttachments, setNewAttachments] = useState<File[]>([]);
   const [removedAttachmentIds, setRemovedAttachmentIds] = useState<string[]>([]);
@@ -176,6 +178,9 @@ export function TransactionForm({
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitting(true);
     setError("");
     setSaved(false);
     try {
@@ -216,6 +221,9 @@ export function TransactionForm({
       setSaved(true);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : t.transaction.saveError);
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
     }
   }
 
@@ -243,7 +251,7 @@ export function TransactionForm({
   }
 
   return (
-    <form className="grid gap-5" onSubmit={handleSubmit}>
+    <form className="grid gap-5" onSubmit={handleSubmit} aria-busy={submitting}>
       {!initial && settings.quickTemplatesEnabled && (templates.length || quickTemplates.length) ? (
         <section className="grid gap-2">
           <div className="flex items-start justify-between gap-3">
@@ -333,25 +341,30 @@ export function TransactionForm({
               setAmount(event.target.value);
               setSaved(false);
             }}
-            className="app-focus min-w-0 flex-1 bg-transparent text-4xl font-semibold tracking-tight text-foreground outline-none placeholder:text-muted/45 sm:text-5xl"
+            className="min-w-0 flex-1 border-0 border-b border-transparent bg-transparent text-4xl font-semibold tracking-tight text-foreground outline-none transition-colors placeholder:text-muted/45 focus-visible:border-muted/40 sm:text-5xl"
           />
           <span className="text-lg font-semibold text-muted">{currency}</span>
         </span>
         <span className="flex flex-wrap items-center gap-1.5">
-          {[
+          {([
             { label: "+", value: "+" },
             { label: "−", value: "-" },
             { label: "×", value: "*" },
             { label: "÷", value: "/" }
-          ].map((operator) => (
+          ] as const).map((operator) => (
             <button
               key={operator.value}
               type="button"
               aria-label={`${t.transaction.calculatorOperator} ${operator.label}`}
               className="app-focus app-field grid h-8 min-w-9 place-items-center rounded-lg px-2 text-sm font-semibold text-muted hover:text-foreground"
               onClick={() => {
-                setAmount((current) => `${current.trimEnd()} ${operator.value} `);
+                setAmount((current) => setAmountOperator(current, operator.value));
                 setSaved(false);
+                amountInputRef.current?.focus();
+                window.requestAnimationFrame(() => {
+                  const input = amountInputRef.current;
+                  input?.setSelectionRange(input.value.length, input.value.length);
+                });
               }}
             >
               {operator.label}
@@ -517,7 +530,7 @@ export function TransactionForm({
       <Button
         type="submit"
         className="h-12 text-base"
-        disabled={!wallets.length || !typeCategories.length}
+        disabled={submitting || !wallets.length || !typeCategories.length}
       >
         {submitLabel}
       </Button>

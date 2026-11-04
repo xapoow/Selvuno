@@ -21,7 +21,6 @@ import { useAppStore, type AppView } from "./state/appStore";
 import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
 import { usePrivacyLock } from "./state/usePrivacyLock";
 import { getIncludedWalletIds, shouldHideWalletAmounts } from "./lib/walletFeatures";
-import { getDesktopShortcut } from "./lib/desktopShortcuts";
 import { AddTransactionView } from "./views/AddTransactionView";
 import { DashboardView } from "./views/DashboardView";
 import { HistoryView } from "./views/HistoryView";
@@ -73,7 +72,6 @@ export function App() {
     prevViewRef.current = activeView;
   }, [activeView]);
   const [walletTransitionDirection, setWalletTransitionDirection] = useState(1);
-  const [historySearchRequest, setHistorySearchRequest] = useState(0);
   const privacy = usePrivacyLock();
   const data = useFinanceData();
   const mutations = useFinanceMutations();
@@ -152,29 +150,6 @@ export function App() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [activeView]);
-
-  useEffect(() => {
-    if (!settings?.onboardingCompleted || privacy.locked) {
-      return;
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const shortcut = getDesktopShortcut(event);
-      if (!shortcut) {
-        return;
-      }
-      event.preventDefault();
-      if (shortcut === "add-transaction") {
-        setActiveView("add");
-        return;
-      }
-      setHistorySearchRequest((request) => request + 1);
-      setActiveView("history");
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [privacy.locked, setActiveView, settings?.onboardingCompleted]);
 
   useEffect(() => {
     if (
@@ -316,27 +291,14 @@ export function App() {
   }
 
   return (
-    <div className="app-page-bg min-h-dvh text-foreground md:grid md:grid-cols-[236px_minmax(0,1fr)]">
-      <aside className="app-chrome sticky top-0 hidden h-dvh p-4 shadow-[1px_0_0_0_rgb(var(--color-foreground)/0.04)] md:flex md:flex-col">
+    <div className="app-page-bg min-h-dvh text-foreground md:pl-[236px]">
+      <aside className="app-chrome fixed inset-y-0 left-0 z-40 hidden h-dvh w-[236px] overflow-y-auto overscroll-contain p-4 shadow-[1px_0_0_0_rgb(var(--color-foreground)/0.04)] md:flex md:flex-col">
         <div className="mb-7 px-2 pt-2">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">MyFinances</p>
           <h1 className="mt-1 text-2xl font-semibold text-foreground">{t.appName}</h1>
         </div>
         <HeaderNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
         <div className="mt-auto grid gap-2">
-          <div className="app-control rounded-app p-3 text-xs text-muted">
-            <p className="mb-2 font-semibold uppercase tracking-wide">{t.shortcuts.title}</p>
-            <div className="grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1.5">
-              <kbd className="rounded-md bg-surface/80 px-1.5 py-0.5 font-mono text-foreground shadow-sm">
-                Ctrl N
-              </kbd>
-              <span>{t.shortcuts.newTransaction}</span>
-              <kbd className="rounded-md bg-surface/80 px-1.5 py-0.5 font-mono text-foreground shadow-sm">
-                Ctrl K
-              </kbd>
-              <span>{t.shortcuts.search}</span>
-            </div>
-          </div>
           {showsWalletContext ? (
             <div className="app-surface rounded-app p-3.5">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">
@@ -429,6 +391,8 @@ export function App() {
                   onChange={handleWalletChange}
                   onAdd={() => setActiveView("add")}
                   onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
+                  onUpdateTransaction={async (id, submission) => { await mutations.updateTransactionWithAttachments.mutateAsync({ id, submission }); }}
+                  onDeleteTransaction={(id) => mutations.deleteTransaction.mutateAsync(id)}
                 />
               </div>
               <div className="hidden overflow-hidden md:block">
@@ -454,6 +418,8 @@ export function App() {
                     t={t}
                     onAdd={() => setActiveView("add")}
                     onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
+                    onUpdateTransaction={async (id, submission) => { await mutations.updateTransactionWithAttachments.mutateAsync({ id, submission }); }}
+                    onDeleteTransaction={(id) => mutations.deleteTransaction.mutateAsync(id)}
                   />
                 </motion.div>
               </div>
@@ -513,7 +479,6 @@ export function App() {
                   exchangeRates={exchangeRates.data}
                   t={t}
                   desktopTools
-                  searchFocusRequest={historySearchRequest}
                   onUpdate={async (id, input) => {
                     await mutations.updateTransaction.mutateAsync({ id, input });
                   }}

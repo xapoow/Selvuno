@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { cn } from "../../lib/cn";
+import { Switch } from "./Switch";
 
 interface SettingsToggleCardProps {
   checked: boolean;
@@ -47,30 +48,13 @@ export function SettingsToggleCard({
         <h3 className="text-sm font-semibold text-foreground">{label}</h3>
         <p className="mt-1 text-xs leading-5 text-muted">{hint}</p>
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        aria-label={label}
+      <Switch
+        checked={checked}
+        label={label}
         disabled={pending}
         onClick={() => void handleChange()}
-        className="app-focus -my-2 grid h-11 w-14 shrink-0 place-items-center rounded-xl disabled:cursor-wait"
-      >
-        <span
-          aria-hidden="true"
-          className={cn(
-            "relative h-7 w-12 rounded-full border transition-colors",
-            checked ? "border-accent bg-accent" : "border-line bg-elevated"
-          )}
-        >
-          <span
-            className={cn(
-              "absolute left-0.5 top-0.5 h-5 w-5 translate-x-0 rounded-full bg-white shadow-sm transition-transform duration-200",
-              checked && "translate-x-6"
-            )}
-          />
-        </span>
-      </button>
+        className="disabled:cursor-wait"
+      />
     </article>
   );
 }

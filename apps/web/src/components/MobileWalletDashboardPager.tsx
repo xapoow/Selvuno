@@ -14,6 +14,7 @@ import { type Dictionary } from "../i18n";
 import { useExchangeRates } from "../lib/exchangeRates";
 import { MonobankWalletCarousel } from "./MonobankWalletCarousel";
 import { getIncludedWalletIds } from "../lib/walletFeatures";
+import type { TransactionSubmission } from "../lib/transactionAttachments";
 
 interface MobileWalletDashboardPagerProps {
   wallets: Wallet[];
@@ -28,6 +29,8 @@ interface MobileWalletDashboardPagerProps {
   onChange: (value: WalletView, direction?: number) => void;
   onAdd: () => void;
   onSetBudget: (input: MonthlyBudgetInput) => Promise<unknown>;
+  onUpdateTransaction: (id: string, submission: TransactionSubmission) => Promise<void>;
+  onDeleteTransaction: (id: string) => Promise<void>;
 }
 
 function MobileWalletDashboardSlide({
@@ -41,7 +44,9 @@ function MobileWalletDashboardSlide({
   settings,
   t,
   onAdd,
-  onSetBudget
+  onSetBudget,
+  onUpdateTransaction,
+  onDeleteTransaction
 }: Omit<MobileWalletDashboardPagerProps, "activeWalletId" | "allLabel" | "onChange"> & {
   walletView: WalletView;
   direction?: number;
@@ -92,6 +97,8 @@ function MobileWalletDashboardSlide({
       t={t}
       onAdd={onAdd}
       onSetBudget={onSetBudget}
+      onUpdateTransaction={onUpdateTransaction}
+      onDeleteTransaction={onDeleteTransaction}
     />
   );
 }
@@ -108,7 +115,9 @@ export function MobileWalletDashboardPager({
   t,
   onChange,
   onAdd,
-  onSetBudget
+  onSetBudget,
+  onUpdateTransaction,
+  onDeleteTransaction
 }: MobileWalletDashboardPagerProps) {
   const [slideDirection, setSlideDirection] = useState(1);
 
@@ -141,6 +150,8 @@ export function MobileWalletDashboardPager({
         t={t}
         onAdd={onAdd}
         onSetBudget={onSetBudget}
+        onUpdateTransaction={onUpdateTransaction}
+        onDeleteTransaction={onDeleteTransaction}
       />
     </div>
   );

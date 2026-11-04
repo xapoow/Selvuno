@@ -9,6 +9,20 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.9.1",
+      date: "2026-11-04",
+      notes: [
+        "Редактирование и удаление операций прямо из окна подробностей",
+        "Модалки затемняют весь экран и блокируют прокрутку фона",
+        "Исправлено падение вкладки «Кошельки», когда кошелёк один или недоступно перетаскивание",
+        "Боковая панель на ПК остаётся на месте при прокрутке страницы",
+        "Убраны горячие клавиши приложения, конфликтовавшие с браузером",
+        "Бегунки переключателей выровнены по центру с одинаковыми отступами",
+        "Последние операции больше не растягиваются по высоте, когда записей мало",
+        "Убрана зелёная рамка поля суммы, кнопки калькулятора заменяют последний знак операции"
+      ]
+    },
+    {
       version: "0.9.0",
       notes: [
         "Фотографии чеков и PDF-документы можно прикреплять прямо к операции",
@@ -134,6 +148,20 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.9.1",
+      date: "2026-11-04",
+      notes: [
+        "Edit or delete transactions directly from their details",
+        "Dialogs now dim the entire screen and lock background scrolling",
+        "Fixed a Wallets crash with a single wallet or when reordering is unavailable",
+        "Desktop sidebar stays in place while the page scrolls",
+        "Removed app hotkeys that conflicted with browser shortcuts",
+        "Aligned switch thumbs with consistent spacing in both states",
+        "Recent transactions keep their natural height even with only a few entries",
+        "Removed the green amount field frame; calculator buttons replace the pending operator"
+      ]
+    },
     {
       version: "0.9.0",
       notes: [
