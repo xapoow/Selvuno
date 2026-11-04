@@ -9,6 +9,17 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.9.2",
+      date: "2026-11-04",
+      notes: [
+        "Меню настроек на телефоне затемняет весь экран и открывается без скачков страницы",
+        "Выбор доступного объектива камеры для чеков с запоминанием на устройстве",
+        "Основная задняя камера выбирается автоматически, если браузер позволяет её определить",
+        "Даты уведомлений и фильтры обновлений, объявлений и напоминаний",
+        "Убраны повторяющиеся заголовки релизов, восстановлены даты старых обновлений"
+      ]
+    },
+    {
       version: "0.9.1",
       date: "2026-11-04",
       notes: [
@@ -164,6 +175,17 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.9.2",
+      date: "2026-11-04",
+      notes: [
+        "Mobile settings menu dims the whole screen and opens without page jumps",
+        "Choose an available receipt camera lens and remember it on this device",
+        "The main rear camera is preferred when the browser identifies it",
+        "Notification dates and separate filters for updates, announcements, and reminders",
+        "Removed repeated release headings and restored historical changelog dates"
+      ]
+    },
     {
       version: "0.9.1",
       date: "2026-11-04",

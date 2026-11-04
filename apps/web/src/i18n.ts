@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.9.1";
+export const appVersion = "0.9.2";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -1024,17 +1024,14 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "More convenient transaction details and a more reliable desktop experience.",
+      intro: "Smoother mobile settings, camera selection, and a clearer notification feed.",
       gotIt: "Explore the update",
       notes: [
-        "Edit or delete transactions directly from their details",
-        "Dialogs now dim the entire screen and keep the background from scrolling",
-        "Fixed a crash when opening Wallets with a single wallet",
-        "Desktop sidebar stays in place while the page scrolls",
-        "Removed app hotkeys that conflicted with browser shortcuts",
-        "Aligned switch thumbs with consistent spacing in both states",
-        "Recent transactions keep their natural height even with only a few entries",
-        "Removed the green amount field frame; calculator buttons replace the pending operator"
+        "Mobile settings menu dims the whole screen and opens without page jumps",
+        "Choose an available receipt camera lens and remember it on this device",
+        "The main rear camera is preferred when the browser identifies it",
+        "Notification dates and separate filters for updates, announcements, and reminders",
+        "Removed repeated release headings and restored historical changelog dates"
       ]
     },
     categories: {
@@ -1669,17 +1666,14 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Удобнее работать с деталями операций, а настольная версия стала стабильнее.",
+      intro: "Плавнее меню настроек, выбор камеры и более понятная лента уведомлений.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Редактирование и удаление операций прямо из окна подробностей",
-        "Модалки затемняют весь экран и блокируют прокрутку фона",
-        "Исправлено падение вкладки «Кошельки», когда кошелёк один",
-        "Боковая панель на ПК остаётся на месте при прокрутке страницы",
-        "Убраны горячие клавиши приложения, конфликтовавшие с браузером",
-        "Бегунки переключателей выровнены по центру с одинаковыми отступами",
-        "Последние операции больше не растягиваются по высоте, когда записей мало",
-        "Убрана зелёная рамка поля суммы, кнопки калькулятора заменяют последний знак операции"
+        "Меню настроек на телефоне затемняет весь экран и открывается без скачков страницы",
+        "Выбор доступного объектива камеры для чеков с запоминанием на устройстве",
+        "Основная задняя камера выбирается автоматически, если браузер позволяет её определить",
+        "Даты уведомлений и фильтры обновлений, объявлений и напоминаний",
+        "Убраны повторяющиеся заголовки релизов, восстановлены даты старых обновлений"
       ]
     },
     categories: {
