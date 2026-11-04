@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type {
   Category,
   Settings,
@@ -39,7 +39,6 @@ interface HistoryViewProps {
   t: Dictionary;
   showTitle?: boolean;
   desktopTools?: boolean;
-  searchFocusRequest?: number;
   onUpdate: (id: string, input: Partial<TransactionInput>) => Promise<void>;
   onUpdateWithAttachments: (id: string, submission: TransactionSubmission) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
@@ -67,7 +66,6 @@ export function HistoryView({
   t,
   showTitle = true,
   desktopTools = false,
-  searchFocusRequest = 0,
   onUpdate,
   onUpdateWithAttachments,
   onDelete
@@ -82,7 +80,6 @@ export function HistoryView({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkCategoryId, setBulkCategoryId] = useState("");
   const [bulkActionError, setBulkActionError] = useState("");
-  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const activeWallet =
     activeWalletId === "all" ? undefined : wallets.find((wallet) => wallet.id === activeWalletId);
   const calendarContainsHiddenWallet =
@@ -227,16 +224,6 @@ export function HistoryView({
   );
 
   useEffect(() => {
-    if (searchFocusRequest <= 0 || !showTitle) {
-      return;
-    }
-    window.requestAnimationFrame(() => {
-      searchInputRef.current?.focus();
-      searchInputRef.current?.select();
-    });
-  }, [searchFocusRequest, showTitle]);
-
-  useEffect(() => {
     const displayedIds = new Set(displayTransactions.map((item) => item.transaction.id));
     setSelectedIds((current) => {
       const next = new Set([...current].filter((id) => displayedIds.has(id)));
@@ -364,7 +351,6 @@ export function HistoryView({
           ]}
         />
         <TextField
-          ref={searchInputRef}
           label={t.history.search}
           value={searchQuery}
           placeholder={t.history.searchPlaceholder}

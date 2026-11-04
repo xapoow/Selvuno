@@ -21,7 +21,6 @@ import { useAppStore, type AppView } from "./state/appStore";
 import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
 import { usePrivacyLock } from "./state/usePrivacyLock";
 import { getIncludedWalletIds, shouldHideWalletAmounts } from "./lib/walletFeatures";
-import { getDesktopShortcut } from "./lib/desktopShortcuts";
 import { AddTransactionView } from "./views/AddTransactionView";
 import { DashboardView } from "./views/DashboardView";
 import { HistoryView } from "./views/HistoryView";
@@ -73,7 +72,6 @@ export function App() {
     prevViewRef.current = activeView;
   }, [activeView]);
   const [walletTransitionDirection, setWalletTransitionDirection] = useState(1);
-  const [historySearchRequest, setHistorySearchRequest] = useState(0);
   const privacy = usePrivacyLock();
   const data = useFinanceData();
   const mutations = useFinanceMutations();
@@ -152,29 +150,6 @@ export function App() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [activeView]);
-
-  useEffect(() => {
-    if (!settings?.onboardingCompleted || privacy.locked) {
-      return;
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const shortcut = getDesktopShortcut(event);
-      if (!shortcut) {
-        return;
-      }
-      event.preventDefault();
-      if (shortcut === "add-transaction") {
-        setActiveView("add");
-        return;
-      }
-      setHistorySearchRequest((request) => request + 1);
-      setActiveView("history");
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [privacy.locked, setActiveView, settings?.onboardingCompleted]);
 
   useEffect(() => {
     if (
@@ -324,19 +299,6 @@ export function App() {
         </div>
         <HeaderNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
         <div className="mt-auto grid gap-2">
-          <div className="app-control rounded-app p-3 text-xs text-muted">
-            <p className="mb-2 font-semibold uppercase tracking-wide">{t.shortcuts.title}</p>
-            <div className="grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1.5">
-              <kbd className="rounded-md bg-surface/80 px-1.5 py-0.5 font-mono text-foreground shadow-sm">
-                Ctrl N
-              </kbd>
-              <span>{t.shortcuts.newTransaction}</span>
-              <kbd className="rounded-md bg-surface/80 px-1.5 py-0.5 font-mono text-foreground shadow-sm">
-                Ctrl K
-              </kbd>
-              <span>{t.shortcuts.search}</span>
-            </div>
-          </div>
           {showsWalletContext ? (
             <div className="app-surface rounded-app p-3.5">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">
@@ -517,7 +479,6 @@ export function App() {
                   exchangeRates={exchangeRates.data}
                   t={t}
                   desktopTools
-                  searchFocusRequest={historySearchRequest}
                   onUpdate={async (id, input) => {
                     await mutations.updateTransaction.mutateAsync({ id, input });
                   }}

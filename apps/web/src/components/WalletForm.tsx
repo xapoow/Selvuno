@@ -11,6 +11,7 @@ import { Button } from "./ui/Button";
 import { SelectField } from "./ui/SelectField";
 import { SegmentedControl } from "./ui/SegmentedControl";
 import { TextField } from "./ui/TextField";
+import { Switch } from "./ui/Switch";
 import type { Dictionary } from "../i18n";
 
 const walletSwatches = [
@@ -228,22 +229,11 @@ function WalletOptionSwitch({
         <p className="text-sm font-semibold text-foreground">{label}</p>
         <p className="mt-0.5 text-xs leading-5 text-muted">{hint}</p>
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        aria-label={label}
+      <Switch
+        checked={checked}
+        label={label}
         onClick={() => onChange(!checked)}
-        className={`app-focus relative mt-1 h-7 w-12 shrink-0 rounded-full border transition-colors ${
-          checked ? "border-accent bg-accent" : "border-line bg-elevated"
-        }`}
-      >
-        <span
-          className={`absolute left-0.5 top-0.5 h-5 w-5 translate-x-0 rounded-full bg-white shadow-sm transition-transform duration-200 ${
-            checked ? "translate-x-6" : ""
-          }`}
-        />
-      </button>
+      />
     </div>
   );
 }

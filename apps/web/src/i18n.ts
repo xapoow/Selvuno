@@ -46,11 +46,6 @@ export interface Dictionary {
   appName: string;
   brand: string;
   nav: Record<AppView, string>;
-  shortcuts: {
-    title: string;
-    newTransaction: string;
-    search: string;
-  };
   common: {
     add: string;
     all: string;
@@ -600,11 +595,6 @@ export const dictionaries: Record<Language, Dictionary> = {
       wallets: "Wallets",
       settings: "Settings"
     },
-    shortcuts: {
-      title: "Shortcuts",
-      newTransaction: "New transaction",
-      search: "Search history"
-    },
     common: {
       add: "Add",
       all: "All",
@@ -1022,7 +1012,9 @@ export const dictionaries: Record<Language, Dictionary> = {
         "Edit or delete transactions directly from their details",
         "Dialogs now dim the entire screen and keep the background from scrolling",
         "Fixed a crash when opening Wallets with a single wallet",
-        "Desktop sidebar stays in place while the page scrolls"
+        "Desktop sidebar stays in place while the page scrolls",
+        "Removed app hotkeys that conflicted with browser shortcuts",
+        "Aligned switch thumbs with consistent spacing in both states"
       ]
     },
     categories: {
@@ -1236,11 +1228,6 @@ export const dictionaries: Record<Language, Dictionary> = {
       add: "Добавить",
       wallets: "Кошельки",
       settings: "Настройки"
-    },
-    shortcuts: {
-      title: "Быстрые действия",
-      newTransaction: "Новая операция",
-      search: "Поиск в истории"
     },
     common: {
       add: "Добавить",
@@ -1659,7 +1646,9 @@ export const dictionaries: Record<Language, Dictionary> = {
         "Редактирование и удаление операций прямо из окна подробностей",
         "Модалки затемняют весь экран и блокируют прокрутку фона",
         "Исправлено падение вкладки «Кошельки», когда кошелёк один",
-        "Боковая панель на ПК остаётся на месте при прокрутке страницы"
+        "Боковая панель на ПК остаётся на месте при прокрутке страницы",
+        "Убраны горячие клавиши приложения, конфликтовавшие с браузером",
+        "Бегунки переключателей выровнены по центру с одинаковыми отступами"
       ]
     },
     categories: {
