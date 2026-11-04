@@ -1,5 +1,13 @@
 const MAX_EXPRESSION_LENGTH = 96;
 
+export function setAmountOperator(input: string, operator: "+" | "-" | "*" | "/"): string {
+  const operand = input.trimEnd().replace(/(?:\s*[+\-*/])+$/, "").trimEnd();
+  if (!/[\d)]$/.test(operand) && !/\d[.,]$/.test(operand)) {
+    return input;
+  }
+  return `${operand} ${operator} `;
+}
+
 export function evaluateAmountExpression(input: string): number {
   const source = input.replace(/,/g, ".").replace(/\s+/g, "");
   if (!source || source.length > MAX_EXPRESSION_LENGTH || /[^0-9+\-*/().]/.test(source)) {

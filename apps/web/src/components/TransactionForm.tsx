@@ -11,7 +11,7 @@ import type {
 import { decimalToMinor, formatMoney, minorToDecimal } from "@myfinances/utils";
 import { CalendarDays, ChevronDown, Equal, Hash, RotateCcw, Sparkles, StickyNote } from "lucide-react";
 import { getCategoryName, type Dictionary } from "../i18n";
-import { evaluateAmountExpression } from "../lib/amountExpression";
+import { evaluateAmountExpression, setAmountOperator } from "../lib/amountExpression";
 import { suggestCategoryId } from "../lib/categorySuggestions";
 import { cn } from "../lib/cn";
 import { fromDateInputValue, toDateInputValue } from "../lib/dates";
@@ -346,20 +346,25 @@ export function TransactionForm({
           <span className="text-lg font-semibold text-muted">{currency}</span>
         </span>
         <span className="flex flex-wrap items-center gap-1.5">
-          {[
+          {([
             { label: "+", value: "+" },
             { label: "−", value: "-" },
             { label: "×", value: "*" },
             { label: "÷", value: "/" }
-          ].map((operator) => (
+          ] as const).map((operator) => (
             <button
               key={operator.value}
               type="button"
               aria-label={`${t.transaction.calculatorOperator} ${operator.label}`}
               className="app-focus app-field grid h-8 min-w-9 place-items-center rounded-lg px-2 text-sm font-semibold text-muted hover:text-foreground"
               onClick={() => {
-                setAmount((current) => `${current.trimEnd()} ${operator.value} `);
+                setAmount((current) => setAmountOperator(current, operator.value));
                 setSaved(false);
+                amountInputRef.current?.focus();
+                window.requestAnimationFrame(() => {
+                  const input = amountInputRef.current;
+                  input?.setSelectionRange(input.value.length, input.value.length);
+                });
               }}
             >
               {operator.label}
