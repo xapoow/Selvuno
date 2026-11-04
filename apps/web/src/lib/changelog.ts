@@ -9,6 +9,18 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.9.4",
+      date: "2026-11-04",
+      notes: [
+        "Отмена удаления операций и восстановление из корзины в истории или настройках",
+        "Сверка баланса кошелька с историей корректировок без изменения доходов и расходов",
+        "Фильтры истории по нескольким категориям, вложениям и диапазону суммы с конвертацией",
+        "Сохранённые наборы фильтров запоминают выбранную валюту суммы",
+        "Общая лента уведомлений с компактными бейджами и ровными отступами",
+        "Мягкое свечение кошельков и тени карточек без обрезки на главной и в истории"
+      ]
+    },
+    {
       version: "0.9.2",
       date: "2026-11-04",
       notes: [
@@ -175,6 +187,18 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.9.4",
+      date: "2026-11-04",
+      notes: [
+        "Undo transaction deletions and restore them later from Trash in History or Settings",
+        "Reconcile wallet balances with a correction history, without changing income or expenses",
+        "Filter history by multiple categories, attachments, and a converted amount range",
+        "Save and reuse filter sets with their original amount currency",
+        "One notification feed with compact type badges and balanced spacing",
+        "Softer wallet glow and unclipped card shadows on Home and History"
+      ]
+    },
     {
       version: "0.9.2",
       date: "2026-11-04",

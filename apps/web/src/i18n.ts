@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.9.2";
+export const appVersion = "0.9.4";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -1178,14 +1178,15 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "Smoother mobile settings, camera selection, and a clearer notification feed.",
+      intro: "Safer deletion, wallet reconciliation, and more useful history search.",
       gotIt: "Explore the update",
       notes: [
-        "Mobile settings menu dims the whole screen and opens without page jumps",
-        "Choose an available receipt camera lens and remember it on this device",
-        "The main rear camera is preferred when the browser identifies it",
-        "Notification dates and separate filters for updates, announcements, and reminders",
-        "Removed repeated release headings and restored historical changelog dates"
+        "Undo transaction deletions and restore them later from Trash in History or Settings",
+        "Reconcile wallet balances with a correction history, without changing income or expenses",
+        "Filter history by multiple categories, attachments, and a converted amount range",
+        "Save and reuse filter sets with their original amount currency",
+        "One notification feed with compact type badges and balanced spacing",
+        "Softer wallet glow and unclipped card shadows on Home and History"
       ]
     },
     categories: {
@@ -1897,14 +1898,15 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Плавнее меню настроек, выбор камеры и более понятная лента уведомлений.",
+      intro: "Безопаснее удалять операции, проще сверять баланс и находить нужные записи.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Меню настроек на телефоне затемняет весь экран и открывается без скачков страницы",
-        "Выбор доступного объектива камеры для чеков с запоминанием на устройстве",
-        "Основная задняя камера выбирается автоматически, если браузер позволяет её определить",
-        "Даты уведомлений и фильтры обновлений, объявлений и напоминаний",
-        "Убраны повторяющиеся заголовки релизов, восстановлены даты старых обновлений"
+        "Отмена удаления операций и восстановление из корзины в истории или настройках",
+        "Сверка баланса кошелька с историей корректировок без изменения доходов и расходов",
+        "Фильтры истории по нескольким категориям, вложениям и диапазону суммы с конвертацией",
+        "Сохранённые наборы фильтров запоминают выбранную валюту суммы",
+        "Общая лента уведомлений с компактными бейджами и ровными отступами",
+        "Мягкое свечение кошельков и тени карточек без обрезки на главной и в истории"
       ]
     },
     categories: {
