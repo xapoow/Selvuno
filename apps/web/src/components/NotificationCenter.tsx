@@ -44,7 +44,7 @@ interface NotificationCenterProps {
 function NotificationMetadata({ notification, t, locale }: { notification: AppNotification; t: Dictionary; locale: string }) {
   const date = notification.date ? formatNotificationDate(notification.date, locale) : "";
   return (
-    <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+    <span className="-ml-2 flex max-w-full flex-wrap items-center justify-start gap-x-2 gap-y-1 text-left text-xs text-muted">
       <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold", toneStyles[notification.tone])}>
         {t.notifications.kinds[notification.kind]}
       </span>
