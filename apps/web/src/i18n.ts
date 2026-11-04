@@ -410,6 +410,43 @@ export interface Dictionary {
       walletDesc: string;
     };
   };
+  historyFilters: {
+    title: string;
+    active: string;
+    categories: string;
+    categorySearch: string;
+    noCategories: string;
+    unavailableCategories: string;
+    unavailableCategory: string;
+    removeUnavailable: string;
+    removeCategory: string;
+    attachments: string;
+    withAttachments: string;
+    withoutAttachments: string;
+    amount: string;
+    minimum: string;
+    maximum: string;
+    currency: string;
+    amountHint: string;
+    clearAttachments: string;
+    clearAmount: string;
+    reset: string;
+    apply: string;
+    saved: string;
+    save: string;
+    saveApply: string;
+    saveHint: string;
+    name: string;
+    nameRequired: string;
+    duplicateName: string;
+    deleteSaved: string;
+    invalidRange: string;
+    storageError: string;
+    limit: string;
+    resultCount: string;
+    ratesLoading: string;
+    ratesMissing: string;
+  };
   wallets: {
     title: string;
     allWallets: string;
@@ -920,6 +957,43 @@ export const dictionaries: Record<Language, Dictionary> = {
         walletAsc: "Wallet A-Z",
         walletDesc: "Wallet Z-A"
       }
+    },
+    historyFilters: {
+      title: "Filters",
+      active: "Active filters",
+      categories: "Categories",
+      categorySearch: "Find a category",
+      noCategories: "No categories found.",
+      unavailableCategories: "Some selected categories were removed. Their filters are kept until you remove them.",
+      unavailableCategory: "Unavailable category",
+      removeUnavailable: "Remove unavailable categories",
+      removeCategory: "Remove category filter",
+      attachments: "Receipts and files",
+      withAttachments: "With attachments",
+      withoutAttachments: "Without attachments",
+      amount: "Amount range",
+      minimum: "From",
+      maximum: "To",
+      currency: "Amount currency",
+      amountHint: "Bounds are inclusive. Amounts are converted to this currency; the currency is kept in saved filters.",
+      clearAttachments: "Clear attachment filter",
+      clearAmount: "Clear amount range",
+      reset: "Clear filters",
+      apply: "Apply filters",
+      saved: "Saved filters",
+      save: "Save filter set",
+      saveApply: "Save and apply",
+      saveHint: "Saved on this device: search, type, categories, attachments, amount, and sorting. The selected wallet does not change.",
+      name: "Filter set name",
+      nameRequired: "Enter a name for this filter set.",
+      duplicateName: "This name is already in use. Choose another name.",
+      deleteSaved: "Delete saved filter",
+      invalidRange: "Enter a non-negative amount with the correct currency precision. The minimum cannot exceed the maximum.",
+      storageError: "Unable to save filters on this device. Your current search is unchanged.",
+      limit: "You can save up to 20 filter sets. Remove one before adding another.",
+      resultCount: "Transactions: {count}",
+      ratesLoading: "Checking exchange rates in {currency}… Pending transactions: {count}.",
+      ratesMissing: "Some transactions have no exchange rate for {currency} and cannot be checked against this range. Excluded: {count}."
     },
     wallets: {
       title: "Wallets",
@@ -1602,6 +1676,43 @@ export const dictionaries: Record<Language, Dictionary> = {
         walletAsc: "Кошелек А-Я",
         walletDesc: "Кошелек Я-А"
       }
+    },
+    historyFilters: {
+      title: "Фильтры",
+      active: "Активные фильтры",
+      categories: "Категории",
+      categorySearch: "Найти категорию",
+      noCategories: "Категории не найдены.",
+      unavailableCategories: "Некоторые выбранные категории удалены. Фильтры для них сохранены, пока вы не снимете выбор.",
+      unavailableCategory: "Недоступная категория",
+      removeUnavailable: "Убрать недоступные категории",
+      removeCategory: "Убрать фильтр категории",
+      attachments: "Чеки и файлы",
+      withAttachments: "С вложениями",
+      withoutAttachments: "Без вложений",
+      amount: "Диапазон суммы",
+      minimum: "От",
+      maximum: "До",
+      currency: "Валюта суммы",
+      amountHint: "Границы включены в диапазон. Суммы конвертируются в эту валюту; сохранённый фильтр запоминает её.",
+      clearAttachments: "Убрать фильтр вложений",
+      clearAmount: "Убрать диапазон суммы",
+      reset: "Сбросить фильтры",
+      apply: "Применить фильтры",
+      saved: "Сохранённые фильтры",
+      save: "Сохранить набор",
+      saveApply: "Сохранить и применить",
+      saveHint: "Сохраняются на устройстве: поиск, тип, категории, вложения, сумма и сортировка. Выбранный кошелёк не переключается.",
+      name: "Название набора",
+      nameRequired: "Введите название набора фильтров.",
+      duplicateName: "Такое название уже используется. Выберите другое.",
+      deleteSaved: "Удалить набор фильтров",
+      invalidRange: "Введите неотрицательные суммы с точностью выбранной валюты. Нижняя граница не может быть выше верхней.",
+      storageError: "Не удалось сохранить фильтры на устройстве. Текущий поиск не изменён.",
+      limit: "Можно сохранить до 20 наборов. Удалите один из них, чтобы добавить новый.",
+      resultCount: "Операций: {count}",
+      ratesLoading: "Проверяем курсы для операций ({count}) в {currency}…",
+      ratesMissing: "Без курсов для {currency} нельзя проверить диапазон суммы для операций: {count}. Они не включены в результаты."
     },
     wallets: {
       title: "Кошельки",

@@ -4,13 +4,13 @@ import type {
   Settings,
   Transaction,
   TransactionInput,
-  TransactionType,
   Wallet,
   WalletView
 } from "@myfinances/types";
-import { minorToDecimal } from "@myfinances/utils";
-import { Download, ReceiptText, Tags, Trash2 } from "lucide-react";
+import { formatMoney, minorToDecimal } from "@myfinances/utils";
+import { Bookmark, Download, Filter, ReceiptText, Tags, Trash2, X } from "lucide-react";
 import { FinancialCalendar } from "../components/FinancialCalendar";
+import { HistoryFilterForm } from "../components/HistoryFilterForm";
 import { TransactionForm } from "../components/TransactionForm";
 import { TransactionDetailsSheet } from "../components/TransactionDetailsSheet";
 import { TransactionRow } from "../components/TransactionRow";
@@ -22,7 +22,9 @@ import { SegmentedControl } from "../components/ui/SegmentedControl";
 import { SelectField } from "../components/ui/SelectField";
 import { TextField } from "../components/ui/TextField";
 import { getCategoryName, type Dictionary } from "../i18n";
-import { convertMinorToBaseCurrency, type ExchangeRateTable } from "../lib/exchangeRates";
+import { convertMinorToBaseCurrency, useExchangeRates, type ExchangeRateTable } from "../lib/exchangeRates";
+import { advancedHistoryFilterCount, defaultHistoryFilters, equalHistoryFilters, filterHistoryTransactions, hasHistoryFilters, readHistoryAmountRange, type HistoryFilters, type HistorySort } from "../lib/historyFilters";
+import { useSavedHistoryFilters } from "../state/useSavedHistoryFilters";
 import { createCsv, downloadCsv } from "../lib/csv";
 import { shouldHideWalletAmounts } from "../lib/walletFeatures";
 import type { TransactionSubmission } from "../lib/transactionAttachments";
@@ -47,17 +49,6 @@ interface HistoryViewProps {
   deletedCount?: number;
 }
 
-type TypeFilter = TransactionType | "all";
-type HistorySort =
-  | "date-desc"
-  | "date-asc"
-  | "amount-desc"
-  | "amount-asc"
-  | "category-asc"
-  | "category-desc"
-  | "wallet-asc"
-  | "wallet-desc";
-
 export function HistoryView({
   wallets,
   categories,
@@ -76,10 +67,14 @@ export function HistoryView({
   onOpenTrash,
   deletedCount = 0
 }: HistoryViewProps) {
-  const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<HistorySort>("date-desc");
+  const [filters, setFilters] = useState(() => defaultHistoryFilters(displayCurrency));
+  const { type: typeFilter, query: searchQuery, sort: sortBy } = filters;
+  const setTypeFilter = (type: HistoryFilters["type"]) => setFilters((current) => ({ ...current, type }));
+  const setSearchQuery = (query: string) => setFilters((current) => ({ ...current, query }));
+  const setSortBy = (sort: HistorySort) => setFilters((current) => ({ ...current, sort }));
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const presets = useSavedHistoryFilters();
+  const advancedCount = advancedHistoryFilterCount(filters);
   const [viewMode, setViewMode] = useState<"list" | "table" | "calendar">("list");
   const [editing, setEditing] = useState<Transaction | null>(null);
   const [details, setDetails] = useState<Transaction | null>(null);
@@ -98,53 +93,24 @@ export function HistoryView({
     ...settings,
     hideAmounts: settings.hideAmounts || calendarContainsHiddenWallet
   };
+  const range = readHistoryAmountRange(filters);
+  const moneyRange = (amount: number) => formatMoney(amount, filters.currency, settings.locale, calendarSettings.hideAmounts);
+  const amountSummary = range.minimum !== null && range.maximum !== null
+    ? `${moneyRange(range.minimum)} — ${moneyRange(range.maximum)}`
+    : range.minimum !== null ? `≥ ${moneyRange(range.minimum)}` : range.maximum !== null ? `≤ ${moneyRange(range.maximum)}` : "";
 
-  const visibleTransactions = useMemo(
-    () => {
-      const searchTerms = searchQuery
-        .toLocaleLowerCase(settings.locale)
-        .split(/[\s,;]+/)
-        .map((term) => term.trim().replace(/^#+/, ""))
-        .filter(Boolean);
-
-      return transactions.filter((transaction) => {
-        if (transaction.deletedAt) {
-          return false;
-        }
-        if (activeWalletId !== "all" && transaction.walletId !== activeWalletId) {
-          return false;
-        }
-        if (typeFilter !== "all" && transaction.type !== typeFilter) {
-          return false;
-        }
-        if (categoryFilter !== "all" && transaction.categoryId !== categoryFilter) {
-          return false;
-        }
-        if (searchTerms.length) {
-          const category = categories.find((item) => item.id === transaction.categoryId);
-          const wallet = wallets.find((item) => item.id === transaction.walletId);
-          const tags = Array.isArray(transaction.tags) ? transaction.tags : [];
-          const searchable = [
-            transaction.note,
-            category?.name,
-            getCategoryName(category?.name, t),
-            wallet?.name,
-            ...tags,
-            ...tags.map((tag) => `#${tag}`)
-          ]
-            .filter(Boolean)
-            .join(" ")
-            .toLocaleLowerCase(settings.locale);
-
-          if (!searchTerms.every((term) => searchable.includes(term))) {
-            return false;
-          }
-        }
-        return true;
-      });
-    },
-    [activeWalletId, categories, categoryFilter, searchQuery, settings.locale, t, transactions, typeFilter, wallets]
+  const amountFiltered = Boolean(filters.minimum.trim() || filters.maximum.trim());
+  const suppliedRates = exchangeRates?.base.toUpperCase() === filters.currency ? exchangeRates : undefined;
+  const amountNeedsRates = amountFiltered && transactions.some((item) =>
+    !item.deletedAt && (activeWalletId === "all" || item.walletId === activeWalletId) && item.currency.toUpperCase() !== filters.currency
   );
+  const filterRatesQuery = useExchangeRates(filters.currency, amountNeedsRates && !suppliedRates);
+  const amountRates = filterRatesQuery.data && (!suppliedRates || filterRatesQuery.data.cachedAt > suppliedRates.cachedAt)
+    ? filterRatesQuery.data : suppliedRates;
+  const filtered = useMemo(() => filterHistoryTransactions({
+    transactions, filters, activeWalletId, categories, wallets, locale: settings.locale, t, rates: amountRates
+  }), [transactions, filters, activeWalletId, categories, wallets, settings.locale, t, amountRates]);
+  const visibleTransactions = filtered.transactions;
   const convertedTransactions = useMemo(
     () =>
       visibleTransactions.map((transaction) => {
@@ -368,17 +334,14 @@ export function HistoryView({
           label={t.history.search}
           value={searchQuery}
           placeholder={t.history.searchPlaceholder}
+          maxLength={240}
           onChange={(event) => setSearchQuery(event.target.value)}
         />
         <div className={viewMode !== "calendar" ? "grid grid-cols-1 gap-3 sm:grid-cols-2" : "grid gap-3"}>
-          <SelectField label={t.common.category} value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
-            <option value="all">{t.history.allCategories}</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {getCategoryName(category.name, t)}
-              </option>
-            ))}
-          </SelectField>
+          <Button type="button" variant="secondary" className="h-11 self-end" onClick={() => setFiltersOpen(true)}>
+            <Filter className="h-4 w-4" />{t.historyFilters.title}
+            {advancedCount ? <span className="rounded-full bg-surface px-2 py-0.5 text-xs">{advancedCount}</span> : null}
+          </Button>
           {viewMode !== "calendar" ? (
             <SelectField label={t.history.sort} value={sortBy} onChange={(event) => setSortBy(event.target.value as HistorySort)}>
               <option value="date-desc">{t.history.sortOptions.dateDesc}</option>
@@ -392,6 +355,34 @@ export function HistoryView({
             </SelectField>
           ) : null}
         </div>
+        {advancedCount ? <div className="flex flex-wrap items-center gap-2" aria-label={t.historyFilters.active}>
+          {filters.categoryIds.slice(0, 3).map((id) => {
+            const category = categories.find((item) => item.id === id);
+            const label = category ? getCategoryName(category.name, t) : t.historyFilters.unavailableCategory;
+            return <button key={id} type="button" aria-label={`${t.historyFilters.removeCategory}: ${label}`}
+              onClick={() => setFilters((current) => ({ ...current, categoryIds: current.categoryIds.filter((value) => value !== id) }))}
+              className="app-focus app-control inline-flex max-w-full items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-muted"><span className="truncate">{label}</span><X className="h-3 w-3 shrink-0" /></button>;
+          })}
+          {filters.categoryIds.length > 3 ? <button type="button" className="app-focus rounded-full px-2 text-xs text-muted" onClick={() => setFiltersOpen(true)}>+{filters.categoryIds.length - 3}</button> : null}
+          {filters.attachments !== "all" ? <button type="button" className="app-focus app-control inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-muted" aria-label={t.historyFilters.clearAttachments}
+            onClick={() => setFilters((current) => ({ ...current, attachments: "all" }))}>{filters.attachments === "with" ? t.historyFilters.withAttachments : t.historyFilters.withoutAttachments}<X className="h-3 w-3" /></button> : null}
+          {amountSummary ? <button type="button" className="app-focus app-control inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-muted" aria-label={t.historyFilters.clearAmount}
+            onClick={() => setFilters((current) => ({ ...current, minimum: "", maximum: "" }))}>{amountSummary}<X className="h-3 w-3" /></button> : null}
+        </div> : null}
+        {presets.saved.length ? <div className="flex gap-2 overflow-x-auto py-1 no-scrollbar" role="group" aria-label={t.historyFilters.saved}>
+          {presets.saved.map((item) => <button key={item.id} type="button" title={item.name} aria-pressed={equalHistoryFilters(filters, item.filters)} onClick={() => setFilters(item.filters)}
+            className={`app-focus inline-flex max-w-48 shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium ${equalHistoryFilters(filters, item.filters) ? "app-selected-control border-line text-foreground" : "border-line text-muted"}`}>
+            <Bookmark className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{item.name}</span>
+          </button>)}
+        </div> : null}
+        <div className="flex items-center justify-between gap-3 text-xs text-muted">
+          <p role="status" aria-live="polite">{t.historyFilters.resultCount.replace("{count}", String(displayTransactions.length))}</p>
+          {hasHistoryFilters(filters) ? <button type="button" className="app-focus rounded-lg px-2 py-1 font-semibold text-accent" onClick={() => setFilters(defaultHistoryFilters(displayCurrency))}>{t.historyFilters.reset}</button> : null}
+        </div>
+        {filtered.missingRates ? <div role="status" className="rounded-xl bg-warning/10 p-3 text-xs leading-5 text-muted">
+          <p>{(filterRatesQuery.isFetching ? t.historyFilters.ratesLoading : t.historyFilters.ratesMissing).replace("{count}", String(filtered.missingRates)).replace("{currency}", filters.currency)}</p>
+          {!filterRatesQuery.isFetching ? <Button type="button" variant="ghost" size="small" className="mt-1" onClick={() => { void filterRatesQuery.refetch(); }}>{t.common.reload}</Button> : null}
+        </div> : null}
       </div>
       {viewMode === "table" && selectedTransactions.length ? (
         <div className="app-surface grid gap-3 rounded-2xl p-3 lg:grid-cols-[auto_minmax(220px,1fr)_auto_auto] lg:items-end">
@@ -527,6 +518,15 @@ export function HistoryView({
           />
         ) : null}
       </BottomSheet>
+      <BottomSheet open={filtersOpen} title={t.historyFilters.title} closeLabel={t.common.close} onClose={() => setFiltersOpen(false)}>
+        <HistoryFilterForm initial={filters} categories={categories} currencies={[displayCurrency, settings.currency, ...wallets.map((wallet) => wallet.currency)]}
+          saved={presets.saved} locale={settings.locale} t={t}
+          onApply={(next) => { setFilters(next); setFiltersOpen(false); }}
+          onSave={(name, savedFilters) => presets.save([...presets.saved, { id: crypto.randomUUID(), name, filters: savedFilters }])}
+          onDeleteSaved={(id) => presets.save(presets.saved.filter((item) => item.id !== id))}
+        />
+      </BottomSheet>
+
       <TransactionDetailsSheet
         open={Boolean(details)}
         transaction={transactions.find((transaction) => transaction.id === details?.id) ?? details}
