@@ -44,11 +44,12 @@ interface NotificationCenterProps {
 function NotificationMetadata({ notification, t, locale }: { notification: AppNotification; t: Dictionary; locale: string }) {
   const date = notification.date ? formatNotificationDate(notification.date, locale) : "";
   return (
-    <span className="flex max-w-full flex-wrap items-center justify-start gap-x-2 gap-y-1 text-left text-[11px] leading-4 text-muted">
+    <span className="flex max-w-full flex-wrap items-center justify-start gap-y-1 text-left text-[11px] leading-4 text-muted">
       <span className={cn("inline-flex items-center rounded-md px-1.5 py-0.5 font-semibold", toneStyles[notification.tone])}>
         {t.notifications.kinds[notification.kind]}
       </span>
       {date || notification.kind !== "reminder" ? <>
+        <span aria-hidden="true" className="mx-[5px] shrink-0">·</span>
         {date ? <time className="whitespace-nowrap" dateTime={notification.date}>{date}</time> : <span>{t.notifications.unknownDate}</span>}
       </> : null}
     </span>
