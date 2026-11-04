@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.9.1";
+export const appVersion = "0.9.2";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -230,6 +230,10 @@ export interface Dictionary {
     takePhoto: string;
     chooseFile: string;
     cameraTitle: string;
+    cameraSelect: string;
+    cameraStarting: string;
+    cameraSwitchError: string;
+    cameraLabels: Record<"main" | "rear" | "ultrawide" | "telephoto" | "front" | "unknown", string>;
     cameraUnavailable: string;
     attachmentTypeError: string;
     attachmentSizeError: string;
@@ -285,6 +289,11 @@ export interface Dictionary {
     empty: string;
     detailsTitle: string;
     backToNotifications: string;
+    all: string;
+    kinds: Record<"release" | "announcement" | "reminder", string>;
+    filters: Record<"release" | "announcement" | "reminder", string>;
+    filterLabel: string;
+    unknownDate: string;
     detailVersion: string;
     detailChanges: string;
     detailCategory: string;
@@ -788,6 +797,10 @@ export const dictionaries: Record<Language, Dictionary> = {
       takePhoto: "Take photo",
       chooseFile: "Choose file",
       cameraTitle: "Receipt camera",
+      cameraSelect: "Choose camera",
+      cameraStarting: "Starting camera…",
+      cameraSwitchError: "This camera is unavailable. Another camera is active; you can choose a different one below.",
+      cameraLabels: { main: "Main", rear: "Rear", ultrawide: "Ultra-wide", telephoto: "Telephoto", front: "Front", unknown: "Camera" },
       cameraUnavailable: "The camera is unavailable. Opening the system camera instead.",
       attachmentTypeError: "Choose a JPG, PNG, WebP, or PDF file.",
       attachmentSizeError: "Each file must be smaller than 10 MB.",
@@ -977,6 +990,11 @@ export const dictionaries: Record<Language, Dictionary> = {
       empty: "You are all caught up.",
       detailsTitle: "Notification details",
       backToNotifications: "Back to notifications",
+      all: "All",
+      kinds: { release: "Update", announcement: "Announcement", reminder: "Reminder" },
+      filters: { release: "Updates", announcement: "Announcements", reminder: "Reminders" },
+      filterLabel: "Notification type",
+      unknownDate: "Date unavailable",
       detailVersion: "Version",
       detailChanges: "Changes",
       detailCategory: "Category",
@@ -988,7 +1006,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       statusCompleted: "Completed",
       statusOverdue: "Overdue",
       statusUpcoming: "Upcoming",
-      updateTitle: "MyFinances {version} is ready",
+      updateTitle: "MyFinances {version}",
       updateBody: "See the latest improvements in this update.",
       budgetNearTitle: "Budget is running low",
       budgetNearBody: "{category}: {percentage}% of the monthly limit has been used.",
@@ -1006,17 +1024,14 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "More convenient transaction details and a more reliable desktop experience.",
+      intro: "Smoother mobile settings, camera selection, and a clearer notification feed.",
       gotIt: "Explore the update",
       notes: [
-        "Edit or delete transactions directly from their details",
-        "Dialogs now dim the entire screen and keep the background from scrolling",
-        "Fixed a crash when opening Wallets with a single wallet",
-        "Desktop sidebar stays in place while the page scrolls",
-        "Removed app hotkeys that conflicted with browser shortcuts",
-        "Aligned switch thumbs with consistent spacing in both states",
-        "Recent transactions keep their natural height even with only a few entries",
-        "Removed the green amount field frame; calculator buttons replace the pending operator"
+        "Mobile settings menu dims the whole screen and opens without page jumps",
+        "Choose an available receipt camera lens and remember it on this device",
+        "The main rear camera is preferred when the browser identifies it",
+        "Notification dates and separate filters for updates, announcements, and reminders",
+        "Removed repeated release headings and restored historical changelog dates"
       ]
     },
     categories: {
@@ -1424,6 +1439,10 @@ export const dictionaries: Record<Language, Dictionary> = {
       takePhoto: "Сфотографировать",
       chooseFile: "Выбрать файл",
       cameraTitle: "Камера для чека",
+      cameraSelect: "Выбор камеры",
+      cameraStarting: "Подключаем камеру…",
+      cameraSwitchError: "Эта камера недоступна. Подключена другая; можно выбрать камеру ниже.",
+      cameraLabels: { main: "Основная", rear: "Задняя", ultrawide: "Сверхширокая", telephoto: "Телефото", front: "Фронтальная", unknown: "Камера" },
       cameraUnavailable: "Камера недоступна. Открываю системную камеру.",
       attachmentTypeError: "Выбери файл JPG, PNG, WebP или PDF.",
       attachmentSizeError: "Размер каждого файла должен быть меньше 10 МБ.",
@@ -1613,6 +1632,11 @@ export const dictionaries: Record<Language, Dictionary> = {
       empty: "Новых уведомлений нет.",
       detailsTitle: "Подробнее об уведомлении",
       backToNotifications: "Назад к уведомлениям",
+      all: "Все",
+      kinds: { release: "Обновление", announcement: "Объявление", reminder: "Напоминание" },
+      filters: { release: "Обновления", announcement: "Объявления", reminder: "Напоминания" },
+      filterLabel: "Тип уведомления",
+      unknownDate: "Дата не указана",
       detailVersion: "Версия",
       detailChanges: "Изменения",
       detailCategory: "Категория",
@@ -1624,7 +1648,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       statusCompleted: "Выполнено",
       statusOverdue: "Просрочено",
       statusUpcoming: "Скоро",
-      updateTitle: "MyFinances {version} уже здесь",
+      updateTitle: "MyFinances {version}",
       updateBody: "Посмотри, что изменилось в новой версии.",
       budgetNearTitle: "Бюджет подходит к лимиту",
       budgetNearBody: "{category}: использовано {percentage}% месячного лимита.",
@@ -1642,17 +1666,14 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Удобнее работать с деталями операций, а настольная версия стала стабильнее.",
+      intro: "Плавнее меню настроек, выбор камеры и более понятная лента уведомлений.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Редактирование и удаление операций прямо из окна подробностей",
-        "Модалки затемняют весь экран и блокируют прокрутку фона",
-        "Исправлено падение вкладки «Кошельки», когда кошелёк один",
-        "Боковая панель на ПК остаётся на месте при прокрутке страницы",
-        "Убраны горячие клавиши приложения, конфликтовавшие с браузером",
-        "Бегунки переключателей выровнены по центру с одинаковыми отступами",
-        "Последние операции больше не растягиваются по высоте, когда записей мало",
-        "Убрана зелёная рамка поля суммы, кнопки калькулятора заменяют последний знак операции"
+        "Меню настроек на телефоне затемняет весь экран и открывается без скачков страницы",
+        "Выбор доступного объектива камеры для чеков с запоминанием на устройстве",
+        "Основная задняя камера выбирается автоматически, если браузер позволяет её определить",
+        "Даты уведомлений и фильтры обновлений, объявлений и напоминаний",
+        "Убраны повторяющиеся заголовки релизов, восстановлены даты старых обновлений"
       ]
     },
     categories: {

@@ -127,6 +127,32 @@ describe("app notifications", () => {
     expect(list.some((n) => n.id === "update:0.7.6")).toBe(true);
   });
 
+  it("includes release dates and a real summary without repeating the title or version", () => {
+    const [notification] = build({
+      announcements: [],
+      changelogItems: [{ version: "0.8.0", date: "2026-09-17", notes: ["Fixed wallet layout"] }]
+    });
+    expect(notification).toMatchObject({ kind: "release", date: "2026-09-17", body: "Fixed wallet layout" });
+    expect(notification.body).not.toBe(notification.title);
+    expect(notification.details).toHaveLength(1);
+    expect(notification.details[0].label).toBe(getDictionary("ru-RU").notifications.detailChanges);
+  });
+
+  it("mixes independent announcements with releases by date and removes duplicate IDs", () => {
+    const announcement = {
+      id: "notice", publishedAt: "2026-11-03", title: "An announcement", summary: "Short summary", paragraphs: ["Full details"]
+    };
+    const notifications = build({
+      now: new Date("2026-11-04T12:00:00Z"),
+      changelogItems: [{ version: "0.8.0", date: "2026-09-17", notes: ["Older release"] }],
+      announcements: [announcement, announcement,
+        { ...announcement, id: "future", publishedAt: "2026-11-05" },
+        { ...announcement, id: "expired", expiresAt: "2026-11-02" }]
+    });
+    expect(notifications.map((item) => item.id)).toEqual(["announcement:notice", "update:0.8.0"]);
+    expect(notifications[0]).toMatchObject({ kind: "announcement", date: "2026-11-03", paragraphs: ["Full details"] });
+  });
+
   it("warns near a budget limit and escalates after it is exceeded", () => {
     const near = build({ budgets: [budget], transactions: [transaction] });
     expect(near).toContainEqual(

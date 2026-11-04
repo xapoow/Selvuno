@@ -9,6 +9,7 @@ interface BottomSheetProps {
   title: string;
   children: React.ReactNode;
   onClose: () => void;
+  onExitComplete?: () => void;
   closeLabel?: string;
   dismissible?: boolean;
 }
@@ -33,7 +34,7 @@ function lockPageScroll() {
   };
 }
 
-export function BottomSheet({ open, title, children, onClose, closeLabel = "Close", dismissible = true }: BottomSheetProps) {
+export function BottomSheet({ open, title, children, onClose, onExitComplete, closeLabel = "Close", dismissible = true }: BottomSheetProps) {
   const dialogRef = useRef<HTMLElement | null>(null);
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
@@ -86,7 +87,7 @@ export function BottomSheet({ open, title, children, onClose, closeLabel = "Clos
   }, [open, dismissible]);
 
   return createPortal(
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={onExitComplete}>
       {open ? (
         <motion.div
           className="fixed inset-0 z-[150] grid items-end bg-black/60 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:items-center sm:px-6"

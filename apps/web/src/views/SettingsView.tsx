@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, Reorder, useDragControls } from "framer-motion";
+import { motion, Reorder, useDragControls } from "framer-motion";
 import type {
   BackupSnapshot,
   Category,
@@ -32,8 +32,7 @@ import {
   Tags,
   Trash2,
   Zap,
-  type LucideIcon,
-  X
+  type LucideIcon
 } from "lucide-react";
 import { CategoryIcon } from "../lib/icons";
 import { currencyOptions, getCurrencyLabel } from "../lib/currencies";
@@ -191,8 +190,7 @@ export function SettingsView({
   const [importError, setImportError] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const settingsTopRef = useRef<HTMLDivElement | null>(null);
-  const settingsMenuButtonRef = useRef<HTMLButtonElement | null>(null);
-  const settingsMenuPanelRef = useRef<HTMLElement | null>(null);
+  const pendingSettingsTabRef = useRef<SettingsTab | null>(null);
   const saveRevisionRef = useRef(0);
   const saveStateTimerRef = useRef<number | null>(null);
   const displayedTimeZones = useMemo(
@@ -231,56 +229,6 @@ export function SettingsView({
     setTargetCategoryId(actionCategories[1]?.id ?? "");
     setCategoryActionError("");
   }, [categoryActionType, groupedCategories, organizingCategories]);
-
-  useEffect(() => {
-    if (!settingsMenuOpen) {
-      return;
-    }
-    const previousOverflow = document.body.style.overflow;
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setSettingsMenuOpen(false);
-        return;
-      }
-      if (event.key !== "Tab") {
-        return;
-      }
-      const focusable = Array.from(
-        settingsMenuPanelRef.current?.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        ) ?? []
-      );
-      if (!focusable.length) {
-        return;
-      }
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", handleKeyDown);
-    window.requestAnimationFrame(() => {
-      settingsMenuPanelRef.current
-        ?.querySelector<HTMLElement>('[aria-current="page"]')
-        ?.focus();
-    });
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", handleKeyDown);
-      if (previouslyFocused?.isConnected) {
-        previouslyFocused.focus();
-      } else {
-        settingsMenuButtonRef.current?.focus();
-      }
-    };
-  }, [settingsMenuOpen]);
 
   useEffect(
     () => () => {
@@ -321,6 +269,17 @@ export function SettingsView({
     window.requestAnimationFrame(() => {
       settingsTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
+  }
+
+  function finishSettingsMenuExit() {
+    const tab = pendingSettingsTabRef.current;
+    pendingSettingsTabRef.current = null;
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+      window.requestAnimationFrame(() => {
+        settingsTopRef.current?.scrollIntoView({ behavior: "instant", block: "start" });
+      });
+    }
   }
 
   function handleThemeChange(theme: ThemePreference) {
@@ -423,7 +382,6 @@ export function SettingsView({
           </p>
         </div>
         <Button
-          ref={settingsMenuButtonRef}
           variant="secondary"
           className="h-11 max-w-[min(68vw,240px)] gap-2 px-3 md:hidden"
           onClick={() => setSettingsMenuOpen(true)}
@@ -436,81 +394,54 @@ export function SettingsView({
         </Button>
       </div>
 
-      <AnimatePresence>
-        {settingsMenuOpen ? (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-end bg-black/55 px-3 pt-[calc(env(safe-area-inset-top)+1rem)] backdrop-blur-[4px] md:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <button
-              type="button"
-              className="absolute inset-0 cursor-default"
-              onClick={() => setSettingsMenuOpen(false)}
-              aria-label={t.common.close}
-            />
-            <motion.section
-              ref={settingsMenuPanelRef}
-              role="dialog"
-              aria-modal="true"
-              aria-label={t.settings.section}
-              className="app-surface relative mx-auto grid max-h-[82dvh] w-full max-w-lg content-start gap-4 overflow-y-auto rounded-t-3xl px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3 shadow-2xl"
-              initial={{ y: "100%", opacity: 0.7 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: "100%", opacity: 0.7 }}
-              transition={{ type: "spring", stiffness: 420, damping: 36 }}
-            >
-              <span className="mx-auto h-1 w-10 rounded-full bg-line" aria-hidden="true" />
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase text-muted">{t.settings.section}</p>
-                  <h3 className="mt-0.5 text-lg font-semibold text-foreground">
-                    {t.settings.tabs[activeTab]}
-                  </h3>
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => setSettingsMenuOpen(false)} aria-label={t.common.close}>
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-              <nav className="grid grid-cols-2 gap-2" aria-label={t.settings.section}>
-                {settingsTabs.map((tab) => {
-                  const isActive = activeTab === tab.value;
-                  const Icon = tab.icon;
-                  return (
-                    <button
-                      key={tab.value}
-                      type="button"
-                      aria-current={isActive ? "page" : undefined}
-                      onClick={() => selectSettingsTab(tab.value)}
-                      className={`app-focus relative flex min-h-20 min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border px-2 py-3 text-center text-xs font-medium active:scale-[0.98] ${
-                        isActive
-                          ? "app-selected-control border-accent/25 text-foreground"
-                          : "border-line/60 text-muted hover:bg-elevated/70 hover:text-foreground"
-                      }`}
-                    >
-                      <span
-                        className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${
-                          isActive ? "bg-accent-soft text-accent" : "bg-elevated/70"
-                        }`}
-                      >
-                        <Icon className="h-[18px] w-[18px]" />
-                      </span>
-                      <span className="min-w-0 leading-4">{t.settings.tabs[tab.value]}</span>
-                      {isActive ? (
-                        <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-accent" />
-                      ) : null}
-                    </button>
-                  );
-                })}
-              </nav>
-              <p className="border-t border-line/60 pt-3 text-center text-xs font-medium text-muted">
-                {t.settings.version} {appVersion}
-              </p>
-            </motion.section>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      <BottomSheet
+        open={settingsMenuOpen}
+        title={t.settings.section}
+        closeLabel={t.common.close}
+        onClose={() => {
+          pendingSettingsTabRef.current = null;
+          setSettingsMenuOpen(false);
+        }}
+        onExitComplete={finishSettingsMenuExit}
+      >
+        <nav className="grid grid-cols-2 gap-2" aria-label={t.settings.section}>
+          {settingsTabs.map((tab) => {
+            const isActive = activeTab === tab.value;
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                aria-current={isActive ? "page" : undefined}
+                onClick={() => {
+                  pendingSettingsTabRef.current = tab.value;
+                  setSettingsMenuOpen(false);
+                }}
+                className={`app-focus relative flex min-h-20 min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border px-2 py-3 text-center text-xs font-medium active:scale-[0.98] ${
+                  isActive
+                    ? "app-selected-control border-accent/25 text-foreground"
+                    : "border-line/60 text-muted hover:bg-elevated/70 hover:text-foreground"
+                }`}
+              >
+                <span
+                  className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${
+                    isActive ? "bg-accent-soft text-accent" : "bg-elevated/70"
+                  }`}
+                >
+                  <Icon className="h-[18px] w-[18px]" />
+                </span>
+                <span className="min-w-0 leading-4">{t.settings.tabs[tab.value]}</span>
+                {isActive ? (
+                  <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-accent" />
+                ) : null}
+              </button>
+            );
+          })}
+        </nav>
+        <p className="mt-4 border-t border-line/60 pt-3 text-center text-xs font-medium text-muted">
+          {t.settings.version} {appVersion}
+        </p>
+      </BottomSheet>
 
       <div className="grid min-w-0 gap-6 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start">
         <aside className="app-surface sticky top-5 hidden rounded-2xl p-2 lg:block">

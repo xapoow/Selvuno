@@ -9,6 +9,17 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.9.2",
+      date: "2026-11-04",
+      notes: [
+        "Меню настроек на телефоне затемняет весь экран и открывается без скачков страницы",
+        "Выбор доступного объектива камеры для чеков с запоминанием на устройстве",
+        "Основная задняя камера выбирается автоматически, если браузер позволяет её определить",
+        "Даты уведомлений и фильтры обновлений, объявлений и напоминаний",
+        "Убраны повторяющиеся заголовки релизов, восстановлены даты старых обновлений"
+      ]
+    },
+    {
       version: "0.9.1",
       date: "2026-11-04",
       notes: [
@@ -24,6 +35,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.9.0",
+      date: "2026-09-17",
       notes: [
         "Фотографии чеков и PDF-документы можно прикреплять прямо к операции",
         "Собственная полноэкранная камера с рамкой для удобной съёмки чеков",
@@ -33,6 +45,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.8.4",
+      date: "2026-09-17",
       notes: [
         "Гармонизирована концентрическая сетка border-radius (карточки 16px, элементы ввода 12px, сегменты и кнопки 8px)",
         "Быстрая горизонтальная панель разделов настроек на смартфонах для мгновенного переключения в одно касание",
@@ -42,6 +55,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.8.3",
+      date: "2026-09-17",
       notes: [
         "Устранены визуальные несостыковки в переключателе цветовых схем (убраны лишние точки и дублирующиеся иконки)",
         "Плавный скользящий индикатор для переключателей режимов с равным распределением колонок",
@@ -51,6 +65,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.8.2",
+      date: "2026-09-17",
       notes: [
         "Изменение порядка кошельков перетаскиванием за левый край во вкладке «Кошельки»",
         "Перетаскивание категорий на смартфонах теперь срабатывает только за левую ручку",
@@ -60,6 +75,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.8.1",
+      date: "2026-09-17",
       notes: [
         "Исправлен неконтролируемый рост карточек кошельков на узких экранах",
         "Восстановлены стабильные границы свайпа без растягивания страницы",
@@ -68,6 +84,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.8.0",
+      date: "2026-09-17",
       notes: [
         "Устранено растягивание страницы и переполнение карусели на смартфонах",
         "PWA-манифест синхронизирован с тёмной темой для статусной строки Android и WebAPK",
@@ -76,6 +93,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.9",
+      date: "2026-09-17",
       notes: [
         "Адаптивный статус-бар для смартфонов в тёмной теме под цвет выбранной схемы",
         "Устранение белого статус-бара и белых вспышек при запуске на мобильных устройствах"
@@ -83,6 +101,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.8",
+      date: "2026-09-17",
       notes: [
         "Сохранение истории changelog всех обновлений в уведомлениях",
         "Чёткое форматирование списка изменений по пунктам в деталях уведомления"
@@ -90,6 +109,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.7",
+      date: "2026-09-17",
       notes: [
         "Чёткое отображение активной карты без затемнения по краям",
         "Расширенные границы карусели кошельков (до 576px)",
@@ -98,6 +118,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.6",
+      date: "2026-09-17",
       notes: [
         "Мягкое затухание (fade in/out) для карточек на границах карусели",
         "Оптимистичное мгновенное переключение активного кошелька без задержек",
@@ -106,6 +127,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.5",
+      date: "2026-09-17",
       notes: [
         "Непрерывный горизонтальный трек карусели в стиле Monobank",
         "Исправлен баг обрезания карточки при вытягивании за пределы экрана"
@@ -113,6 +135,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.4",
+      date: "2026-09-17",
       notes: [
         "Мгновенный локальный стейт при свайпе без задержек базы данных",
         "Плавная физика перелистывания карточек"
@@ -120,12 +143,14 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.3",
+      date: "2026-09-16",
       notes: [
         "Плавная непрерывная анимация карточек без замедления на середине пути"
       ]
     },
     {
       version: "0.7.2",
+      date: "2026-09-16",
       notes: [
         "Дизайн дебетовых карточек кошельков в стиле Monobank",
         "Ступенчатая водопадная анимация обновления элементов страницы при свайпе"
@@ -133,6 +158,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.0",
+      date: "2026-09-16",
       notes: [
         "Карусель кошельков на главном экране",
         "Удаление лишнего заголовка и оптимизация мобильного экрана"
@@ -140,6 +166,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.6.0",
+      date: "2026-09-11",
       notes: [
         "Опциональные PIN-код, автоблокировка и скрытие сумм",
         "Быстрый ввод операций, расширенные кошельки и локальные умные наблюдения",
@@ -148,6 +175,17 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.9.2",
+      date: "2026-11-04",
+      notes: [
+        "Mobile settings menu dims the whole screen and opens without page jumps",
+        "Choose an available receipt camera lens and remember it on this device",
+        "The main rear camera is preferred when the browser identifies it",
+        "Notification dates and separate filters for updates, announcements, and reminders",
+        "Removed repeated release headings and restored historical changelog dates"
+      ]
+    },
     {
       version: "0.9.1",
       date: "2026-11-04",
@@ -164,6 +202,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.9.0",
+      date: "2026-09-17",
       notes: [
         "Attach receipt photos and PDF documents directly to a transaction",
         "Capture receipts in a custom full-screen camera with an alignment frame",
@@ -173,6 +212,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.8.4",
+      date: "2026-09-17",
       notes: [
         "Harmonized concentric border-radius hierarchy (16px cards, 12px controls, 8px pills and segments)",
         "Quick horizontal settings navigation strip on mobile phones for instant one-tap category switching",
@@ -182,6 +222,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.8.3",
+      date: "2026-09-17",
       notes: [
         "Refined color theme picker UI: eliminated redundant dots and balanced item layout",
         "Interactive animated indicator for segmented controls with equal column sizing",
@@ -191,6 +232,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.8.2",
+      date: "2026-09-17",
       notes: [
         "Reorder wallets via drag-and-drop handles in the Wallets tab",
         "Refined category drag on mobile: items only move when grabbed by the left edge",
@@ -200,6 +242,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.8.1",
+      date: "2026-09-17",
       notes: [
         "Fixed runaway wallet card sizing on narrow mobile screens",
         "Restored stable swipe bounds without stretching the page",
@@ -208,6 +251,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.8.0",
+      date: "2026-09-17",
       notes: [
         "Eliminated horizontal page stretch and carousel overflow on mobile phones",
         "Synchronized PWA manifest with dark theme for Android and WebAPK status bar",
@@ -216,6 +260,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.9",
+      date: "2026-09-17",
       notes: [
         "Adaptive mobile status bar in dark mode matching the active color scheme",
         "Eliminated white status bar and startup flashes on mobile devices"
@@ -223,6 +268,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.8",
+      date: "2026-09-17",
       notes: [
         "Preserve complete update changelog history in notifications",
         "Bulleted formatting for change details in notification view"
@@ -230,6 +276,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.7",
+      date: "2026-09-17",
       notes: [
         "Crisp active card rendering without edge gradient blur",
         "Wider wallet carousel boundaries (up to 576px)",
@@ -238,6 +285,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.6",
+      date: "2026-09-17",
       notes: [
         "Soft edge feathering and real-time fade in/out for cards at carousel boundaries",
         "Instant optimistic wallet switching without UI latency",
@@ -246,6 +294,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.5",
+      date: "2026-09-17",
       notes: [
         "Continuous horizontal carousel track in Monobank style",
         "Fixed card clipping bug when dragged past container edges"
@@ -253,6 +302,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.4",
+      date: "2026-09-17",
       notes: [
         "Instant local state on swipe without database latency",
         "Smooth physics for card sliding"
@@ -260,12 +310,14 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.3",
+      date: "2026-09-16",
       notes: [
         "Continuous smooth card animation without mid-transition stall"
       ]
     },
     {
       version: "0.7.2",
+      date: "2026-09-16",
       notes: [
         "Monobank-style card design for wallets",
         "Staggered waterfall animation of page elements on wallet switch"
@@ -273,6 +325,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.7.0",
+      date: "2026-09-16",
       notes: [
         "Wallet carousel on home screen",
         "Removed redundant header and streamlined mobile dashboard"
@@ -280,6 +333,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     },
     {
       version: "0.6.0",
+      date: "2026-09-11",
       notes: [
         "Optional PIN, auto-lock, and private balance visibility controls",
         "Faster transactions, advanced wallets, and local smart insights",
@@ -312,7 +366,14 @@ export function getChangelogHistory(locale: string, currentNotes?: string[]): Ch
     if (typeof window !== "undefined" && window.localStorage) {
       const raw = window.localStorage.getItem(changelogStorageKey);
       if (raw) {
-        stored = JSON.parse(raw) as ChangelogItem[];
+        const parsed: unknown = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          stored = parsed.filter((item): item is ChangelogItem =>
+            item && typeof item.version === "string" && /^\d+\.\d+\.\d+$/.test(item.version) &&
+            Array.isArray(item.notes) && item.notes.every((note: unknown) => typeof note === "string") &&
+            (item.date === undefined || (typeof item.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(item.date)))
+          );
+        }
       }
     }
   } catch {
@@ -330,8 +391,8 @@ export function getChangelogHistory(locale: string, currentNotes?: string[]): Ch
       const existing = map.get(item.version);
       map.set(item.version, {
         version: item.version,
-        notes: item.notes && item.notes.length ? item.notes : (existing?.notes ?? []),
-        date: item.date ?? existing?.date
+        notes: existing?.notes ?? [...new Set(item.notes)],
+        date: existing?.date ?? item.date
       });
     }
   }
@@ -339,7 +400,8 @@ export function getChangelogHistory(locale: string, currentNotes?: string[]): Ch
   if (currentNotes && currentNotes.length) {
     map.set(appVersion, {
       version: appVersion,
-      notes: currentNotes
+      notes: [...new Set(currentNotes)],
+      date: map.get(appVersion)?.date
     });
   }
 
