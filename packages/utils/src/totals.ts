@@ -70,8 +70,13 @@ export function calculateWalletTotals(
     initialBalanceMinor,
     balanceMinor:
       initialBalanceMinor +
+      calculateWalletAdjustmentTotal(wallet) +
       transactionTotals.balanceMinor +
       transferTotals.transferInMinor -
       transferTotals.transferOutMinor
   };
+}
+
+export function calculateWalletAdjustmentTotal(wallet: Wallet): number {
+  return (wallet.balanceReconciliations ?? []).reduce((total, item) => total + item.adjustmentMinor, 0);
 }

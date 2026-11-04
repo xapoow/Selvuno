@@ -44,11 +44,13 @@ interface NotificationCenterProps {
 function NotificationMetadata({ notification, t, locale }: { notification: AppNotification; t: Dictionary; locale: string }) {
   const date = notification.date ? formatNotificationDate(notification.date, locale) : "";
   return (
-    <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
-      <span>{t.notifications.kinds[notification.kind]}</span>
+    <span className="flex max-w-full flex-wrap items-center justify-start gap-y-1 text-left text-[11px] leading-4 text-muted">
+      <span className={cn("inline-flex items-center rounded-md py-0.5 font-semibold", toneStyles[notification.tone])}>
+        {t.notifications.kinds[notification.kind]}
+      </span>
       {date || notification.kind !== "reminder" ? <>
-        <span aria-hidden="true">·</span>
-        {date ? <time dateTime={notification.date}>{date}</time> : <span>{t.notifications.unknownDate}</span>}
+        <span aria-hidden="true" className="mx-[5px] shrink-0">·</span>
+        {date ? <time className="whitespace-nowrap" dateTime={notification.date}>{date}</time> : <span>{t.notifications.unknownDate}</span>}
       </> : null}
     </span>
   );
@@ -58,7 +60,6 @@ export function NotificationCenter({ notifications, t, locale }: NotificationCen
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<AppNotification | null>(null);
   const [readIds, setReadIds] = useState<string[]>([]);
-  const [filter, setFilter] = useState<AppNotificationKind | "all">("all");
 
   useEffect(() => {
     try {
@@ -72,7 +73,6 @@ export function NotificationCenter({ notifications, t, locale }: NotificationCen
 
   const readSet = useMemo(() => new Set(readIds), [readIds]);
   const unreadCount = notifications.filter((notification) => !readSet.has(notification.id)).length;
-  const displayed = notifications.filter((notification) => filter === "all" || notification.kind === filter);
 
   function saveReadIds(nextIds: string[]) {
     const uniqueIds = [...new Set(nextIds)];
@@ -121,22 +121,9 @@ export function NotificationCenter({ notifications, t, locale }: NotificationCen
         onExitComplete={() => setSelected(null)}
       >
         {!selected ? <>
-        <div className="app-control mb-4 flex gap-1 overflow-x-auto rounded-xl p-1 no-scrollbar" role="group" aria-label={t.notifications.filterLabel}>
-          {(["all", "release", "announcement", "reminder"] as const).map((kind) => (
-            <button
-              key={kind}
-              type="button"
-              aria-pressed={filter === kind}
-              onClick={() => setFilter(kind)}
-              className={cn("app-focus min-h-10 shrink-0 rounded-lg px-3 text-xs font-medium", filter === kind ? "app-selected-control text-foreground" : "text-muted")}
-            >
-              {kind === "all" ? t.notifications.all : t.notifications.filters[kind]}
-            </button>
-          ))}
-        </div>
         <div className="max-h-[min(68vh,560px)] space-y-2 overflow-y-auto pr-1">
-          {displayed.length ? (
-            displayed.map((notification) => {
+          {notifications.length ? (
+            notifications.map((notification) => {
               const isRead = readSet.has(notification.id);
               return (
                   <button
@@ -160,12 +147,12 @@ export function NotificationCenter({ notifications, t, locale }: NotificationCen
                     >
                       <NotificationIcon tone={notification.tone} kind={notification.kind} />
                     </span>
-                    <span className="min-w-0 flex-1">
+                    <span className="grid min-w-0 flex-1 content-start gap-1">
                       <NotificationMetadata notification={notification} t={t} locale={locale} />
-                      <span className="mt-1.5 block text-sm font-semibold text-foreground">
+                      <span className="block text-sm font-semibold text-foreground">
                         {notification.title}
                       </span>
-                      <span className="mt-1 block text-sm leading-5 text-muted">
+                      <span className="block text-sm leading-5 text-muted">
                         {notification.body}
                       </span>
                     </span>

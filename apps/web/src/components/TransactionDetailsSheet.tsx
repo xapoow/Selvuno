@@ -60,7 +60,7 @@ export function TransactionDetailsSheet({
   const [attachments, setAttachments] = useState<TransactionAttachment[]>([]);
   const [loading, setLoading] = useState(false);
   const [viewer, setViewer] = useState<AttachmentPreview | null>(null);
-  const [mode, setMode] = useState<"details" | "edit" | "delete">("details");
+  const [mode, setMode] = useState<"details" | "edit">("details");
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState("");
   const [attachmentError, setAttachmentError] = useState(false);
@@ -271,45 +271,29 @@ export function TransactionDetailsSheet({
             )}
           </section>
 
-          {mode === "delete" ? (
-            <motion.section className="rounded-2xl bg-expense/10 p-4" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-              <h3 className="text-sm font-semibold text-foreground">{t.history.confirmDelete}</h3>
-              <p className="mt-1 text-xs leading-5 text-muted">{t.transaction.deleteHint}</p>
-              {actionError ? <p role="alert" className="mt-2 text-sm text-expense">{actionError}</p> : null}
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <Button type="button" variant="secondary" disabled={busy} onClick={() => { setMode("details"); setActionError(""); }}>
-                  {t.common.cancel}
-                </Button>
-                <Button type="button" variant="danger" disabled={busy} onClick={async () => {
-                  if (busy) return;
-                  setBusy(true);
-                  setActionError("");
-                  try {
-                    await onDelete(transaction.id);
-                    onClose();
-                  } catch {
-                    setActionError(t.transaction.deleteError);
-                  } finally {
-                    setBusy(false);
-                  }
-                }}>
-                  {busy ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                  {t.common.delete}
-                </Button>
-              </div>
-            </motion.section>
-          ) : (
+          {actionError ? <p role="alert" className="text-sm text-expense">{actionError}</p> : null}
             <div className="grid grid-cols-2 gap-2 border-t border-line/60 pt-4">
-              <Button type="button" variant="secondary" className="min-w-0 px-2 text-xs sm:text-sm" onClick={() => setMode("edit")}>
+              <Button type="button" variant="secondary" disabled={busy} className="min-w-0 px-2 text-xs sm:text-sm" onClick={() => setMode("edit")}>
                 <Edit3 className="h-4 w-4 shrink-0" />
                 {t.common.edit}
               </Button>
-              <Button type="button" variant="ghost" className="min-w-0 px-2 text-xs text-expense sm:text-sm" onClick={() => setMode("delete")}>
-                <Trash2 className="h-4 w-4 shrink-0" />
+              <Button type="button" variant="ghost" disabled={busy} className="min-w-0 px-2 text-xs text-expense sm:text-sm" onClick={async () => {
+                if (busy) return;
+                setBusy(true);
+                setActionError("");
+                try {
+                  await onDelete(transaction.id);
+                  onClose();
+                } catch {
+                  setActionError(t.transaction.deleteError);
+                } finally {
+                  setBusy(false);
+                }
+              }}>
+                {busy ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4 shrink-0" />}
                 {t.common.delete}
               </Button>
             </div>
-          )}
         </div>
         )}
       </BottomSheet>

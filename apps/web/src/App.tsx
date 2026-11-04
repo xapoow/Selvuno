@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import type { WalletView } from "@myfinances/types";
 import { Eye, EyeOff, LockKeyhole } from "lucide-react";
+import { calculateWalletAdjustmentTotal } from "@myfinances/utils";
 import { BottomNavigation } from "./components/BottomNavigation";
 import { CookieNotice } from "./components/CookieNotice";
 import { HeaderNavigation } from "./components/HeaderNavigation";
@@ -10,6 +11,8 @@ import { NotificationCenter } from "./components/NotificationCenter";
 import { OfflineIndicator } from "./components/OfflineIndicator";
 import { LockScreen } from "./components/LockScreen";
 import { UpdateAnnouncement } from "./components/UpdateAnnouncement";
+import { TransactionUndoNotice } from "./components/TransactionUndoNotice";
+import { TransactionTrash } from "./components/TransactionTrash";
 import { WalletSwitcher } from "./components/WalletSwitcher";
 import { MonobankWalletCarousel } from "./components/MonobankWalletCarousel";
 import { ErrorScreen } from "./components/ErrorScreen";
@@ -20,6 +23,7 @@ import { buildAppNotifications } from "./lib/notifications";
 import { useAppStore, type AppView } from "./state/appStore";
 import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
 import { usePrivacyLock } from "./state/usePrivacyLock";
+import { useTransactionDeletion } from "./state/useTransactionDeletion";
 import { getIncludedWalletIds, shouldHideWalletAmounts } from "./lib/walletFeatures";
 import { AddTransactionView } from "./views/AddTransactionView";
 import { DashboardView } from "./views/DashboardView";
@@ -75,6 +79,11 @@ export function App() {
   const privacy = usePrivacyLock();
   const data = useFinanceData();
   const mutations = useFinanceMutations();
+  const [trashOpen, setTrashOpen] = useState(false);
+  const deletion = useTransactionDeletion({
+    deleteTransactions: (ids) => mutations.deleteTransactions.mutateAsync(ids),
+    restoreTransactions: (deleted) => mutations.restoreTransactions.mutateAsync(deleted)
+  });
 
   const settings = data.settings.data;
   const wallets = data.wallets.data ?? [];
@@ -198,7 +207,7 @@ export function App() {
             !wallet.deletedAt &&
             walletIsInCurrentStatistics(wallet.id) &&
             wallet.currency.toUpperCase() !== displayCurrency &&
-            wallet.initialBalanceMinor !== 0
+            (wallet.initialBalanceMinor + calculateWalletAdjustmentTotal(wallet)) !== 0
         ) ||
         walletTransfers.some(
           (transfer) =>
@@ -313,7 +322,7 @@ export function App() {
         </div>
       </aside>
 
-      <main className="mx-auto w-full min-w-0 max-w-[1180px] overflow-x-hidden px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:px-8 md:pb-10 md:pt-7 lg:px-10">
+      <main className="mx-auto w-full min-w-0 max-w-[1180px] overflow-x-clip px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:px-8 md:pb-10 md:pt-7 lg:px-10">
         <div className="mb-3 flex justify-end gap-1">
           <button
             type="button"
@@ -392,10 +401,10 @@ export function App() {
                   onAdd={() => setActiveView("add")}
                   onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
                   onUpdateTransaction={async (id, submission) => { await mutations.updateTransactionWithAttachments.mutateAsync({ id, submission }); }}
-                  onDeleteTransaction={(id) => mutations.deleteTransaction.mutateAsync(id)}
+                  onDeleteTransaction={deletion.deleteOne}
                 />
               </div>
-              <div className="hidden overflow-hidden md:block">
+              <div className="hidden min-w-0 md:block">
                 <motion.div
                   key={activeWalletId}
                   initial={{ opacity: 0, x: walletTransitionDirection * 18 }}
@@ -419,7 +428,7 @@ export function App() {
                     onAdd={() => setActiveView("add")}
                     onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
                     onUpdateTransaction={async (id, submission) => { await mutations.updateTransactionWithAttachments.mutateAsync({ id, submission }); }}
-                    onDeleteTransaction={(id) => mutations.deleteTransaction.mutateAsync(id)}
+                    onDeleteTransaction={deletion.deleteOne}
                   />
                 </motion.div>
               </div>
@@ -462,7 +471,7 @@ export function App() {
             />
           ) : null}
           {activeView === "history" ? (
-            <div className="overflow-hidden">
+            <div className="min-w-0">
               <motion.div
                 key={activeWalletId}
                 initial={{ opacity: 0, x: walletTransitionDirection * 18 }}
@@ -479,13 +488,16 @@ export function App() {
                   exchangeRates={exchangeRates.data}
                   t={t}
                   desktopTools
+                  onOpenTrash={() => { deletion.dismiss(); setTrashOpen(true); }}
+                  deletedCount={data.deletedTransactions.data?.length ?? 0}
+                  onDeleteMany={deletion.deleteMany}
                   onUpdate={async (id, input) => {
                     await mutations.updateTransaction.mutateAsync({ id, input });
                   }}
                   onUpdateWithAttachments={async (id, submission) => {
                     await mutations.updateTransactionWithAttachments.mutateAsync({ id, submission });
                   }}
-                  onDelete={(id) => mutations.deleteTransaction.mutateAsync(id)}
+                  onDelete={deletion.deleteOne}
                 />
               </motion.div>
             </div>
@@ -513,6 +525,7 @@ export function App() {
               onReorderWallet={async (orderedIds) => {
                 await mutations.reorderWallets.mutateAsync(orderedIds);
               }}
+              onReconcileWallet={async (input) => { await mutations.reconcileWallet.mutateAsync(input); }}
               onCreateGoal={async (input) => {
                 await mutations.createSavingsGoal.mutateAsync(input);
               }}
@@ -542,6 +555,8 @@ export function App() {
               onUpdateSettings={async (input) => {
                 await mutations.updateSettings.mutateAsync(input);
               }}
+              onOpenTrash={() => { deletion.dismiss(); setTrashOpen(true); }}
+              deletedCount={data.deletedTransactions.data?.length ?? 0}
               onCreateCategory={async (input) => {
                 await mutations.createCategory.mutateAsync(input);
               }}
@@ -572,6 +587,20 @@ export function App() {
       </main>
 
       <BottomNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
+      <TransactionUndoNotice deletion={deletion} t={t} onOpenTrash={() => setTrashOpen(true)} />
+      <TransactionTrash
+        open={trashOpen}
+        onClose={() => setTrashOpen(false)}
+        transactions={data.deletedTransactions.data ?? []}
+        wallets={[...wallets, ...archivedWallets]}
+        categories={categories}
+        settings={settings}
+        t={t}
+        loading={data.deletedTransactions.isLoading}
+        loadError={data.deletedTransactions.isError}
+        onRestore={(deleted) => mutations.restoreTransactions.mutateAsync(deleted)}
+        onRetry={() => { void data.deletedTransactions.refetch(); }}
+      />
       <UpdateAnnouncement t={t} locale={settings.locale} />
       <CookieNotice />
       <OfflineIndicator t={t} />

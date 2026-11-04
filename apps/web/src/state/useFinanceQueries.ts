@@ -10,6 +10,7 @@ import type {
   TransactionInput,
   TransactionTemplateInput,
   WalletInput,
+  WalletReconciliationInput,
   WalletTransferInput
 } from "@myfinances/types";
 import { seedLocalData } from "../db/database";
@@ -19,7 +20,7 @@ import { categoryRepository } from "../repositories/categoryRepository";
 import { recurringTransactionRepository } from "../repositories/recurringTransactionRepository";
 import { savingsGoalRepository } from "../repositories/savingsGoalRepository";
 import { settingsRepository } from "../repositories/settingsRepository";
-import { transactionRepository } from "../repositories/transactionRepository";
+import { transactionRepository, type DeletedTransactionRef } from "../repositories/transactionRepository";
 import { transactionAttachmentRepository } from "../repositories/transactionAttachmentRepository";
 import { transactionTemplateRepository } from "../repositories/transactionTemplateRepository";
 import { walletRepository } from "../repositories/walletRepository";
@@ -71,6 +72,11 @@ export function useFinanceData() {
     queryFn: () => transactionTemplateRepository.listTemplates(),
     enabled
   });
+  const deletedTransactions = useQuery({
+    queryKey: queryKeys.deletedTransactions,
+    queryFn: () => transactionRepository.listDeletedTransactions(),
+    enabled
+  });
   const budgets = useQuery({
     queryKey: queryKeys.budgets,
     queryFn: () => budgetRepository.listBudgets(),
@@ -109,6 +115,7 @@ export function useFinanceData() {
     archivedWallets,
     categories,
     transactions,
+    deletedTransactions,
     transactionTemplates,
     budgets,
     recurringTransactions,
@@ -186,6 +193,14 @@ export function useFinanceMutations() {
       mutationFn: (id: string) => transactionRepository.deleteTransaction(id),
       onSuccess: invalidate
     }),
+    deleteTransactions: useMutation({
+      mutationFn: (ids: string[]) => transactionRepository.deleteTransactions(ids),
+      onSuccess: invalidate
+    }),
+    restoreTransactions: useMutation({
+      mutationFn: (deleted: DeletedTransactionRef[]) => transactionRepository.restoreTransactions(deleted),
+      onSuccess: invalidate
+    }),
     createTransactionTemplate: useMutation({
       mutationFn: (input: TransactionTemplateInput) =>
         transactionTemplateRepository.createTemplate(input),
@@ -203,6 +218,11 @@ export function useFinanceMutations() {
       mutationFn: ({ id, input }: { id: string; input: Partial<WalletInput> }) =>
         walletRepository.updateWallet(id, input),
       onSuccess: invalidate
+    }),
+    reconcileWallet: useMutation({
+      mutationFn: (input: WalletReconciliationInput) => walletRepository.reconcileBalance(input),
+      onSuccess: () => invalidateFinance(queryClient),
+      onError: invalidate
     }),
     archiveWallet: useMutation({
       mutationFn: (id: string) => walletRepository.archiveWallet(id),

@@ -3,6 +3,7 @@ import type {
   Transaction,
   Wallet,
   WalletInput,
+  WalletReconciliationInput,
   WalletTransfer
 } from "@myfinances/types";
 import { WalletsView } from "../views/WalletsView";
@@ -20,6 +21,7 @@ interface MobileWalletsPagerProps {
   onArchive: (id: string) => Promise<void>;
   onRestore: (id: string) => Promise<void>;
   onReorder?: (orderedIds: string[]) => Promise<void>;
+  onReconcile?: (input: WalletReconciliationInput) => Promise<void>;
 }
 
 export function MobileWalletsPager({
@@ -33,7 +35,8 @@ export function MobileWalletsPager({
   onUpdate,
   onArchive,
   onRestore,
-  onReorder
+  onReorder,
+  onReconcile
 }: MobileWalletsPagerProps) {
   return (
     <WalletsView
@@ -48,6 +51,7 @@ export function MobileWalletsPager({
       onArchive={onArchive}
       onRestore={onRestore}
       onReorder={onReorder}
+      onReconcile={onReconcile}
     />
   );
 }

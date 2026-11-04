@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { calculateWalletAdjustmentTotal } from "@myfinances/utils";
 import type {
   Category,
   MonthlyBudget,
@@ -67,7 +68,7 @@ function MobileWalletDashboardSlide({
       (wallet) =>
         !wallet.deletedAt &&
         walletIsInCurrentStatistics(wallet.id) &&
-        wallet.initialBalanceMinor !== 0 &&
+        (wallet.initialBalanceMinor + calculateWalletAdjustmentTotal(wallet)) !== 0 &&
         wallet.currency.toUpperCase() !== displayCurrency
     ) ||
     transfers.some(

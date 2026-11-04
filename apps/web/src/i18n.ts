@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.9.2";
+export const appVersion = "0.9.4";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -243,7 +243,6 @@ export interface Dictionary {
     openAttachment: string;
     noAttachments: string;
     attachmentsLoadError: string;
-    deleteHint: string;
     deleteError: string;
   };
   recurring: {
@@ -281,6 +280,50 @@ export interface Dictionary {
     offline: string;
     online: string;
   };
+  undo: {
+    openTrash: string;
+    entryHint: string;
+    title: string;
+    action: string;
+    deletedOne: string;
+    deletedMany: string;
+    hint: string;
+    trash: string;
+    trashHint: string;
+    empty: string;
+    restore: string;
+    restoreAll: string;
+    restoreError: string;
+    loadError: string;
+    retry: string;
+    loading: string;
+    unavailableWallet: string;
+    deletedOn: string;
+  };
+  reconciliation: {
+    action: string;
+    title: string;
+    intro: string;
+    creditHint: string;
+    recordedBalance: string;
+    actualBalance: string;
+    difference: string;
+    matched: string;
+    matchHint: string;
+    adjustmentHint: string;
+    note: string;
+    confirmMatch: string;
+    applyAdjustment: string;
+    invalidAmount: string;
+    balanceChanged: string;
+    saveError: string;
+    history: string;
+    noHistory: string;
+    checked: string;
+    toggleSign: string;
+    currencyLocked: string;
+    currencyLockHint: string;
+  };
   notifications: {
     title: string;
     open: string;
@@ -289,10 +332,7 @@ export interface Dictionary {
     empty: string;
     detailsTitle: string;
     backToNotifications: string;
-    all: string;
     kinds: Record<"release" | "announcement" | "reminder", string>;
-    filters: Record<"release" | "announcement" | "reminder", string>;
-    filterLabel: string;
     unknownDate: string;
     detailVersion: string;
     detailChanges: string;
@@ -369,6 +409,43 @@ export interface Dictionary {
       walletAsc: string;
       walletDesc: string;
     };
+  };
+  historyFilters: {
+    title: string;
+    active: string;
+    categories: string;
+    categorySearch: string;
+    noCategories: string;
+    unavailableCategories: string;
+    unavailableCategory: string;
+    removeUnavailable: string;
+    removeCategory: string;
+    attachments: string;
+    withAttachments: string;
+    withoutAttachments: string;
+    amount: string;
+    minimum: string;
+    maximum: string;
+    currency: string;
+    amountHint: string;
+    clearAttachments: string;
+    clearAmount: string;
+    reset: string;
+    apply: string;
+    saved: string;
+    save: string;
+    saveApply: string;
+    saveHint: string;
+    name: string;
+    nameRequired: string;
+    duplicateName: string;
+    deleteSaved: string;
+    invalidRange: string;
+    storageError: string;
+    limit: string;
+    resultCount: string;
+    ratesLoading: string;
+    ratesMissing: string;
   };
   wallets: {
     title: string;
@@ -810,7 +887,6 @@ export const dictionaries: Record<Language, Dictionary> = {
       openAttachment: "Open attachment",
       noAttachments: "No receipts or files attached.",
       attachmentsLoadError: "Unable to load attachments. Close and reopen the transaction to try again.",
-      deleteHint: "The transaction will be removed from your history. This action cannot be undone.",
       deleteError: "Unable to delete the transaction. Please try again."
     },
     recurring: {
@@ -881,6 +957,43 @@ export const dictionaries: Record<Language, Dictionary> = {
         walletAsc: "Wallet A-Z",
         walletDesc: "Wallet Z-A"
       }
+    },
+    historyFilters: {
+      title: "Filters",
+      active: "Active filters",
+      categories: "Categories",
+      categorySearch: "Find a category",
+      noCategories: "No categories found.",
+      unavailableCategories: "Some selected categories were removed. Their filters are kept until you remove them.",
+      unavailableCategory: "Unavailable category",
+      removeUnavailable: "Remove unavailable categories",
+      removeCategory: "Remove category filter",
+      attachments: "Receipts and files",
+      withAttachments: "With attachments",
+      withoutAttachments: "Without attachments",
+      amount: "Amount range",
+      minimum: "From",
+      maximum: "To",
+      currency: "Amount currency",
+      amountHint: "Bounds are inclusive. Amounts are converted to this currency; the currency is kept in saved filters.",
+      clearAttachments: "Clear attachment filter",
+      clearAmount: "Clear amount range",
+      reset: "Clear filters",
+      apply: "Apply filters",
+      saved: "Saved filters",
+      save: "Save filter set",
+      saveApply: "Save and apply",
+      saveHint: "Saved on this device: search, type, categories, attachments, amount, and sorting. The selected wallet does not change.",
+      name: "Filter set name",
+      nameRequired: "Enter a name for this filter set.",
+      duplicateName: "This name is already in use. Choose another name.",
+      deleteSaved: "Delete saved filter",
+      invalidRange: "Enter a non-negative amount with the correct currency precision. The minimum cannot exceed the maximum.",
+      storageError: "Unable to save filters on this device. Your current search is unchanged.",
+      limit: "You can save up to 20 filter sets. Remove one before adding another.",
+      resultCount: "Transactions: {count}",
+      ratesLoading: "Checking exchange rates in {currency}… Pending transactions: {count}.",
+      ratesMissing: "Some transactions have no exchange rate for {currency} and cannot be checked against this range. Excluded: {count}."
     },
     wallets: {
       title: "Wallets",
@@ -982,6 +1095,50 @@ export const dictionaries: Record<Language, Dictionary> = {
       offline: "Offline — changes stay safely on this device",
       online: "Connection restored"
     },
+    undo: {
+      openTrash: "Open Trash",
+      entryHint: "Deleted transactions and receipts. Restore individual records or everything at once.",
+      title: "Transaction deleted",
+      action: "Undo",
+      deletedOne: "Transaction deleted",
+      deletedMany: "Transactions deleted: {count}",
+      hint: "You can also restore it later from",
+      trash: "Trash",
+      trashHint: "Deleted transactions and their receipts stay on this device until you restore them. They are not included in balances or analytics.",
+      empty: "Trash is empty.",
+      restore: "Restore",
+      restoreAll: "Restore all",
+      restoreError: "Unable to restore transactions. Please try again; your receipts remain in Trash.",
+      loadError: "Unable to load Trash.",
+      retry: "Try again",
+      loading: "Loading deleted transactions…",
+      unavailableWallet: "Unavailable wallet",
+      deletedOn: "Deleted"
+    },
+    reconciliation: {
+      action: "Reconcile balance",
+      title: "Balance reconciliation",
+      intro: "Enter the actual amount in this wallet. Your initial balance and existing transactions will not change.",
+      creditHint: "Enter debt as a negative balance. Do not include your available credit limit.",
+      recordedBalance: "Recorded balance",
+      actualBalance: "Actual balance",
+      difference: "Balance adjustment",
+      matched: "The balance matches",
+      matchHint: "You can save this check without changing the balance.",
+      adjustmentHint: "A separate adjustment will affect only the balance, not income, expenses, or budgets.",
+      note: "Comment (optional)",
+      confirmMatch: "Confirm balance",
+      applyAdjustment: "Save adjustment",
+      invalidAmount: "Enter a valid balance with the correct number of decimal places for this currency.",
+      balanceChanged: "Wallet data changed. Review the latest balance and try again.",
+      saveError: "Unable to save reconciliation. No adjustment was applied.",
+      history: "Reconciliation history",
+      noHistory: "No balance checks yet.",
+      checked: "Confirmed",
+      toggleSign: "Change balance sign",
+      currencyLocked: "Currency is locked to preserve reconciliation history. Create a separate wallet for another currency.",
+      currencyLockHint: "After the first reconciliation, the wallet currency is locked to preserve its history."
+    },
     notifications: {
       title: "Notifications",
       open: "Open notifications",
@@ -990,10 +1147,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       empty: "You are all caught up.",
       detailsTitle: "Notification details",
       backToNotifications: "Back to notifications",
-      all: "All",
       kinds: { release: "Update", announcement: "Announcement", reminder: "Reminder" },
-      filters: { release: "Updates", announcement: "Announcements", reminder: "Reminders" },
-      filterLabel: "Notification type",
       unknownDate: "Date unavailable",
       detailVersion: "Version",
       detailChanges: "Changes",
@@ -1024,14 +1178,15 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "Smoother mobile settings, camera selection, and a clearer notification feed.",
+      intro: "Safer deletion, wallet reconciliation, and more useful history search.",
       gotIt: "Explore the update",
       notes: [
-        "Mobile settings menu dims the whole screen and opens without page jumps",
-        "Choose an available receipt camera lens and remember it on this device",
-        "The main rear camera is preferred when the browser identifies it",
-        "Notification dates and separate filters for updates, announcements, and reminders",
-        "Removed repeated release headings and restored historical changelog dates"
+        "Undo transaction deletions and restore them later from Trash in History or Settings",
+        "Reconcile wallet balances with a correction history, without changing income or expenses",
+        "Filter history by multiple categories, attachments, and a converted amount range",
+        "Save and reuse filter sets with their original amount currency",
+        "One notification feed with compact type badges and balanced spacing",
+        "Softer wallet glow and unclipped card shadows on Home and History"
       ]
     },
     categories: {
@@ -1452,7 +1607,6 @@ export const dictionaries: Record<Language, Dictionary> = {
       openAttachment: "Открыть вложение",
       noAttachments: "К операции не прикреплены чеки или файлы.",
       attachmentsLoadError: "Не удалось загрузить вложения. Закрой и открой операцию, чтобы попробовать снова.",
-      deleteHint: "Операция будет удалена из истории. Это действие нельзя отменить.",
       deleteError: "Не удалось удалить операцию. Попробуй ещё раз."
     },
     recurring: {
@@ -1523,6 +1677,43 @@ export const dictionaries: Record<Language, Dictionary> = {
         walletAsc: "Кошелек А-Я",
         walletDesc: "Кошелек Я-А"
       }
+    },
+    historyFilters: {
+      title: "Фильтры",
+      active: "Активные фильтры",
+      categories: "Категории",
+      categorySearch: "Найти категорию",
+      noCategories: "Категории не найдены.",
+      unavailableCategories: "Некоторые выбранные категории удалены. Фильтры для них сохранены, пока вы не снимете выбор.",
+      unavailableCategory: "Недоступная категория",
+      removeUnavailable: "Убрать недоступные категории",
+      removeCategory: "Убрать фильтр категории",
+      attachments: "Чеки и файлы",
+      withAttachments: "С вложениями",
+      withoutAttachments: "Без вложений",
+      amount: "Диапазон суммы",
+      minimum: "От",
+      maximum: "До",
+      currency: "Валюта суммы",
+      amountHint: "Границы включены в диапазон. Суммы конвертируются в эту валюту; сохранённый фильтр запоминает её.",
+      clearAttachments: "Убрать фильтр вложений",
+      clearAmount: "Убрать диапазон суммы",
+      reset: "Сбросить фильтры",
+      apply: "Применить фильтры",
+      saved: "Сохранённые фильтры",
+      save: "Сохранить набор",
+      saveApply: "Сохранить и применить",
+      saveHint: "Сохраняются на устройстве: поиск, тип, категории, вложения, сумма и сортировка. Выбранный кошелёк не переключается.",
+      name: "Название набора",
+      nameRequired: "Введите название набора фильтров.",
+      duplicateName: "Такое название уже используется. Выберите другое.",
+      deleteSaved: "Удалить набор фильтров",
+      invalidRange: "Введите неотрицательные суммы с точностью выбранной валюты. Нижняя граница не может быть выше верхней.",
+      storageError: "Не удалось сохранить фильтры на устройстве. Текущий поиск не изменён.",
+      limit: "Можно сохранить до 20 наборов. Удалите один из них, чтобы добавить новый.",
+      resultCount: "Операций: {count}",
+      ratesLoading: "Проверяем курсы для операций ({count}) в {currency}…",
+      ratesMissing: "Без курсов для {currency} нельзя проверить диапазон суммы для операций: {count}. Они не включены в результаты."
     },
     wallets: {
       title: "Кошельки",
@@ -1624,6 +1815,50 @@ export const dictionaries: Record<Language, Dictionary> = {
       offline: "Нет сети — изменения сохраняются на устройстве",
       online: "Соединение восстановлено"
     },
+    undo: {
+      openTrash: "Открыть корзину",
+      entryHint: "Удалённые операции и чеки. Можно восстановить записи по одной или все сразу.",
+      title: "Удаление операции",
+      action: "Отменить",
+      deletedOne: "Операция удалена",
+      deletedMany: "Удалено операций: {count}",
+      hint: "Восстановить позже можно здесь:",
+      trash: "Корзина",
+      trashHint: "Удалённые операции и их чеки остаются на устройстве до восстановления. Они не учитываются в балансе и аналитике.",
+      empty: "Корзина пуста.",
+      restore: "Восстановить",
+      restoreAll: "Восстановить все",
+      restoreError: "Не удалось восстановить операции. Попробуйте ещё раз — чеки остаются в корзине.",
+      loadError: "Не удалось загрузить корзину.",
+      retry: "Повторить",
+      loading: "Загружаем удалённые операции…",
+      unavailableWallet: "Недоступный кошелёк",
+      deletedOn: "Удалено"
+    },
+    reconciliation: {
+      action: "Сверить баланс",
+      title: "Сверка баланса",
+      intro: "Введите фактический остаток в кошельке. Начальный баланс и существующие операции останутся без изменений.",
+      creditHint: "Задолженность вводится со знаком «−». Доступный кредитный лимит сюда не входит.",
+      recordedBalance: "Баланс в приложении",
+      actualBalance: "Фактический остаток",
+      difference: "Корректировка баланса",
+      matched: "Баланс совпадает",
+      matchHint: "Можно сохранить проверку без изменения баланса.",
+      adjustmentHint: "Отдельная корректировка изменит только баланс — не доходы, расходы или бюджеты.",
+      note: "Комментарий (необязательно)",
+      confirmMatch: "Подтвердить баланс",
+      applyAdjustment: "Сохранить корректировку",
+      invalidAmount: "Введите корректный остаток с допустимым для этой валюты числом знаков после запятой.",
+      balanceChanged: "Данные кошелька изменились. Проверьте актуальный баланс и повторите сверку.",
+      saveError: "Не удалось сохранить сверку. Корректировка не применена.",
+      history: "История сверок",
+      noHistory: "Сверок пока не было.",
+      checked: "Подтверждено",
+      toggleSign: "Изменить знак остатка",
+      currencyLocked: "Валюта зафиксирована для сохранения истории сверок. Для другой валюты создайте отдельный кошелёк.",
+      currencyLockHint: "После первой сверки валюта кошелька фиксируется, чтобы сохранить историю."
+    },
     notifications: {
       title: "Уведомления",
       open: "Открыть уведомления",
@@ -1632,10 +1867,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       empty: "Новых уведомлений нет.",
       detailsTitle: "Подробнее об уведомлении",
       backToNotifications: "Назад к уведомлениям",
-      all: "Все",
       kinds: { release: "Обновление", announcement: "Объявление", reminder: "Напоминание" },
-      filters: { release: "Обновления", announcement: "Объявления", reminder: "Напоминания" },
-      filterLabel: "Тип уведомления",
       unknownDate: "Дата не указана",
       detailVersion: "Версия",
       detailChanges: "Изменения",
@@ -1666,14 +1898,15 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Плавнее меню настроек, выбор камеры и более понятная лента уведомлений.",
+      intro: "Безопаснее удалять операции, проще сверять баланс и находить нужные записи.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Меню настроек на телефоне затемняет весь экран и открывается без скачков страницы",
-        "Выбор доступного объектива камеры для чеков с запоминанием на устройстве",
-        "Основная задняя камера выбирается автоматически, если браузер позволяет её определить",
-        "Даты уведомлений и фильтры обновлений, объявлений и напоминаний",
-        "Убраны повторяющиеся заголовки релизов, восстановлены даты старых обновлений"
+        "Отмена удаления операций и восстановление из корзины в истории или настройках",
+        "Сверка баланса кошелька с историей корректировок без изменения доходов и расходов",
+        "Фильтры истории по нескольким категориям, вложениям и диапазону суммы с конвертацией",
+        "Сохранённые наборы фильтров запоминают выбранную валюту суммы",
+        "Общая лента уведомлений с компактными бейджами и ровными отступами",
+        "Мягкое свечение кошельков и тени карточек без обрезки на главной и в истории"
       ]
     },
     categories: {

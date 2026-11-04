@@ -54,19 +54,14 @@ describe("transaction detail actions", () => {
     expect(onUpdate).toHaveBeenCalledWith(testTransaction.id, expect.objectContaining({ input: expect.objectContaining({ amountMinor: 2500 }) }));
   });
 
-  it("asks for deletion inside the sheet, supports cancelling and keeps failed deletions open", async () => {
+  it("deletes immediately without confirmation and keeps failed deletions open for retry", async () => {
     const user = userEvent.setup();
     const props = detailsProps();
     props.onDelete.mockRejectedValueOnce(new Error("Storage unavailable"));
     render(<TransactionDetailsSheet {...props} />);
     const dialog = screen.getByRole("dialog", { name: "Transaction details" });
     await user.click(within(dialog).getByRole("button", { name: "Delete" }));
-    expect(props.onDelete).not.toHaveBeenCalled();
-    expect(within(dialog).getByRole("heading", { name: "Delete this transaction?" })).toBeInTheDocument();
-    await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
-    expect(props.onDelete).not.toHaveBeenCalled();
-    await user.click(within(dialog).getByRole("button", { name: "Delete" }));
-    await user.click(within(dialog).getByRole("button", { name: "Delete" }));
+    expect(props.onDelete).toHaveBeenCalledWith(testTransaction.id);
     expect(await within(dialog).findByRole("alert")).toHaveTextContent("Unable to delete");
     expect(props.onClose).not.toHaveBeenCalled();
     await user.click(within(dialog).getByRole("button", { name: "Delete" }));
