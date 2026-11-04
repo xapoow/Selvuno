@@ -42,6 +42,9 @@ interface HistoryViewProps {
   onUpdate: (id: string, input: Partial<TransactionInput>) => Promise<void>;
   onUpdateWithAttachments: (id: string, submission: TransactionSubmission) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
+  onDeleteMany?: (ids: string[]) => Promise<void>;
+  onOpenTrash?: () => void;
+  deletedCount?: number;
 }
 
 type TypeFilter = TransactionType | "all";
@@ -68,7 +71,10 @@ export function HistoryView({
   desktopTools = false,
   onUpdate,
   onUpdateWithAttachments,
-  onDelete
+  onDelete,
+  onDeleteMany,
+  onOpenTrash,
+  deletedCount = 0
 }: HistoryViewProps) {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -80,6 +86,7 @@ export function HistoryView({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkCategoryId, setBulkCategoryId] = useState("");
   const [bulkActionError, setBulkActionError] = useState("");
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const activeWallet =
     activeWalletId === "all" ? undefined : wallets.find((wallet) => wallet.id === activeWalletId);
   const calendarContainsHiddenWallet =
@@ -236,8 +243,11 @@ export function HistoryView({
   }, [selectedSignature]);
 
   async function handleDelete(transaction: Transaction) {
-    if (window.confirm(t.history.confirmDelete)) {
+    setBulkActionError("");
+    try {
       await onDelete(transaction.id);
+    } catch {
+      setBulkActionError(t.transaction.deleteError);
     }
   }
 
@@ -288,22 +298,20 @@ export function HistoryView({
   }
 
   async function deleteSelectedTransactions() {
-    if (!selectedTransactions.length) {
-      return;
-    }
-    if (
-      !window.confirm(
-        t.history.confirmDeleteSelected.replace("{count}", String(selectedTransactions.length))
-      )
-    ) {
+    if (!selectedTransactions.length || bulkDeleting) {
       return;
     }
     setBulkActionError("");
+    setBulkDeleting(true);
     try {
-      await Promise.all(selectedTransactions.map((transaction) => onDelete(transaction.id)));
+      const ids = selectedTransactions.map((transaction) => transaction.id);
+      if (onDeleteMany) await onDeleteMany(ids);
+      else await Promise.all(ids.map(onDelete));
       setSelectedIds(new Set());
     } catch {
-      setBulkActionError(t.transaction.saveError);
+      setBulkActionError(t.transaction.deleteError);
+    } finally {
+      setBulkDeleting(false);
     }
   }
 
@@ -315,7 +323,13 @@ export function HistoryView({
         ) : (
           <span />
         )}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {onOpenTrash ? (
+            <Button type="button" variant="ghost" size="small" onClick={onOpenTrash}>
+              <Trash2 className="h-4 w-4" />
+              {t.undo.trash}{deletedCount ? ` (${deletedCount})` : ""}
+            </Button>
+          ) : null}
           <Button
             type="button"
             variant="secondary"
@@ -404,7 +418,7 @@ export function HistoryView({
             type="button"
             variant="secondary"
             size="small"
-            disabled={!selectedType || !bulkCategoryId}
+            disabled={bulkDeleting || !selectedType || !bulkCategoryId}
             onClick={() => void applyBulkCategory()}
           >
             <Tags className="h-4 w-4" />
@@ -415,15 +429,14 @@ export function HistoryView({
             variant="danger"
             size="small"
             onClick={() => void deleteSelectedTransactions()}
+            disabled={bulkDeleting}
           >
             <Trash2 className="h-4 w-4" />
             {t.history.deleteSelected}
           </Button>
-          {bulkActionError ? (
-            <p className="text-sm font-medium text-expense lg:col-span-4">{bulkActionError}</p>
-          ) : null}
         </div>
       ) : null}
+      {bulkActionError ? <p role="alert" className="text-sm font-medium text-expense">{bulkActionError}</p> : null}
       {viewMode === "calendar" ? (
         <FinancialCalendar
           wallets={wallets}

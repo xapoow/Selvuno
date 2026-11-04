@@ -3,10 +3,18 @@ import { transactionFilterSchema, transactionInputSchema } from "@myfinances/typ
 import { createEntityBase, financeDb, nowIso } from "../db/database";
 import { normalizeTags } from "../lib/tags";
 
+export interface DeletedTransactionRef {
+  id: string;
+  deletedAt: string;
+}
+
 export interface TransactionRepository {
   addTransaction(input: TransactionInput): Promise<Transaction>;
   updateTransaction(id: string, input: Partial<TransactionInput>): Promise<Transaction>;
   deleteTransaction(id: string): Promise<void>;
+  deleteTransactions(ids: string[]): Promise<DeletedTransactionRef[]>;
+  restoreTransactions(deleted: DeletedTransactionRef[]): Promise<void>;
+  listDeletedTransactions(): Promise<Transaction[]>;
   listTransactions(filter?: Partial<TransactionFilter>): Promise<Transaction[]>;
 }
 
@@ -63,17 +71,41 @@ export const transactionRepository: TransactionRepository = {
   },
 
   async deleteTransaction(id) {
-    const current = await financeDb.transactions.get(id);
-    if (!current || current.deletedAt) {
-      return;
-    }
-    const now = nowIso();
-    await financeDb.transactions.put({
-      ...current,
-      deletedAt: now,
-      updatedAt: now,
-      syncStatus: "pending"
+    await transactionRepository.deleteTransactions([id]);
+  },
+
+  async deleteTransactions(ids) {
+    return financeDb.transaction("rw", financeDb.transactions, async () => {
+      const current = (await financeDb.transactions.bulkGet([...new Set(ids)]))
+        .filter((item): item is Transaction => Boolean(item && !item.deletedAt));
+      const now = nowIso();
+      await financeDb.transactions.bulkPut(current.map((item) => ({
+        ...item, deletedAt: now, updatedAt: now, syncStatus: "pending" as const
+      })));
+      return current.map((item) => ({ id: item.id, deletedAt: now }));
     });
+  },
+
+  async restoreTransactions(deleted) {
+    await financeDb.transaction("rw", financeDb.transactions, async () => {
+      const unique = [...new Map(deleted.map((item) => [item.id, item])).values()];
+      const current = await financeDb.transactions.bulkGet(unique.map((item) => item.id));
+      const restored: Transaction[] = [];
+      const now = nowIso();
+      for (let index = 0; index < unique.length; index += 1) {
+        const item = current[index];
+        if (!item || (item.deletedAt && item.deletedAt !== unique[index].deletedAt)) {
+          throw new Error("Transaction changed since deletion. Reload the trash and try again.");
+        }
+        if (item.deletedAt) restored.push({ ...item, deletedAt: null, updatedAt: now, syncStatus: "pending" });
+      }
+      // Attachments are deliberately untouched: they remain linked to the original transaction ID.
+      await financeDb.transactions.bulkPut(restored);
+    });
+  },
+
+  async listDeletedTransactions() {
+    return financeDb.transactions.where("deletedAt").above("").reverse().toArray();
   },
 
   async listTransactions(filter) {

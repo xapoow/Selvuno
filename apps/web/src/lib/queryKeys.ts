@@ -6,6 +6,7 @@ export const queryKeys = {
   categories: ["categories"] as const,
   backupSnapshots: ["backup-snapshots"] as const,
   transactions: ["transactions"] as const,
+  deletedTransactions: ["transactions", "deleted"] as const,
   transactionTemplates: ["transaction-templates"] as const,
   budgets: ["budgets"] as const,
   recurringTransactions: ["recurring-transactions"] as const,

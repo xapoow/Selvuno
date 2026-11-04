@@ -243,7 +243,6 @@ export interface Dictionary {
     openAttachment: string;
     noAttachments: string;
     attachmentsLoadError: string;
-    deleteHint: string;
     deleteError: string;
   };
   recurring: {
@@ -280,6 +279,24 @@ export interface Dictionary {
   connectivity: {
     offline: string;
     online: string;
+  };
+  undo: {
+    title: string;
+    action: string;
+    deletedOne: string;
+    deletedMany: string;
+    hint: string;
+    trash: string;
+    trashHint: string;
+    empty: string;
+    restore: string;
+    restoreAll: string;
+    restoreError: string;
+    loadError: string;
+    retry: string;
+    loading: string;
+    unavailableWallet: string;
+    deletedOn: string;
   };
   notifications: {
     title: string;
@@ -807,7 +824,6 @@ export const dictionaries: Record<Language, Dictionary> = {
       openAttachment: "Open attachment",
       noAttachments: "No receipts or files attached.",
       attachmentsLoadError: "Unable to load attachments. Close and reopen the transaction to try again.",
-      deleteHint: "The transaction will be removed from your history. This action cannot be undone.",
       deleteError: "Unable to delete the transaction. Please try again."
     },
     recurring: {
@@ -978,6 +994,24 @@ export const dictionaries: Record<Language, Dictionary> = {
     connectivity: {
       offline: "Offline — changes stay safely on this device",
       online: "Connection restored"
+    },
+    undo: {
+      title: "Transaction deleted",
+      action: "Undo",
+      deletedOne: "Transaction deleted",
+      deletedMany: "Transactions deleted: {count}",
+      hint: "You can also restore it later from",
+      trash: "Trash",
+      trashHint: "Deleted transactions and their receipts stay on this device until you restore them. They are not included in balances or analytics.",
+      empty: "Trash is empty.",
+      restore: "Restore",
+      restoreAll: "Restore all",
+      restoreError: "Unable to restore transactions. Please try again; your receipts remain in Trash.",
+      loadError: "Unable to load Trash.",
+      retry: "Try again",
+      loading: "Loading deleted transactions…",
+      unavailableWallet: "Unavailable wallet",
+      deletedOn: "Deleted"
     },
     notifications: {
       title: "Notifications",
@@ -1446,7 +1480,6 @@ export const dictionaries: Record<Language, Dictionary> = {
       openAttachment: "Открыть вложение",
       noAttachments: "К операции не прикреплены чеки или файлы.",
       attachmentsLoadError: "Не удалось загрузить вложения. Закрой и открой операцию, чтобы попробовать снова.",
-      deleteHint: "Операция будет удалена из истории. Это действие нельзя отменить.",
       deleteError: "Не удалось удалить операцию. Попробуй ещё раз."
     },
     recurring: {
@@ -1617,6 +1650,24 @@ export const dictionaries: Record<Language, Dictionary> = {
     connectivity: {
       offline: "Нет сети — изменения сохраняются на устройстве",
       online: "Соединение восстановлено"
+    },
+    undo: {
+      title: "Удаление операции",
+      action: "Отменить",
+      deletedOne: "Операция удалена",
+      deletedMany: "Удалено операций: {count}",
+      hint: "Восстановить позже можно здесь:",
+      trash: "Корзина",
+      trashHint: "Удалённые операции и их чеки остаются на устройстве до восстановления. Они не учитываются в балансе и аналитике.",
+      empty: "Корзина пуста.",
+      restore: "Восстановить",
+      restoreAll: "Восстановить все",
+      restoreError: "Не удалось восстановить операции. Попробуйте ещё раз — чеки остаются в корзине.",
+      loadError: "Не удалось загрузить корзину.",
+      retry: "Повторить",
+      loading: "Загружаем удалённые операции…",
+      unavailableWallet: "Недоступный кошелёк",
+      deletedOn: "Удалено"
     },
     notifications: {
       title: "Уведомления",

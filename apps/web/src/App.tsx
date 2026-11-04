@@ -10,6 +10,8 @@ import { NotificationCenter } from "./components/NotificationCenter";
 import { OfflineIndicator } from "./components/OfflineIndicator";
 import { LockScreen } from "./components/LockScreen";
 import { UpdateAnnouncement } from "./components/UpdateAnnouncement";
+import { TransactionUndoNotice } from "./components/TransactionUndoNotice";
+import { TransactionTrash } from "./components/TransactionTrash";
 import { WalletSwitcher } from "./components/WalletSwitcher";
 import { MonobankWalletCarousel } from "./components/MonobankWalletCarousel";
 import { ErrorScreen } from "./components/ErrorScreen";
@@ -20,6 +22,7 @@ import { buildAppNotifications } from "./lib/notifications";
 import { useAppStore, type AppView } from "./state/appStore";
 import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
 import { usePrivacyLock } from "./state/usePrivacyLock";
+import { useTransactionDeletion } from "./state/useTransactionDeletion";
 import { getIncludedWalletIds, shouldHideWalletAmounts } from "./lib/walletFeatures";
 import { AddTransactionView } from "./views/AddTransactionView";
 import { DashboardView } from "./views/DashboardView";
@@ -75,6 +78,11 @@ export function App() {
   const privacy = usePrivacyLock();
   const data = useFinanceData();
   const mutations = useFinanceMutations();
+  const [trashOpen, setTrashOpen] = useState(false);
+  const deletion = useTransactionDeletion({
+    deleteTransactions: (ids) => mutations.deleteTransactions.mutateAsync(ids),
+    restoreTransactions: (deleted) => mutations.restoreTransactions.mutateAsync(deleted)
+  });
 
   const settings = data.settings.data;
   const wallets = data.wallets.data ?? [];
@@ -392,7 +400,7 @@ export function App() {
                   onAdd={() => setActiveView("add")}
                   onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
                   onUpdateTransaction={async (id, submission) => { await mutations.updateTransactionWithAttachments.mutateAsync({ id, submission }); }}
-                  onDeleteTransaction={(id) => mutations.deleteTransaction.mutateAsync(id)}
+                  onDeleteTransaction={deletion.deleteOne}
                 />
               </div>
               <div className="hidden min-w-0 md:block">
@@ -419,7 +427,7 @@ export function App() {
                     onAdd={() => setActiveView("add")}
                     onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
                     onUpdateTransaction={async (id, submission) => { await mutations.updateTransactionWithAttachments.mutateAsync({ id, submission }); }}
-                    onDeleteTransaction={(id) => mutations.deleteTransaction.mutateAsync(id)}
+                    onDeleteTransaction={deletion.deleteOne}
                   />
                 </motion.div>
               </div>
@@ -479,13 +487,16 @@ export function App() {
                   exchangeRates={exchangeRates.data}
                   t={t}
                   desktopTools
+                  onOpenTrash={() => { deletion.dismiss(); setTrashOpen(true); }}
+                  deletedCount={data.deletedTransactions.data?.length ?? 0}
+                  onDeleteMany={deletion.deleteMany}
                   onUpdate={async (id, input) => {
                     await mutations.updateTransaction.mutateAsync({ id, input });
                   }}
                   onUpdateWithAttachments={async (id, submission) => {
                     await mutations.updateTransactionWithAttachments.mutateAsync({ id, submission });
                   }}
-                  onDelete={(id) => mutations.deleteTransaction.mutateAsync(id)}
+                  onDelete={deletion.deleteOne}
                 />
               </motion.div>
             </div>
@@ -572,6 +583,20 @@ export function App() {
       </main>
 
       <BottomNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
+      <TransactionUndoNotice deletion={deletion} t={t} onOpenTrash={() => setTrashOpen(true)} />
+      <TransactionTrash
+        open={trashOpen}
+        onClose={() => setTrashOpen(false)}
+        transactions={data.deletedTransactions.data ?? []}
+        wallets={[...wallets, ...archivedWallets]}
+        categories={categories}
+        settings={settings}
+        t={t}
+        loading={data.deletedTransactions.isLoading}
+        loadError={data.deletedTransactions.isError}
+        onRestore={(deleted) => mutations.restoreTransactions.mutateAsync(deleted)}
+        onRetry={() => { void data.deletedTransactions.refetch(); }}
+      />
       <UpdateAnnouncement t={t} locale={settings.locale} />
       <CookieNotice />
       <OfflineIndicator t={t} />
