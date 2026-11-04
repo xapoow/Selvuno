@@ -313,7 +313,7 @@ export function App() {
         </div>
       </aside>
 
-      <main className="mx-auto w-full min-w-0 max-w-[1180px] overflow-x-hidden px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:px-8 md:pb-10 md:pt-7 lg:px-10">
+      <main className="mx-auto w-full min-w-0 max-w-[1180px] overflow-x-clip px-4 pb-28 pt-[calc(env(safe-area-inset-top)+16px)] md:px-8 md:pb-10 md:pt-7 lg:px-10">
         <div className="mb-3 flex justify-end gap-1">
           <button
             type="button"
@@ -395,7 +395,7 @@ export function App() {
                   onDeleteTransaction={(id) => mutations.deleteTransaction.mutateAsync(id)}
                 />
               </div>
-              <div className="hidden overflow-hidden md:block">
+              <div className="hidden min-w-0 md:block">
                 <motion.div
                   key={activeWalletId}
                   initial={{ opacity: 0, x: walletTransitionDirection * 18 }}
@@ -462,7 +462,7 @@ export function App() {
             />
           ) : null}
           {activeView === "history" ? (
-            <div className="overflow-hidden">
+            <div className="min-w-0">
               <motion.div
                 key={activeWalletId}
                 initial={{ opacity: 0, x: walletTransitionDirection * 18 }}
