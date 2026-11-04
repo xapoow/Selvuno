@@ -289,10 +289,7 @@ export interface Dictionary {
     empty: string;
     detailsTitle: string;
     backToNotifications: string;
-    all: string;
     kinds: Record<"release" | "announcement" | "reminder", string>;
-    filters: Record<"release" | "announcement" | "reminder", string>;
-    filterLabel: string;
     unknownDate: string;
     detailVersion: string;
     detailChanges: string;
@@ -990,10 +987,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       empty: "You are all caught up.",
       detailsTitle: "Notification details",
       backToNotifications: "Back to notifications",
-      all: "All",
       kinds: { release: "Update", announcement: "Announcement", reminder: "Reminder" },
-      filters: { release: "Updates", announcement: "Announcements", reminder: "Reminders" },
-      filterLabel: "Notification type",
       unknownDate: "Date unavailable",
       detailVersion: "Version",
       detailChanges: "Changes",
@@ -1632,10 +1626,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       empty: "Новых уведомлений нет.",
       detailsTitle: "Подробнее об уведомлении",
       backToNotifications: "Назад к уведомлениям",
-      all: "Все",
       kinds: { release: "Обновление", announcement: "Объявление", reminder: "Напоминание" },
-      filters: { release: "Обновления", announcement: "Объявления", reminder: "Напоминания" },
-      filterLabel: "Тип уведомления",
       unknownDate: "Дата не указана",
       detailVersion: "Версия",
       detailChanges: "Изменения",

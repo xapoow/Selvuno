@@ -37,17 +37,20 @@ describe("NotificationCenter", () => {
     expect(JSON.parse(localStorage.getItem("myfinances:read-notifications:v1")!)).toContain("update:0.9.1");
   });
 
-  it("filters announcements, displays full content, and keeps the filter on return", async () => {
+  it("keeps all types in one feed with badges and returns to the full feed after viewing an announcement", async () => {
     const user = userEvent.setup();
     render(<NotificationCenter notifications={notifications} t={t} locale="en-US" />);
     await user.click(screen.getByRole("button", { name: /Open notifications/ }));
     const dialog = screen.getByRole("dialog");
-    await user.click(within(dialog).getByRole("button", { name: t.notifications.filters.announcement }));
-    expect(within(dialog).queryByRole("button", { name: "MyFinances 0.9.1" })).not.toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "MyFinances 0.9.1" })).toBeInTheDocument();
+    expect(within(dialog).getByText(t.notifications.kinds.release)).toBeInTheDocument();
+    expect(within(dialog).getByText(t.notifications.kinds.announcement)).toBeInTheDocument();
+    expect(within(dialog).queryByRole("group")).not.toBeInTheDocument();
     await user.click(within(dialog).getByRole("button", { name: "A separate announcement" }));
     expect(within(dialog).getByText("Announcement details")).toBeInTheDocument();
     expect(within(dialog).getAllByText("A separate announcement")).toHaveLength(1);
     await user.click(within(dialog).getByRole("button", { name: t.notifications.backToNotifications }));
-    expect(within(dialog).getByRole("button", { name: t.notifications.filters.announcement })).toHaveAttribute("aria-pressed", "true");
+    expect(within(dialog).getByRole("button", { name: "MyFinances 0.9.1" })).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "A separate announcement" })).toBeInTheDocument();
   });
 });

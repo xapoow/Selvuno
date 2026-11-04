@@ -45,7 +45,9 @@ function NotificationMetadata({ notification, t, locale }: { notification: AppNo
   const date = notification.date ? formatNotificationDate(notification.date, locale) : "";
   return (
     <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
-      <span>{t.notifications.kinds[notification.kind]}</span>
+      <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold", toneStyles[notification.tone])}>
+        {t.notifications.kinds[notification.kind]}
+      </span>
       {date || notification.kind !== "reminder" ? <>
         <span aria-hidden="true">·</span>
         {date ? <time dateTime={notification.date}>{date}</time> : <span>{t.notifications.unknownDate}</span>}
@@ -58,7 +60,6 @@ export function NotificationCenter({ notifications, t, locale }: NotificationCen
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<AppNotification | null>(null);
   const [readIds, setReadIds] = useState<string[]>([]);
-  const [filter, setFilter] = useState<AppNotificationKind | "all">("all");
 
   useEffect(() => {
     try {
@@ -72,7 +73,6 @@ export function NotificationCenter({ notifications, t, locale }: NotificationCen
 
   const readSet = useMemo(() => new Set(readIds), [readIds]);
   const unreadCount = notifications.filter((notification) => !readSet.has(notification.id)).length;
-  const displayed = notifications.filter((notification) => filter === "all" || notification.kind === filter);
 
   function saveReadIds(nextIds: string[]) {
     const uniqueIds = [...new Set(nextIds)];
@@ -121,22 +121,9 @@ export function NotificationCenter({ notifications, t, locale }: NotificationCen
         onExitComplete={() => setSelected(null)}
       >
         {!selected ? <>
-        <div className="app-control mb-4 flex gap-1 overflow-x-auto rounded-xl p-1 no-scrollbar" role="group" aria-label={t.notifications.filterLabel}>
-          {(["all", "release", "announcement", "reminder"] as const).map((kind) => (
-            <button
-              key={kind}
-              type="button"
-              aria-pressed={filter === kind}
-              onClick={() => setFilter(kind)}
-              className={cn("app-focus min-h-10 shrink-0 rounded-lg px-3 text-xs font-medium", filter === kind ? "app-selected-control text-foreground" : "text-muted")}
-            >
-              {kind === "all" ? t.notifications.all : t.notifications.filters[kind]}
-            </button>
-          ))}
-        </div>
         <div className="max-h-[min(68vh,560px)] space-y-2 overflow-y-auto pr-1">
-          {displayed.length ? (
-            displayed.map((notification) => {
+          {notifications.length ? (
+            notifications.map((notification) => {
               const isRead = readSet.has(notification.id);
               return (
                   <button
