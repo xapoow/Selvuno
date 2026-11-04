@@ -341,7 +341,7 @@ export function TransactionForm({
               setAmount(event.target.value);
               setSaved(false);
             }}
-            className="app-focus min-w-0 flex-1 bg-transparent text-4xl font-semibold tracking-tight text-foreground outline-none placeholder:text-muted/45 sm:text-5xl"
+            className="min-w-0 flex-1 border-0 border-b border-transparent bg-transparent text-4xl font-semibold tracking-tight text-foreground outline-none transition-colors placeholder:text-muted/45 focus-visible:border-muted/40 sm:text-5xl"
           />
           <span className="text-lg font-semibold text-muted">{currency}</span>
         </span>
