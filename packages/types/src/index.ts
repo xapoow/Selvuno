@@ -288,6 +288,14 @@ export const transactionFilterSchema = z.object({
 });
 export type TransactionFilter = z.infer<typeof transactionFilterSchema>;
 
+export const dashboardBlockSchema = z.enum(["summary", "budget", "insights", "cashFlow", "recent", "goals"]);
+export type DashboardBlockId = z.infer<typeof dashboardBlockSchema>;
+export const dashboardLayoutSchema = z.object({
+  order: z.array(dashboardBlockSchema).max(6).refine((items) => new Set(items).size === items.length),
+  hidden: z.array(dashboardBlockSchema).max(6).refine((items) => new Set(items).size === items.length)
+});
+export type DashboardLayout = z.infer<typeof dashboardLayoutSchema>;
+
 export const settingsSchema = z.object({
   id: z.literal("default"),
   locale: z.string().min(2),
@@ -303,6 +311,7 @@ export const settingsSchema = z.object({
   addAnotherEnabled: z.boolean().default(true),
   advancedWalletsEnabled: z.boolean().default(false),
   smartInsightsEnabled: z.boolean().default(false),
+  dashboardLayout: dashboardLayoutSchema.optional(),
   onboardingCompleted: z.boolean().default(false),
   defaultsVersion: z.number().int().default(2),
   createdAt: z.string().datetime(),

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { calculateWalletAdjustmentTotal } from "@myfinances/utils";
 import type {
   Category,
+  SavingsGoal,
+  SavingsGoalContribution,
   MonthlyBudget,
   MonthlyBudgetInput,
   Settings,
@@ -23,6 +25,9 @@ interface MobileWalletDashboardPagerProps {
   transactions: Transaction[];
   transfers: WalletTransfer[];
   budgets: MonthlyBudget[];
+  goals: SavingsGoal[];
+  contributions: SavingsGoalContribution[];
+  onOpenGoals: () => void;
   settings: Settings;
   activeWalletId: WalletView;
   allLabel: string;
@@ -42,6 +47,9 @@ function MobileWalletDashboardSlide({
   transactions,
   transfers,
   budgets,
+  goals,
+  contributions,
+  onOpenGoals,
   settings,
   t,
   onAdd,
@@ -88,6 +96,9 @@ function MobileWalletDashboardSlide({
       transactions={transactions}
       transfers={transfers}
       budgets={budgets}
+      goals={goals}
+      contributions={contributions}
+      onOpenGoals={onOpenGoals}
       settings={settings}
       activeWalletId={walletView}
       displayCurrency={displayCurrency}
@@ -110,6 +121,9 @@ export function MobileWalletDashboardPager({
   transactions,
   transfers,
   budgets,
+  goals,
+  contributions,
+  onOpenGoals,
   settings,
   activeWalletId,
   allLabel,
@@ -147,6 +161,9 @@ export function MobileWalletDashboardPager({
         transactions={transactions}
         transfers={transfers}
         budgets={budgets}
+        goals={goals}
+        contributions={contributions}
+        onOpenGoals={onOpenGoals}
         settings={settings}
         t={t}
         onAdd={onAdd}

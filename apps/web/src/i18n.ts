@@ -1,4 +1,4 @@
-import type { ColorThemePreference } from "@myfinances/types";
+import type { ColorThemePreference, DashboardBlockId } from "@myfinances/types";
 import type { AppView } from "./state/appStore";
 
 export type Language = "en" | "ru";
@@ -123,6 +123,20 @@ export interface Dictionary {
     operations: string;
     categoriesBreakdown: string;
     categoryComparison: string;
+  };
+  homeLayout: {
+    title: string;
+    intro: string;
+    walletHint: string;
+    drag: string;
+    up: string;
+    down: string;
+    reset: string;
+    saveError: string;
+    persistenceHint: string;
+    empty: string;
+    openGoals: string;
+    blocks: Record<DashboardBlockId, { title: string; hint: string }>;
   };
   insights: {
     title: string;
@@ -767,6 +781,24 @@ export const dictionaries: Record<Language, Dictionary> = {
       operations: "operations",
       categoriesBreakdown: "Category breakdown",
       categoryComparison: "Your largest categories"
+    },
+    homeLayout: {
+      title: "Home screen",
+      intro: "Choose your blocks and their order. Drag the handle or use the arrows. Changes are saved automatically.",
+      walletHint: "The wallet selector always stays at the top. The same layout is used on mobile and desktop.",
+      drag: "Reorder", up: "Move up", down: "Move down", reset: "Restore default layout",
+      saveError: "Could not save the layout. Your previous layout has been restored.",
+      persistenceHint: "Stored on this device and included in backups. Hiding a block does not delete its data.",
+      empty: "Your home blocks are hidden. You can enable them in Settings → Appearance → Home screen.",
+      openGoals: "All goals",
+      blocks: {
+        summary: { title: "Income and expenses", hint: "A quick overview for the selected wallet." },
+        budget: { title: "Monthly budget", hint: "Limits and remaining budget for this month." },
+        insights: { title: "Money observations", hint: "Local patterns from your transactions. Enabling this block also turns on observations." },
+        cashFlow: { title: "Cash flow", hint: "Category chart and a shortcut to analytics." },
+        recent: { title: "Recent transactions", hint: "Your latest transactions and their details." },
+        goals: { title: "Savings goals", hint: "Progress for up to three goals in the selected wallet." }
+      }
     },
     insights: {
       title: "Money observations",
@@ -1487,6 +1519,24 @@ export const dictionaries: Record<Language, Dictionary> = {
       operations: "операций",
       categoriesBreakdown: "По категориям",
       categoryComparison: "Самые крупные категории"
+    },
+    homeLayout: {
+      title: "Главный экран",
+      intro: "Выбери блоки и их порядок. Перетаскивай за ручку или используй стрелки. Изменения сохраняются автоматически.",
+      walletHint: "Выбор кошелька всегда остаётся сверху. Порядок одинаковый на телефоне и компьютере.",
+      drag: "Переместить", up: "Выше", down: "Ниже", reset: "Вернуть стандартный вид",
+      saveError: "Не удалось сохранить настройки. Восстановлен предыдущий вид.",
+      persistenceHint: "Сохраняется на этом устройстве и попадает в бэкапы. Скрытие блока не удаляет его данные.",
+      empty: "Все блоки скрыты. Включить их можно в Настройки → Вид → Главный экран.",
+      openGoals: "Все цели",
+      blocks: {
+        summary: { title: "Доходы и расходы", hint: "Краткая сводка выбранного кошелька." },
+        budget: { title: "Бюджет месяца", hint: "Лимиты и остаток бюджета на этот месяц." },
+        insights: { title: "Наблюдения о деньгах", hint: "Закономерности в операциях. Включение блока также включает наблюдения." },
+        cashFlow: { title: "Движение денег", hint: "График по категориям и переход к аналитике." },
+        recent: { title: "Последние операции", hint: "Недавние записи и их подробности." },
+        goals: { title: "Накопительные цели", hint: "Прогресс до трёх целей выбранного кошелька." }
+      }
     },
     insights: {
       title: "Наблюдения о деньгах",

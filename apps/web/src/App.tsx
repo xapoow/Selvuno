@@ -80,6 +80,15 @@ export function App() {
   const data = useFinanceData();
   const mutations = useFinanceMutations();
   const [trashOpen, setTrashOpen] = useState(false);
+  const [walletHubMode, setWalletHubMode] = useState<"wallets" | "goals">("wallets");
+  const openGoals = () => {
+    setWalletHubMode("goals");
+    setActiveView("wallets");
+  };
+  const navigate = (view: AppView) => {
+    if (view === "wallets") setWalletHubMode("wallets");
+    setActiveView(view);
+  };
   const deletion = useTransactionDeletion({
     deleteTransactions: (ids) => mutations.deleteTransactions.mutateAsync(ids),
     restoreTransactions: (deleted) => mutations.restoreTransactions.mutateAsync(deleted)
@@ -306,7 +315,7 @@ export function App() {
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">MyFinances</p>
           <h1 className="mt-1 text-2xl font-semibold text-foreground">{t.appName}</h1>
         </div>
-        <HeaderNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
+        <HeaderNavigation activeView={activeView} labels={t.nav} onChange={navigate} />
         <div className="mt-auto grid gap-2">
           {showsWalletContext ? (
             <div className="app-surface rounded-app p-3.5">
@@ -393,6 +402,9 @@ export function App() {
                   transactions={transactions}
                   transfers={walletTransfers}
                   budgets={budgets}
+                  goals={savingsGoals}
+                  contributions={savingsGoalContributions}
+                  onOpenGoals={openGoals}
                   settings={settings}
                   activeWalletId={activeWalletId}
                   allLabel={t.wallets.allWallets}
@@ -417,6 +429,9 @@ export function App() {
                     transactions={transactions}
                     transfers={walletTransfers}
                     budgets={budgets}
+                    goals={savingsGoals}
+                    contributions={savingsGoalContributions}
+                    onOpenGoals={openGoals}
                     settings={settings}
                     activeWalletId={activeWalletId}
                     displayCurrency={displayCurrency}
@@ -504,6 +519,7 @@ export function App() {
           ) : null}
           {activeView === "wallets" ? (
             <WalletsHubView
+              initialMode={walletHubMode}
               wallets={wallets}
               archivedWallets={archivedWallets}
               transactions={transactions}
@@ -586,7 +602,7 @@ export function App() {
       </AnimatePresence>
       </main>
 
-      <BottomNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
+      <BottomNavigation activeView={activeView} labels={t.nav} onChange={navigate} />
       <TransactionUndoNotice deletion={deletion} t={t} onOpenTrash={() => setTrashOpen(true)} />
       <TransactionTrash
         open={trashOpen}
