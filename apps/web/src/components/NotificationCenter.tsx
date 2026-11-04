@@ -4,12 +4,13 @@ import {
   Check,
   CircleAlert,
   Clock3,
+  Megaphone,
   Sparkles,
   Target,
   TriangleAlert
 } from "lucide-react";
 import type { Dictionary } from "../i18n";
-import type { AppNotification, AppNotificationTone } from "../lib/notifications";
+import { formatNotificationDate, type AppNotification, type AppNotificationKind, type AppNotificationTone } from "../lib/notifications";
 import { cn } from "../lib/cn";
 import { BottomSheet } from "./ui/BottomSheet";
 import { Button } from "./ui/Button";
@@ -24,8 +25,9 @@ const toneStyles: Record<AppNotificationTone, string> = {
   success: "bg-income/12 text-income"
 };
 
-function NotificationIcon({ tone }: { tone: AppNotificationTone }) {
+function NotificationIcon({ tone, kind }: { tone: AppNotificationTone; kind: AppNotificationKind }) {
   const className = "h-5 w-5";
+  if (kind === "announcement") return <Megaphone className={className} />;
   if (tone === "update") return <Sparkles className={className} />;
   if (tone === "info") return <Clock3 className={className} />;
   if (tone === "warning") return <TriangleAlert className={className} />;
@@ -36,17 +38,33 @@ function NotificationIcon({ tone }: { tone: AppNotificationTone }) {
 interface NotificationCenterProps {
   notifications: AppNotification[];
   t: Dictionary;
+  locale: string;
 }
 
-export function NotificationCenter({ notifications, t }: NotificationCenterProps) {
+function NotificationMetadata({ notification, t, locale }: { notification: AppNotification; t: Dictionary; locale: string }) {
+  const date = notification.date ? formatNotificationDate(notification.date, locale) : "";
+  return (
+    <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+      <span>{t.notifications.kinds[notification.kind]}</span>
+      {date || notification.kind !== "reminder" ? <>
+        <span aria-hidden="true">·</span>
+        {date ? <time dateTime={notification.date}>{date}</time> : <span>{t.notifications.unknownDate}</span>}
+      </> : null}
+    </span>
+  );
+}
+
+export function NotificationCenter({ notifications, t, locale }: NotificationCenterProps) {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<AppNotification | null>(null);
   const [readIds, setReadIds] = useState<string[]>([]);
+  const [filter, setFilter] = useState<AppNotificationKind | "all">("all");
 
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem(readNotificationsKey);
-      setReadIds(stored ? (JSON.parse(stored) as string[]) : []);
+      const parsed: unknown = stored ? JSON.parse(stored) : [];
+      setReadIds(Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : []);
     } catch {
       setReadIds([]);
     }
@@ -54,6 +72,7 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
 
   const readSet = useMemo(() => new Set(readIds), [readIds]);
   const unreadCount = notifications.filter((notification) => !readSet.has(notification.id)).length;
+  const displayed = notifications.filter((notification) => filter === "all" || notification.kind === filter);
 
   function saveReadIds(nextIds: string[]) {
     const uniqueIds = [...new Set(nextIds)];
@@ -94,22 +113,42 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
         ) : null}
       </button>
 
-      <BottomSheet open={open} title={t.notifications.title} onClose={() => setOpen(false)}>
+      <BottomSheet
+        open={open}
+        title={selected?.title ?? t.notifications.title}
+        closeLabel={t.common.close}
+        onClose={() => setOpen(false)}
+        onExitComplete={() => setSelected(null)}
+      >
+        {!selected ? <>
+        <div className="app-control mb-4 flex gap-1 overflow-x-auto rounded-xl p-1 no-scrollbar" role="group" aria-label={t.notifications.filterLabel}>
+          {(["all", "release", "announcement", "reminder"] as const).map((kind) => (
+            <button
+              key={kind}
+              type="button"
+              aria-pressed={filter === kind}
+              onClick={() => setFilter(kind)}
+              className={cn("app-focus min-h-10 shrink-0 rounded-lg px-3 text-xs font-medium", filter === kind ? "app-selected-control text-foreground" : "text-muted")}
+            >
+              {kind === "all" ? t.notifications.all : t.notifications.filters[kind]}
+            </button>
+          ))}
+        </div>
         <div className="max-h-[min(68vh,560px)] space-y-2 overflow-y-auto pr-1">
-          {notifications.length ? (
-            notifications.map((notification) => {
+          {displayed.length ? (
+            displayed.map((notification) => {
               const isRead = readSet.has(notification.id);
               return (
                   <button
                     key={notification.id}
                     type="button"
+                    aria-label={notification.title}
                     className={cn(
                       "app-focus app-control flex w-full gap-3 rounded-xl p-3.5 text-left transition-opacity",
                       isRead && "opacity-60"
                     )}
                     onClick={() => {
                       markAsRead(notification.id);
-                      setOpen(false);
                       setSelected(notification);
                     }}
                   >
@@ -119,10 +158,11 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
                         toneStyles[notification.tone]
                       )}
                     >
-                      <NotificationIcon tone={notification.tone} />
+                      <NotificationIcon tone={notification.tone} kind={notification.kind} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold text-foreground">
+                      <NotificationMetadata notification={notification} t={t} locale={locale} />
+                      <span className="mt-1.5 block text-sm font-semibold text-foreground">
                         {notification.title}
                       </span>
                       <span className="mt-1 block text-sm leading-5 text-muted">
@@ -145,13 +185,7 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
             {t.notifications.markAllRead}
           </Button>
         ) : null}
-      </BottomSheet>
-
-      <BottomSheet
-        open={Boolean(selected)}
-        title={selected?.title ?? t.notifications.detailsTitle}
-        onClose={() => setSelected(null)}
-      >
+        </> : null}
         {selected ? (
           <div className="grid gap-4">
             <div className="app-control flex items-start gap-3 rounded-xl p-4">
@@ -161,10 +195,14 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
                   toneStyles[selected.tone]
                 )}
               >
-                <NotificationIcon tone={selected.tone} />
+                <NotificationIcon tone={selected.tone} kind={selected.kind} />
               </span>
-              <p className="text-sm leading-6 text-muted">{selected.body}</p>
+              <div className="min-w-0 self-center">
+                <NotificationMetadata notification={selected} t={t} locale={locale} />
+                {selected.kind !== "release" ? <p className="mt-2 text-sm leading-6 text-foreground">{selected.body}</p> : null}
+              </div>
             </div>
+            {selected.paragraphs?.map((paragraph) => <p key={paragraph} className="text-sm leading-6 text-muted">{paragraph}</p>)}
             {selected.details.length ? (
               <dl className="grid gap-2">
                 {selected.details.map((detail) => (
@@ -185,7 +223,6 @@ export function NotificationCenter({ notifications, t }: NotificationCenterProps
               variant="secondary"
               onClick={() => {
                 setSelected(null);
-                setOpen(true);
               }}
             >
               {t.notifications.backToNotifications}

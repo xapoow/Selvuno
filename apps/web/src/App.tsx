@@ -337,7 +337,7 @@ export function App() {
               <LockKeyhole className="h-5 w-5" />
             </button>
           ) : null}
-          <NotificationCenter notifications={notifications} t={t} />
+          <NotificationCenter notifications={notifications} t={t} locale={settings.locale} />
         </div>
         {showsWalletContext ? (
           <div className={activeView === "dashboard" ? "mb-6 hidden md:block" : "mb-6"}>
@@ -572,7 +572,7 @@ export function App() {
       </main>
 
       <BottomNavigation activeView={activeView} labels={t.nav} onChange={setActiveView} />
-      <UpdateAnnouncement t={t} />
+      <UpdateAnnouncement t={t} locale={settings.locale} />
       <CookieNotice />
       <OfflineIndicator t={t} />
     </div>

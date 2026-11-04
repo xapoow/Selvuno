@@ -7,18 +7,23 @@ import type {
   Settings,
   Transaction
 } from "@myfinances/types";
-import { appVersion, getCategoryName, type Dictionary } from "../i18n";
+import { getCategoryName, type Dictionary } from "../i18n";
 import { calculateMonthlyBudgetProgress, getBudgetMonth } from "./budgets";
 import { toCalendarDate } from "./dates";
 import { getChangelogHistory, type ChangelogItem } from "./changelog";
+import { getAppAnnouncements, type AppAnnouncement } from "./announcements";
 
 export type AppNotificationTone = "update" | "info" | "warning" | "danger" | "success";
+export type AppNotificationKind = "release" | "announcement" | "reminder";
 
 export interface AppNotification {
   id: string;
+  kind: AppNotificationKind;
+  date?: string;
   tone: AppNotificationTone;
   title: string;
   body: string;
+  paragraphs?: string[];
   details: Array<{
     label: string;
     value: string;
@@ -36,6 +41,7 @@ interface NotificationInput {
   t: Dictionary;
   now?: Date;
   changelogItems?: ChangelogItem[];
+  announcements?: AppAnnouncement[];
 }
 
 function fillTemplate(template: string, values: Record<string, string | number>): string {
@@ -50,13 +56,15 @@ function daysFromToday(value: string, today: string): number {
   return Math.round((targetDate.getTime() - todayDate.getTime()) / 86_400_000);
 }
 
-function formatCalendarDate(value: string, locale: string): string {
+export function formatNotificationDate(value: string, locale: string): string {
+  const date = new Date(`${value}T12:00:00Z`);
+  if (!Number.isFinite(date.getTime())) return "";
   return new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
     timeZone: "UTC"
-  }).format(new Date(`${value}T12:00:00Z`));
+  }).format(date);
 }
 
 export function buildAppNotifications({
@@ -69,20 +77,35 @@ export function buildAppNotifications({
   savingsGoalContributions,
   t,
   now = new Date(),
-  changelogItems
+  changelogItems,
+  announcements = getAppAnnouncements(settings.locale)
 }: NotificationInput): AppNotification[] {
   const changelogs = changelogItems ?? getChangelogHistory(settings.locale, t.updates.notes);
   const notifications: AppNotification[] = changelogs.map((item) => ({
     id: `update:${item.version}`,
+    kind: "release",
+    date: item.date,
     tone: "update",
     title: fillTemplate(t.notifications.updateTitle, { version: item.version }),
-    body: item.version === appVersion ? t.notifications.updateBody : fillTemplate(t.notifications.updateTitle, { version: item.version }),
+    body: item.notes[0] ?? t.notifications.updateBody,
     details: [
-      { label: t.notifications.detailVersion, value: item.version },
       { label: t.notifications.detailChanges, value: item.notes.map((note) => `• ${note}`).join("\n") }
     ]
   }));
   const today = toCalendarDate(now);
+  for (const announcement of announcements) {
+    if (announcement.publishedAt > today || (announcement.expiresAt && announcement.expiresAt < today)) continue;
+    notifications.push({
+      id: `announcement:${announcement.id}`,
+      kind: "announcement",
+      tone: "info",
+      date: announcement.publishedAt,
+      title: announcement.title,
+      body: announcement.summary,
+      paragraphs: announcement.paragraphs,
+      details: []
+    });
+  }
   const currentMonth = getBudgetMonth(now, settings.timeZone);
   const budgetProgress = calculateMonthlyBudgetProgress({
     month: currentMonth,
@@ -101,6 +124,7 @@ export function buildAppNotifications({
     const category = getCategoryName(item.category.name, t);
     notifications.push({
       id: `budget:${currentMonth}:${item.category.id}:${exceeded ? "exceeded" : "near"}`,
+      kind: "reminder",
       tone: exceeded ? "danger" : "warning",
       title: exceeded ? t.notifications.budgetExceededTitle : t.notifications.budgetNearTitle,
       body: fillTemplate(
@@ -129,17 +153,19 @@ export function buildAppNotifications({
     );
     notifications.push({
       id: `recurring:${recurring.id}:${recurring.nextRunDate}`,
+      kind: "reminder",
+      date: recurring.nextRunDate,
       tone: "info",
       title: t.notifications.recurringTitle,
       body: fillTemplate(t.notifications.recurringBody, {
         category,
-        date: formatCalendarDate(recurring.nextRunDate, settings.locale)
+        date: formatNotificationDate(recurring.nextRunDate, settings.locale)
       }),
       details: [
         { label: t.notifications.detailCategory, value: category },
         {
           label: t.notifications.detailDate,
-          value: formatCalendarDate(recurring.nextRunDate, settings.locale)
+          value: formatNotificationDate(recurring.nextRunDate, settings.locale)
         }
       ]
     });
@@ -162,6 +188,9 @@ export function buildAppNotifications({
     if ((savedByGoal.get(goal.id) ?? 0) >= goal.targetAmountMinor) {
       notifications.push({
         id: `goal:${goal.id}:completed`,
+        kind: "reminder",
+        date: savingsGoalContributions.filter((item) => item.goalId === goal.id && !item.deletedAt)
+          .map((item) => item.contributionDate.slice(0, 10)).sort().at(-1),
         tone: "success",
         title: t.notifications.goalCompletedTitle,
         body: fillTemplate(t.notifications.goalCompletedBody, { goal: goal.name }),
@@ -182,20 +211,22 @@ export function buildAppNotifications({
     const overdue = daysUntilDeadline < 0;
     notifications.push({
       id: `goal:${goal.id}:${overdue ? "overdue" : goal.targetDate}`,
+      kind: "reminder",
+      date: goal.targetDate,
       tone: overdue ? "danger" : "warning",
       title: overdue ? t.notifications.goalOverdueTitle : t.notifications.goalDeadlineTitle,
       body: fillTemplate(
         overdue ? t.notifications.goalOverdueBody : t.notifications.goalDeadlineBody,
         {
           goal: goal.name,
-          date: formatCalendarDate(goal.targetDate, settings.locale)
+          date: formatNotificationDate(goal.targetDate, settings.locale)
         }
       ),
       details: [
         { label: t.notifications.detailGoal, value: goal.name },
         {
           label: t.notifications.detailDate,
-          value: formatCalendarDate(goal.targetDate, settings.locale)
+          value: formatNotificationDate(goal.targetDate, settings.locale)
         },
         {
           label: t.notifications.detailStatus,
@@ -205,5 +236,6 @@ export function buildAppNotifications({
     });
   }
 
-  return notifications;
+  return [...new Map(notifications.map((notification) => [notification.id, notification])).values()]
+    .sort((left, right) => (right.date ?? "").localeCompare(left.date ?? ""));
 }

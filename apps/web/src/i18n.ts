@@ -289,6 +289,11 @@ export interface Dictionary {
     empty: string;
     detailsTitle: string;
     backToNotifications: string;
+    all: string;
+    kinds: Record<"release" | "announcement" | "reminder", string>;
+    filters: Record<"release" | "announcement" | "reminder", string>;
+    filterLabel: string;
+    unknownDate: string;
     detailVersion: string;
     detailChanges: string;
     detailCategory: string;
@@ -985,6 +990,11 @@ export const dictionaries: Record<Language, Dictionary> = {
       empty: "You are all caught up.",
       detailsTitle: "Notification details",
       backToNotifications: "Back to notifications",
+      all: "All",
+      kinds: { release: "Update", announcement: "Announcement", reminder: "Reminder" },
+      filters: { release: "Updates", announcement: "Announcements", reminder: "Reminders" },
+      filterLabel: "Notification type",
+      unknownDate: "Date unavailable",
       detailVersion: "Version",
       detailChanges: "Changes",
       detailCategory: "Category",
@@ -996,7 +1006,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       statusCompleted: "Completed",
       statusOverdue: "Overdue",
       statusUpcoming: "Upcoming",
-      updateTitle: "MyFinances {version} is ready",
+      updateTitle: "MyFinances {version}",
       updateBody: "See the latest improvements in this update.",
       budgetNearTitle: "Budget is running low",
       budgetNearBody: "{category}: {percentage}% of the monthly limit has been used.",
@@ -1625,6 +1635,11 @@ export const dictionaries: Record<Language, Dictionary> = {
       empty: "Новых уведомлений нет.",
       detailsTitle: "Подробнее об уведомлении",
       backToNotifications: "Назад к уведомлениям",
+      all: "Все",
+      kinds: { release: "Обновление", announcement: "Объявление", reminder: "Напоминание" },
+      filters: { release: "Обновления", announcement: "Объявления", reminder: "Напоминания" },
+      filterLabel: "Тип уведомления",
+      unknownDate: "Дата не указана",
       detailVersion: "Версия",
       detailChanges: "Изменения",
       detailCategory: "Категория",
@@ -1636,7 +1651,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       statusCompleted: "Выполнено",
       statusOverdue: "Просрочено",
       statusUpcoming: "Скоро",
-      updateTitle: "MyFinances {version} уже здесь",
+      updateTitle: "MyFinances {version}",
       updateBody: "Посмотри, что изменилось в новой версии.",
       budgetNearTitle: "Бюджет подходит к лимиту",
       budgetNearBody: "{category}: использовано {percentage}% месячного лимита.",

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Check, Sparkles } from "lucide-react";
 import { appVersion, type Dictionary } from "../i18n";
+import { BUILTIN_CHANGELOG } from "../lib/changelog";
+import { formatNotificationDate } from "../lib/notifications";
 import { BottomSheet } from "./ui/BottomSheet";
 import { Button } from "./ui/Button";
 
@@ -10,8 +12,9 @@ function fillVersion(template: string): string {
   return template.replace("{version}", appVersion);
 }
 
-export function UpdateAnnouncement({ t }: { t: Dictionary }) {
+export function UpdateAnnouncement({ t, locale }: { t: Dictionary; locale: string }) {
   const [open, setOpen] = useState(false);
+  const releaseDate = BUILTIN_CHANGELOG[locale.startsWith("ru") ? "ru" : "en"].find((item) => item.version === appVersion)?.date;
 
   useEffect(() => {
     try {
@@ -39,6 +42,7 @@ export function UpdateAnnouncement({ t }: { t: Dictionary }) {
           <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
             {fillVersion(t.updates.eyebrow)}
           </p>
+          {releaseDate ? <time dateTime={releaseDate} className="mt-2 block text-xs text-muted">{formatNotificationDate(releaseDate, locale)}</time> : null}
           <p className="mt-2 text-sm leading-6 text-muted">{t.updates.intro}</p>
         </div>
         <ul className="space-y-3 border-t border-line/60 p-5">

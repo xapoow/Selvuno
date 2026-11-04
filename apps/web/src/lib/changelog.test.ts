@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { compareVersions, getChangelogHistory, changelogStorageKey } from "./changelog";
+import { appVersion } from "../i18n";
+import { BUILTIN_CHANGELOG, compareVersions, getChangelogHistory, changelogStorageKey } from "./changelog";
 
 describe("changelog", () => {
   beforeEach(() => {
@@ -36,5 +37,27 @@ describe("changelog", () => {
     expect(list.some((item) => item.version === "0.5.5")).toBe(true);
     const found = list.find((item) => item.version === "0.5.5");
     expect(found?.notes).toEqual(["Previous archived custom feature"]);
+  });
+
+  it("preserves the release date across repeated current-note updates and storage reloads", () => {
+    const date = BUILTIN_CHANGELOG.en.find((item) => item.version === appVersion)?.date;
+    expect(date).toBeTruthy();
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const current = getChangelogHistory("en-US", ["Fixed camera", "Fixed camera"]).find((item) => item.version === appVersion);
+      expect(current?.date).toBe(date);
+      expect(current?.notes).toEqual(["Fixed camera"]);
+    }
+    expect(getChangelogHistory("en-US").every((item) => item.date)).toBe(true);
+  });
+
+  it("restores canonical localized notes and dates instead of stale stored release data", () => {
+    localStorage.setItem(changelogStorageKey, JSON.stringify([
+      { version: "0.9.0", notes: ["Stale or wrong-language description"] },
+      { version: "bad", notes: [] },
+      { version: "0.1.1", notes: "corrupt" }
+    ]));
+    const history = getChangelogHistory("ru-RU");
+    expect(history.find((item) => item.version === "0.9.0")).toEqual(BUILTIN_CHANGELOG.ru.find((item) => item.version === "0.9.0"));
+    expect(history.some((item) => item.version === "bad" || item.version === "0.1.1")).toBe(false);
   });
 });
