@@ -418,7 +418,7 @@ export function DashboardView({
       <motion.div
         custom={direction}
         variants={staggerItem}
-        className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(330px,0.85fr)]"
+        className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(330px,0.85fr)]"
       >
         <Section title={t.dashboard.cashFlow}>
           <div className="app-surface grid min-h-[286px] gap-4 rounded-2xl p-4 sm:p-5">
@@ -503,7 +503,7 @@ export function DashboardView({
 
         <Section title={t.dashboard.recent}>
           {recentTransactions.length ? (
-            <div className="grid gap-2">
+            <div className="grid content-start gap-2">
               {recentTransactions.map((item) => (
                 <TransactionRow
                   key={item.transaction.id}
