@@ -325,7 +325,7 @@ export function HistoryView({
         )}
         <div className="flex flex-wrap items-center gap-2">
           {onOpenTrash ? (
-            <Button type="button" variant="ghost" size="small" onClick={onOpenTrash}>
+            <Button type="button" variant="secondary" size="small" onClick={onOpenTrash}>
               <Trash2 className="h-4 w-4" />
               {t.undo.trash}{deletedCount ? ` (${deletedCount})` : ""}
             </Button>

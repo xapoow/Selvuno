@@ -1,6 +1,8 @@
-import type { Wallet, WalletInput } from "@myfinances/types";
-import { walletInputSchema } from "@myfinances/types";
-import { createEntityBase, financeDb, nowIso } from "../db/database";
+import type { Wallet, WalletInput, WalletReconciliationInput } from "@myfinances/types";
+import { balanceReconciliationSchema, walletInputSchema, walletReconciliationInputSchema } from "@myfinances/types";
+import { calculateWalletTotals } from "@myfinances/utils";
+import { createEntityBase, createId, financeDb, nowIso } from "../db/database";
+import { WalletBalanceChangedError } from "../lib/walletReconciliation";
 
 export interface WalletRepository {
   createWallet(input: WalletInput): Promise<Wallet>;
@@ -9,6 +11,7 @@ export interface WalletRepository {
   restoreWallet(id: string): Promise<Wallet>;
   reorderWallets(orderedIds: string[]): Promise<void>;
   listWallets(options?: { includeArchived?: boolean }): Promise<Wallet[]>;
+  reconcileBalance(input: WalletReconciliationInput): Promise<Wallet>;
 }
 
 export const walletRepository: WalletRepository = {
@@ -41,6 +44,9 @@ export const walletRepository: WalletRepository = {
     if (!current || current.deletedAt) {
       throw new Error("Wallet not found.");
     }
+    if (input.currency && input.currency.toUpperCase() !== current.currency && current.balanceReconciliations?.length) {
+      throw new Error("Currency cannot be changed after a balance reconciliation.");
+    }
     const next: Wallet = {
       ...current,
       ...input,
@@ -71,6 +77,11 @@ export const walletRepository: WalletRepository = {
         financeDb.walletTransfers
       ],
       async () => {
+        const latest = await financeDb.wallets.get(id);
+        if (!latest || latest.updatedAt !== current.updatedAt ||
+          (latest.balanceReconciliations?.length ?? 0) !== (current.balanceReconciliations?.length ?? 0)) {
+          throw new WalletBalanceChangedError();
+        }
         await financeDb.wallets.put(next);
         if (next.currency !== current.currency) {
           const transactions = await financeDb.transactions.where("walletId").equals(id).toArray();
@@ -143,6 +154,31 @@ export const walletRepository: WalletRepository = {
     return next;
   },
 
+  async reconcileBalance(input) {
+    const parsed = walletReconciliationInputSchema.parse(input);
+    return financeDb.transaction("rw", [financeDb.wallets, financeDb.transactions, financeDb.walletTransfers], async () => {
+      const wallet = await financeDb.wallets.get(parsed.walletId);
+      if (!wallet || wallet.deletedAt || wallet.archivedAt) throw new Error("Active wallet not found.");
+      const transactions = await financeDb.transactions.where("walletId").equals(wallet.id).toArray();
+      const transfers = await financeDb.walletTransfers.filter((item) => item.fromWalletId === wallet.id || item.toWalletId === wallet.id).toArray();
+      const currentBalance = calculateWalletTotals(wallet, transactions, transfers).balanceMinor;
+      if (parsed.currency !== wallet.currency || currentBalance !== parsed.expectedBalanceMinor) throw new WalletBalanceChangedError();
+      const now = nowIso();
+      const reconciliation = balanceReconciliationSchema.parse({
+        id: createId(), createdAt: now, currency: wallet.currency,
+        expectedBalanceMinor: currentBalance, actualBalanceMinor: parsed.actualBalanceMinor,
+        adjustmentMinor: parsed.actualBalanceMinor - currentBalance,
+        note: parsed.note?.trim() || undefined
+      });
+      const next: Wallet = {
+        ...wallet, balanceReconciliations: [...(wallet.balanceReconciliations ?? []), reconciliation],
+        updatedAt: now, syncStatus: "pending"
+      };
+      await financeDb.wallets.put(next);
+      return next;
+    });
+  },
+
   async archiveWallet(id) {
     const current = await financeDb.wallets.get(id);
     if (!current || current.deletedAt) {
@@ -159,8 +195,10 @@ export const walletRepository: WalletRepository = {
       "rw",
       [financeDb.wallets, financeDb.recurringTransactions],
       async () => {
+        const latest = await financeDb.wallets.get(id);
+        if (!latest || latest.deletedAt) return;
         await financeDb.wallets.put({
-          ...current,
+          ...latest,
           archivedAt: now,
           updatedAt: now,
           syncStatus: "pending"
@@ -181,18 +219,13 @@ export const walletRepository: WalletRepository = {
   },
 
   async restoreWallet(id) {
-    const current = await financeDb.wallets.get(id);
-    if (!current || current.deletedAt) {
-      throw new Error("Wallet not found.");
-    }
-    const restored: Wallet = {
-      ...current,
-      archivedAt: null,
-      updatedAt: nowIso(),
-      syncStatus: "pending"
-    };
-    await financeDb.wallets.put(restored);
-    return restored;
+    return financeDb.transaction("rw", financeDb.wallets, async () => {
+      const current = await financeDb.wallets.get(id);
+      if (!current || current.deletedAt) throw new Error("Wallet not found.");
+      const restored: Wallet = { ...current, archivedAt: null, updatedAt: nowIso(), syncStatus: "pending" };
+      await financeDb.wallets.put(restored);
+      return restored;
+    });
   },
 
   async reorderWallets(orderedIds) {

@@ -45,6 +45,28 @@ export const baseEntitySchema = z.object({
   syncStatus: syncStatusSchema
 });
 
+export const balanceReconciliationSchema = z.object({
+  id: z.string().uuid(),
+  createdAt: z.string().datetime(),
+  currency: z.string().length(3),
+  expectedBalanceMinor: z.number().int().safe(),
+  actualBalanceMinor: z.number().int().safe(),
+  adjustmentMinor: z.number().int().safe(),
+  note: z.string().max(240).optional()
+}).refine((item) => item.actualBalanceMinor - item.expectedBalanceMinor === item.adjustmentMinor, {
+  message: "Balance adjustment does not match the recorded difference."
+});
+export type BalanceReconciliation = z.infer<typeof balanceReconciliationSchema>;
+
+export const walletReconciliationInputSchema = z.object({
+  walletId: z.string().uuid(),
+  currency: z.string().length(3),
+  expectedBalanceMinor: z.number().int().safe(),
+  actualBalanceMinor: z.number().int().safe(),
+  note: z.string().max(240).optional()
+});
+export type WalletReconciliationInput = z.infer<typeof walletReconciliationInputSchema>;
+
 export const walletSchema = baseEntitySchema.extend({
   name: z.string().min(1).max(64),
   currency: z.string().length(3),
@@ -56,7 +78,10 @@ export const walletSchema = baseEntitySchema.extend({
   color: z.string().min(4).max(32).default("#207a6f"),
   icon: z.string().min(1).max(32).default("wallet-cards"),
   archivedAt: z.string().datetime().nullable(),
-  sortOrder: z.number().int().nonnegative().default(0)
+  sortOrder: z.number().int().nonnegative().default(0),
+  balanceReconciliations: z.array(balanceReconciliationSchema).optional()
+}).refine((wallet) => (wallet.balanceReconciliations ?? []).every((item) => item.currency === wallet.currency), {
+  message: "Reconciliation currency must match the wallet."
 });
 export type Wallet = z.infer<typeof walletSchema>;
 

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import type { WalletView } from "@myfinances/types";
 import { Eye, EyeOff, LockKeyhole } from "lucide-react";
+import { calculateWalletAdjustmentTotal } from "@myfinances/utils";
 import { BottomNavigation } from "./components/BottomNavigation";
 import { CookieNotice } from "./components/CookieNotice";
 import { HeaderNavigation } from "./components/HeaderNavigation";
@@ -206,7 +207,7 @@ export function App() {
             !wallet.deletedAt &&
             walletIsInCurrentStatistics(wallet.id) &&
             wallet.currency.toUpperCase() !== displayCurrency &&
-            wallet.initialBalanceMinor !== 0
+            (wallet.initialBalanceMinor + calculateWalletAdjustmentTotal(wallet)) !== 0
         ) ||
         walletTransfers.some(
           (transfer) =>
@@ -524,6 +525,7 @@ export function App() {
               onReorderWallet={async (orderedIds) => {
                 await mutations.reorderWallets.mutateAsync(orderedIds);
               }}
+              onReconcileWallet={async (input) => { await mutations.reconcileWallet.mutateAsync(input); }}
               onCreateGoal={async (input) => {
                 await mutations.createSavingsGoal.mutateAsync(input);
               }}
@@ -553,6 +555,8 @@ export function App() {
               onUpdateSettings={async (input) => {
                 await mutations.updateSettings.mutateAsync(input);
               }}
+              onOpenTrash={() => { deletion.dismiss(); setTrashOpen(true); }}
+              deletedCount={data.deletedTransactions.data?.length ?? 0}
               onCreateCategory={async (input) => {
                 await mutations.createCategory.mutateAsync(input);
               }}

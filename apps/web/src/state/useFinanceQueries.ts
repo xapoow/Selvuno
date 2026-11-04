@@ -10,6 +10,7 @@ import type {
   TransactionInput,
   TransactionTemplateInput,
   WalletInput,
+  WalletReconciliationInput,
   WalletTransferInput
 } from "@myfinances/types";
 import { seedLocalData } from "../db/database";
@@ -217,6 +218,11 @@ export function useFinanceMutations() {
       mutationFn: ({ id, input }: { id: string; input: Partial<WalletInput> }) =>
         walletRepository.updateWallet(id, input),
       onSuccess: invalidate
+    }),
+    reconcileWallet: useMutation({
+      mutationFn: (input: WalletReconciliationInput) => walletRepository.reconcileBalance(input),
+      onSuccess: () => invalidateFinance(queryClient),
+      onError: invalidate
     }),
     archiveWallet: useMutation({
       mutationFn: (id: string) => walletRepository.archiveWallet(id),

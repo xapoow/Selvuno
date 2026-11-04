@@ -281,6 +281,8 @@ export interface Dictionary {
     online: string;
   };
   undo: {
+    openTrash: string;
+    entryHint: string;
     title: string;
     action: string;
     deletedOne: string;
@@ -297,6 +299,30 @@ export interface Dictionary {
     loading: string;
     unavailableWallet: string;
     deletedOn: string;
+  };
+  reconciliation: {
+    action: string;
+    title: string;
+    intro: string;
+    creditHint: string;
+    recordedBalance: string;
+    actualBalance: string;
+    difference: string;
+    matched: string;
+    matchHint: string;
+    adjustmentHint: string;
+    note: string;
+    confirmMatch: string;
+    applyAdjustment: string;
+    invalidAmount: string;
+    balanceChanged: string;
+    saveError: string;
+    history: string;
+    noHistory: string;
+    checked: string;
+    toggleSign: string;
+    currencyLocked: string;
+    currencyLockHint: string;
   };
   notifications: {
     title: string;
@@ -996,6 +1022,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       online: "Connection restored"
     },
     undo: {
+      openTrash: "Open Trash",
+      entryHint: "Deleted transactions and receipts. Restore individual records or everything at once.",
       title: "Transaction deleted",
       action: "Undo",
       deletedOne: "Transaction deleted",
@@ -1012,6 +1040,30 @@ export const dictionaries: Record<Language, Dictionary> = {
       loading: "Loading deleted transactions…",
       unavailableWallet: "Unavailable wallet",
       deletedOn: "Deleted"
+    },
+    reconciliation: {
+      action: "Reconcile balance",
+      title: "Balance reconciliation",
+      intro: "Enter the actual amount in this wallet. Your initial balance and existing transactions will not change.",
+      creditHint: "Enter debt as a negative balance. Do not include your available credit limit.",
+      recordedBalance: "Recorded balance",
+      actualBalance: "Actual balance",
+      difference: "Balance adjustment",
+      matched: "The balance matches",
+      matchHint: "You can save this check without changing the balance.",
+      adjustmentHint: "A separate adjustment will affect only the balance, not income, expenses, or budgets.",
+      note: "Comment (optional)",
+      confirmMatch: "Confirm balance",
+      applyAdjustment: "Save adjustment",
+      invalidAmount: "Enter a valid balance with the correct number of decimal places for this currency.",
+      balanceChanged: "Wallet data changed. Review the latest balance and try again.",
+      saveError: "Unable to save reconciliation. No adjustment was applied.",
+      history: "Reconciliation history",
+      noHistory: "No balance checks yet.",
+      checked: "Confirmed",
+      toggleSign: "Change balance sign",
+      currencyLocked: "Currency is locked to preserve reconciliation history. Create a separate wallet for another currency.",
+      currencyLockHint: "After the first reconciliation, the wallet currency is locked to preserve its history."
     },
     notifications: {
       title: "Notifications",
@@ -1652,6 +1704,8 @@ export const dictionaries: Record<Language, Dictionary> = {
       online: "Соединение восстановлено"
     },
     undo: {
+      openTrash: "Открыть корзину",
+      entryHint: "Удалённые операции и чеки. Можно восстановить записи по одной или все сразу.",
       title: "Удаление операции",
       action: "Отменить",
       deletedOne: "Операция удалена",
@@ -1668,6 +1722,30 @@ export const dictionaries: Record<Language, Dictionary> = {
       loading: "Загружаем удалённые операции…",
       unavailableWallet: "Недоступный кошелёк",
       deletedOn: "Удалено"
+    },
+    reconciliation: {
+      action: "Сверить баланс",
+      title: "Сверка баланса",
+      intro: "Введите фактический остаток в кошельке. Начальный баланс и существующие операции останутся без изменений.",
+      creditHint: "Задолженность вводится со знаком «−». Доступный кредитный лимит сюда не входит.",
+      recordedBalance: "Баланс в приложении",
+      actualBalance: "Фактический остаток",
+      difference: "Корректировка баланса",
+      matched: "Баланс совпадает",
+      matchHint: "Можно сохранить проверку без изменения баланса.",
+      adjustmentHint: "Отдельная корректировка изменит только баланс — не доходы, расходы или бюджеты.",
+      note: "Комментарий (необязательно)",
+      confirmMatch: "Подтвердить баланс",
+      applyAdjustment: "Сохранить корректировку",
+      invalidAmount: "Введите корректный остаток с допустимым для этой валюты числом знаков после запятой.",
+      balanceChanged: "Данные кошелька изменились. Проверьте актуальный баланс и повторите сверку.",
+      saveError: "Не удалось сохранить сверку. Корректировка не применена.",
+      history: "История сверок",
+      noHistory: "Сверок пока не было.",
+      checked: "Подтверждено",
+      toggleSign: "Изменить знак остатка",
+      currencyLocked: "Валюта зафиксирована для сохранения истории сверок. Для другой валюты создайте отдельный кошелёк.",
+      currencyLockHint: "После первой сверки валюта кошелька фиксируется, чтобы сохранить историю."
     },
     notifications: {
       title: "Уведомления",

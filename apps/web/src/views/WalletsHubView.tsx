@@ -8,6 +8,7 @@ import type {
   Transaction,
   Wallet,
   WalletInput,
+  WalletReconciliationInput,
   WalletTransfer,
   WalletTransferInput
 } from "@myfinances/types";
@@ -39,6 +40,7 @@ interface WalletsHubViewProps {
   onCreateTransfer: (input: WalletTransferInput) => Promise<void>;
   onDeleteTransfer: (id: string) => Promise<void>;
   onReorderWallet?: (orderedIds: string[]) => Promise<void>;
+  onReconcileWallet?: (input: WalletReconciliationInput) => Promise<void>;
 }
 
 export function WalletsHubView({
@@ -55,6 +57,7 @@ export function WalletsHubView({
   onArchiveWallet,
   onRestoreWallet,
   onReorderWallet,
+  onReconcileWallet,
   onCreateGoal,
   onUpdateGoal,
   onDeleteGoal,
@@ -94,6 +97,7 @@ export function WalletsHubView({
               onArchive={onArchiveWallet}
               onRestore={onRestoreWallet}
               onReorder={onReorderWallet}
+              onReconcile={onReconcileWallet}
             />
           </div>
           <div className="hidden md:block">
@@ -109,6 +113,7 @@ export function WalletsHubView({
               onArchive={onArchiveWallet}
               onRestore={onRestoreWallet}
               onReorder={onReorderWallet}
+              onReconcile={onReconcileWallet}
             />
           </div>
         </>

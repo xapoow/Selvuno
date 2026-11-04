@@ -7,7 +7,7 @@ import { SettingsView } from "./SettingsView";
 
 const t = getDictionary("en-US");
 
-function Fixture() {
+function Fixture({ onOpenTrash, deletedCount = 0 }: { onOpenTrash?: () => void; deletedCount?: number } = {}) {
   const save = vi.fn().mockResolvedValue(undefined);
   return (
     <div style={{ transform: "translateZ(0)", overflow: "hidden", height: 100 }}>
@@ -22,6 +22,7 @@ function Fixture() {
         onDeleteCategory={save} onReorderCategories={save} onReplaceCategory={save}
         onExportBackup={save} onImportBackup={save} onRestoreBackupSnapshot={save}
         onDeleteBackupSnapshot={save}
+        onOpenTrash={onOpenTrash} deletedCount={deletedCount}
       />
     </div>
   );
@@ -30,6 +31,16 @@ function Fixture() {
 afterEach(() => vi.restoreAllMocks());
 
 describe("mobile settings navigation", () => {
+  it("offers a permanent Trash entry in general settings", async () => {
+    const user = userEvent.setup();
+    const openTrash = vi.fn();
+    render(<Fixture onOpenTrash={openTrash} deletedCount={3} />);
+    const entry = screen.getByRole("button", { name: t.undo.openTrash });
+    expect(within(entry).getByText("3")).toBeInTheDocument();
+    await user.click(entry);
+    expect(openTrash).toHaveBeenCalledOnce();
+  });
+
   it("opens outside clipped parents without scrolling and switches sections only after exit", async () => {
     const scrollIntoView = vi.fn();
     const previousScrollIntoView = HTMLElement.prototype.scrollIntoView;

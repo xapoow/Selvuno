@@ -12,6 +12,7 @@ import { SelectField } from "./ui/SelectField";
 import { SegmentedControl } from "./ui/SegmentedControl";
 import { TextField } from "./ui/TextField";
 import { Switch } from "./ui/Switch";
+import { WalletBalanceChangedError } from "../lib/walletReconciliation";
 import type { Dictionary } from "../i18n";
 
 const walletSwatches = [
@@ -93,20 +94,21 @@ export function WalletForm({
         setName("");
       }
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : t.wallets.saveError);
+      setError(cause instanceof WalletBalanceChangedError ? t.reconciliation.balanceChanged : cause instanceof Error ? cause.message : t.wallets.saveError);
     }
   }
 
   return (
     <form className="grid gap-4" onSubmit={handleSubmit}>
       <TextField label={t.common.name} value={name} onChange={(event) => setName(event.target.value)} maxLength={64} />
-      <SelectField label={t.common.currency} value={currency} onChange={(event) => setCurrency(event.target.value)}>
+      <SelectField label={t.common.currency} value={currency} disabled={Boolean(initial?.balanceReconciliations?.length)} onChange={(event) => setCurrency(event.target.value)}>
         {currencyOptions.map((option) => (
           <option key={option} value={option}>
             {getCurrencyLabel(option)}
           </option>
         ))}
       </SelectField>
+      {initial?.balanceReconciliations?.length ? <p className="-mt-2 text-xs leading-5 text-muted">{t.reconciliation.currencyLocked}</p> : null}
       <TextField
         label={`${t.wallets.initialBalance} (${currency})`}
         inputMode="decimal"

@@ -14,6 +14,7 @@ import type {
 import {
   AlertCircle,
   Check,
+  ChevronRight,
   Cloud,
   Combine,
   DatabaseBackup,
@@ -67,6 +68,8 @@ interface SettingsViewProps {
   onImportBackup: (backup: unknown) => Promise<void>;
   onRestoreBackupSnapshot: (id: string) => Promise<void>;
   onDeleteBackupSnapshot: (id: string) => Promise<void>;
+  onOpenTrash?: () => void;
+  deletedCount?: number;
 }
 
 const timeZoneOptions = ["UTC", "Europe/Warsaw", "Europe/Berlin", "America/New_York", "Asia/Tokyo"];
@@ -167,7 +170,9 @@ export function SettingsView({
   onExportBackup,
   onImportBackup,
   onRestoreBackupSnapshot,
-  onDeleteBackupSnapshot
+  onDeleteBackupSnapshot,
+  onOpenTrash,
+  deletedCount = 0
 }: SettingsViewProps) {
   const [creatingCategory, setCreatingCategory] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -562,6 +567,15 @@ export function SettingsView({
             </SelectField>
           </div>
         </Section>
+      ) : null}
+
+      {activeTab === "general" && onOpenTrash ? (
+        <button type="button" onClick={onOpenTrash} aria-label={t.undo.openTrash} className="app-surface app-focus flex w-full items-center gap-3 rounded-2xl p-4 text-left">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent"><Trash2 className="h-5 w-5" /></span>
+          <span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-foreground">{t.undo.trash}</span><span className="mt-1 block text-xs leading-5 text-muted">{t.undo.entryHint}</span></span>
+          <span className="app-control rounded-full px-2.5 py-1 text-xs font-semibold text-muted">{deletedCount}</span>
+          <ChevronRight className="h-4 w-4 shrink-0 text-muted" />
+        </button>
       ) : null}
 
       {activeTab === "appearance" ? (

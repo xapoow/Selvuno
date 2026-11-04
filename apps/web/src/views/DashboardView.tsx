@@ -11,7 +11,7 @@ import type {
   WalletView
 } from "@myfinances/types";
 import { BarChart3, PlusCircle } from "lucide-react";
-import { filterTransactionsByWallet, formatMoney } from "@myfinances/utils";
+import { calculateWalletAdjustmentTotal, filterTransactionsByWallet, formatMoney } from "@myfinances/utils";
 import {
   AnalyticsView,
   type AnalyticsCategoryItem
@@ -150,9 +150,9 @@ export function DashboardView({
     direction: -1 | 1;
   }> = [
     ...visibleWallets
-      .filter((wallet) => !wallet.deletedAt && wallet.initialBalanceMinor !== 0)
+      .filter((wallet) => !wallet.deletedAt && (wallet.initialBalanceMinor + calculateWalletAdjustmentTotal(wallet)) !== 0)
       .map((wallet) => ({
-        amountMinor: wallet.initialBalanceMinor,
+        amountMinor: wallet.initialBalanceMinor + calculateWalletAdjustmentTotal(wallet),
         currency: wallet.currency,
         direction: 1 as const
       })),

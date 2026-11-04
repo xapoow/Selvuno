@@ -5,12 +5,14 @@ import type {
   Transaction,
   Wallet,
   WalletInput,
+  WalletReconciliationInput,
   WalletTransfer,
   WalletView
 } from "@myfinances/types";
-import { Archive, Edit3, GripVertical, Plus, RotateCcw, WalletCards } from "lucide-react";
+import { Archive, Edit3, GripVertical, Plus, RotateCcw, Scale, WalletCards } from "lucide-react";
 import { calculateWalletTotals, formatMoney } from "@myfinances/utils";
 import { WalletForm } from "../components/WalletForm";
+import { WalletReconciliationForm } from "../components/WalletReconciliationForm";
 import { BottomSheet } from "../components/ui/BottomSheet";
 import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -32,6 +34,7 @@ interface WalletsViewProps {
   onArchive: (id: string) => Promise<void>;
   onRestore: (id: string) => Promise<void>;
   onReorder?: (orderedIds: string[]) => Promise<void>;
+  onReconcile?: (input: WalletReconciliationInput) => Promise<void>;
 }
 
 interface ReorderWalletItemProps {
@@ -43,6 +46,7 @@ interface ReorderWalletItemProps {
   onEdit: (wallet: Wallet) => void;
   onArchive: (id: string) => Promise<void>;
   onDragEnd?: () => void;
+  onReconcile?: (walletId: string) => void;
 }
 
 function ReorderWalletItem({
@@ -53,7 +57,8 @@ function ReorderWalletItem({
   canReorder,
   onEdit,
   onArchive,
-  onDragEnd
+  onDragEnd,
+  onReconcile
 }: ReorderWalletItemProps) {
   const dragControls = useDragControls();
   const advanced = settings.advancedWalletsEnabled;
@@ -149,13 +154,19 @@ function ReorderWalletItem({
           </div>
         </div>
       ) : null}
-      <Button
-        variant="secondary"
-        size="small"
-        onClick={() => void onArchive(wallet.id)}
-      >
-        {t.wallets.archive}
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        {onReconcile ? <Button type="button" variant="secondary" size="small" className="flex-1" onClick={() => onReconcile(wallet.id)}>
+          <Scale className="h-4 w-4" />{t.reconciliation.action}
+        </Button> : null}
+        <Button
+          type="button"
+          variant="secondary"
+          size="small"
+          onClick={() => void onArchive(wallet.id)}
+        >
+          {t.wallets.archive}
+        </Button>
+      </div>
     </>
   );
 
@@ -187,12 +198,16 @@ export function WalletsView({
   onUpdate,
   onArchive,
   onRestore,
-  onReorder
+  onReorder,
+  onReconcile
 }: WalletsViewProps) {
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Wallet | null>(null);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [operationError, setOperationError] = useState("");
+  const [reconcilingId, setReconcilingId] = useState<string | null>(null);
+  const [reconcilingBusy, setReconcilingBusy] = useState(false);
+  const reconcilingWallet = wallets.find((wallet) => wallet.id === reconcilingId);
   const [walletOrder, setWalletOrder] = useState<string[]>(() => wallets.map((w) => w.id));
 
   useEffect(() => {
@@ -285,6 +300,7 @@ export function WalletsView({
                   canReorder
                   onEdit={setEditing}
                   onArchive={handleArchive}
+                  onReconcile={onReconcile ? setReconcilingId : undefined}
                   onDragEnd={() => void saveWalletOrder()}
                 />
               );
@@ -304,6 +320,7 @@ export function WalletsView({
                   canReorder={false}
                   onEdit={setEditing}
                   onArchive={handleArchive}
+                  onReconcile={onReconcile ? setReconcilingId : undefined}
                 />
               );
             })}
@@ -324,6 +341,19 @@ export function WalletsView({
             setCreating(false);
           }}
         />
+      </BottomSheet>
+
+      <BottomSheet open={Boolean(reconcilingWallet)} title={t.reconciliation.title} closeLabel={t.common.close} dismissible={!reconcilingBusy} onClose={() => setReconcilingId(null)}>
+        {reconcilingWallet && onReconcile ? <WalletReconciliationForm
+          key={reconcilingWallet.id} wallet={reconcilingWallet} transactions={transactions} transfers={transfers}
+          settings={settings} t={t} onSubmit={async (input) => {
+            setReconcilingBusy(true);
+            try {
+              await onReconcile(input);
+              setReconcilingId((current) => current === input.walletId ? null : current);
+            } finally { setReconcilingBusy(false); }
+          }}
+        /> : null}
       </BottomSheet>
 
       <BottomSheet open={Boolean(editing)} title={t.wallets.editTitle} onClose={() => setEditing(null)}>
