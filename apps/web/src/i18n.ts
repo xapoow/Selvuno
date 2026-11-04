@@ -230,6 +230,10 @@ export interface Dictionary {
     takePhoto: string;
     chooseFile: string;
     cameraTitle: string;
+    cameraSelect: string;
+    cameraStarting: string;
+    cameraSwitchError: string;
+    cameraLabels: Record<"main" | "rear" | "ultrawide" | "telephoto" | "front" | "unknown", string>;
     cameraUnavailable: string;
     attachmentTypeError: string;
     attachmentSizeError: string;
@@ -788,6 +792,10 @@ export const dictionaries: Record<Language, Dictionary> = {
       takePhoto: "Take photo",
       chooseFile: "Choose file",
       cameraTitle: "Receipt camera",
+      cameraSelect: "Choose camera",
+      cameraStarting: "Starting camera…",
+      cameraSwitchError: "This camera is unavailable. Another camera is active; you can choose a different one below.",
+      cameraLabels: { main: "Main", rear: "Rear", ultrawide: "Ultra-wide", telephoto: "Telephoto", front: "Front", unknown: "Camera" },
       cameraUnavailable: "The camera is unavailable. Opening the system camera instead.",
       attachmentTypeError: "Choose a JPG, PNG, WebP, or PDF file.",
       attachmentSizeError: "Each file must be smaller than 10 MB.",
@@ -1424,6 +1432,10 @@ export const dictionaries: Record<Language, Dictionary> = {
       takePhoto: "Сфотографировать",
       chooseFile: "Выбрать файл",
       cameraTitle: "Камера для чека",
+      cameraSelect: "Выбор камеры",
+      cameraStarting: "Подключаем камеру…",
+      cameraSwitchError: "Эта камера недоступна. Подключена другая; можно выбрать камеру ниже.",
+      cameraLabels: { main: "Основная", rear: "Задняя", ultrawide: "Сверхширокая", telephoto: "Телефото", front: "Фронтальная", unknown: "Камера" },
       cameraUnavailable: "Камера недоступна. Открываю системную камеру.",
       attachmentTypeError: "Выбери файл JPG, PNG, WebP или PDF.",
       attachmentSizeError: "Размер каждого файла должен быть меньше 10 МБ.",

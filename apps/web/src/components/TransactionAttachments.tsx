@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Camera, FileImage, FileText, Paperclip, Plus, ScanLine, X } from "lucide-react";
+import { Camera, FileImage, FileText, LoaderCircle, Paperclip, Plus, ScanLine, X } from "lucide-react";
 import type { TransactionAttachment } from "../db/models";
 import type { Dictionary } from "../i18n";
 import { ATTACHMENT_MAX_FILES, validateAttachment } from "../lib/transactionAttachments";
+import { openReceiptCamera, readReceiptCamera, rememberReceiptCamera, stopCamera, type ReceiptCameraDevice } from "../lib/receiptCamera";
 import { Button } from "./ui/Button";
 
 interface TransactionAttachmentsProps {
@@ -49,6 +50,10 @@ export function TransactionAttachments({
   const [sourceOpen, setSourceOpen] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
+  const [cameras, setCameras] = useState<ReceiptCameraDevice[]>([]);
+  const [activeCameraId, setActiveCameraId] = useState("");
+  const [requestedCameraId, setRequestedCameraId] = useState<string | null>(null);
+  const [cameraMessage, setCameraMessage] = useState("");
   const [viewer, setViewer] = useState<AttachmentPreview | null>(null);
   const [error, setError] = useState("");
   const [dragActive, setDragActive] = useState(false);
@@ -92,45 +97,48 @@ export function TransactionAttachments({
 
   useEffect(() => {
     if (!cameraOpen) {
-      streamRef.current?.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
       setCameraReady(false);
+      setRequestedCameraId(null);
+      setCameras([]);
+      setActiveCameraId("");
       return;
     }
-    let cancelled = false;
+    const controller = new AbortController();
+    let ownedStream: MediaStream | null = null;
+    setCameraReady(false);
+    setCameraMessage("");
     if (!navigator.mediaDevices?.getUserMedia) {
       openNativeCameraFallback();
       return;
     }
-    void navigator.mediaDevices
-      .getUserMedia({
-        video: {
-          facingMode: { ideal: "environment" },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        },
-        audio: false
-      })
-      .then((stream) => {
-        if (cancelled) {
-          stream.getTracks().forEach((track) => track.stop());
+    void openReceiptCamera(navigator.mediaDevices, requestedCameraId ?? readReceiptCamera(), controller.signal)
+      .then(({ stream, cameras: availableCameras, deviceId, preferredUnavailable }) => {
+        if (controller.signal.aborted) {
+          stopCamera(stream);
           return;
         }
+        ownedStream = stream;
         streamRef.current = stream;
+        setCameras(availableCameras);
+        setActiveCameraId(deviceId);
+        if (preferredUnavailable) setCameraMessage(t.transaction.cameraSwitchError);
+        if (requestedCameraId && deviceId === requestedCameraId) rememberReceiptCamera(deviceId);
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          void videoRef.current.play().catch(openNativeCameraFallback);
+          void videoRef.current.play().catch(() => {
+            if (!controller.signal.aborted) openNativeCameraFallback();
+          });
         }
       })
       .catch(() => {
-        if (!cancelled) openNativeCameraFallback();
+        if (!controller.signal.aborted) openNativeCameraFallback();
       });
     return () => {
-      cancelled = true;
-      streamRef.current?.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
+      controller.abort();
+      stopCamera(ownedStream);
+      if (streamRef.current === ownedStream) streamRef.current = null;
     };
-  }, [cameraOpen, t.transaction.cameraUnavailable]);
+  }, [cameraOpen, requestedCameraId, t.transaction.cameraUnavailable, t.transaction.cameraSwitchError]);
 
   useEffect(() => {
     if (!cameraOpen && !sourceOpen && !viewer) return;
@@ -223,20 +231,48 @@ export function TransactionAttachments({
 
       {cameraOpen ? (
         <motion.div className="fixed inset-0 z-[200] overflow-hidden bg-black text-white" role="dialog" aria-modal="true" aria-label={t.transaction.cameraTitle} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <video ref={videoRef} playsInline muted className="h-full w-full object-cover" onLoadedMetadata={() => setCameraReady(true)} />
+          <video ref={videoRef} playsInline muted className={`h-full w-full object-cover transition-opacity duration-200 ${cameraReady ? "opacity-100" : "opacity-0"}`} onLoadedData={() => {
+            if (videoRef.current?.srcObject === streamRef.current && streamRef.current) setCameraReady(true);
+          }} />
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.28)_100%)]" />
           <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/75 to-transparent p-4 pb-16 pt-[calc(env(safe-area-inset-top)+1rem)]">
             <div><p className="text-base font-semibold">{t.transaction.cameraTitle}</p><p className="mt-0.5 text-xs text-white/70">{t.transaction.receiptGuide}</p></div>
             <Button type="button" variant="secondary" size="icon" className="pointer-events-auto border-white/15 bg-black/30 text-white backdrop-blur-xl" onClick={() => setCameraOpen(false)} aria-label={t.common.close}><X className="h-5 w-5" /></Button>
           </div>
-          <div className="pointer-events-none absolute inset-8 bottom-36 top-32 rounded-[2rem] border border-white/35">
+          <div className="pointer-events-none absolute inset-8 bottom-52 top-32 rounded-[2rem] border border-white/35">
             <span className="absolute -left-px -top-px h-12 w-12 rounded-tl-[2rem] border-l-4 border-t-4 border-accent" />
             <span className="absolute -right-px -top-px h-12 w-12 rounded-tr-[2rem] border-r-4 border-t-4 border-accent" />
             <span className="absolute -bottom-px -left-px h-12 w-12 rounded-bl-[2rem] border-b-4 border-l-4 border-accent" />
             <span className="absolute -bottom-px -right-px h-12 w-12 rounded-br-[2rem] border-b-4 border-r-4 border-accent" />
             <ScanLine className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 text-white/65" />
           </div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-black/85 to-transparent px-6 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-20">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 grid justify-items-center gap-4 bg-gradient-to-t from-black/90 via-black/65 to-transparent px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-12">
+            <div className="min-h-5 text-center text-xs text-white/80" role="status" aria-live="polite">
+              {!cameraReady ? <span className="inline-flex items-center gap-2"><LoaderCircle className="h-4 w-4 animate-spin" />{t.transaction.cameraStarting}</span> : cameraMessage}
+            </div>
+            {cameras.length > 1 ? (
+              <div className="pointer-events-auto flex max-w-full gap-2 overflow-x-auto rounded-2xl p-1 no-scrollbar" role="group" aria-label={t.transaction.cameraSelect}>
+                {cameras.map((camera) => {
+                  const sameKind = cameras.filter((item) => item.kind === camera.kind);
+                  const label = `${t.transaction.cameraLabels[camera.kind]}${sameKind.length > 1 ? ` ${sameKind.findIndex((item) => item.deviceId === camera.deviceId) + 1}` : ""}`;
+                  const selected = activeCameraId === camera.deviceId;
+                  return (
+                    <button
+                      key={camera.deviceId}
+                      type="button"
+                      title={camera.label || label}
+                      aria-label={camera.label || label}
+                      aria-pressed={selected}
+                      disabled={!cameraReady}
+                      onClick={() => { if (!selected) setRequestedCameraId(camera.deviceId); }}
+                      className={`min-h-11 shrink-0 rounded-full border px-4 text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white disabled:opacity-50 ${selected ? "border-white/50 bg-white/20 text-white" : "border-white/15 bg-black/40 text-white/70"}`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
             <motion.button type="button" whileTap={cameraReady ? { scale: 0.9 } : undefined} disabled={!cameraReady} className="pointer-events-auto grid h-20 w-20 place-items-center rounded-full border-[5px] border-white/90 bg-white/20 shadow-2xl backdrop-blur-sm disabled:opacity-40" onClick={capturePhoto} aria-label={t.transaction.takePhoto}><span className="h-14 w-14 rounded-full bg-white shadow-inner" /></motion.button>
           </div>
         </motion.div>
