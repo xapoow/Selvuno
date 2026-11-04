@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.9.4";
+export const appVersion = "0.9.5";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -1210,15 +1210,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "Safer deletion, wallet reconciliation, and more useful history search.",
+      intro: "Your home screen, arranged around what matters to you.",
       gotIt: "Explore the update",
       notes: [
-        "Undo transaction deletions and restore them later from Trash in History or Settings",
-        "Reconcile wallet balances with a correction history, without changing income or expenses",
-        "Filter history by multiple categories, attachments, and a converted amount range",
-        "Save and reuse filter sets with their original amount currency",
-        "One notification feed with compact type badges and balanced spacing",
-        "Softer wallet glow and unclipped card shadows on Home and History"
+        "Choose visible home blocks in Settings → Appearance → Home screen",
+        "Reorder blocks by dragging or using arrows, with one layout on mobile and desktop",
+        "Optionally show savings goals with progress and a shortcut to all goals",
+        "Your layout is saved automatically, included in backups, and can be reset at any time"
       ]
     },
     categories: {
@@ -1948,15 +1946,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Безопаснее удалять операции, проще сверять баланс и находить нужные записи.",
+      intro: "Главный экран можно настроить под себя и оставить только важное.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Отмена удаления операций и восстановление из корзины в истории или настройках",
-        "Сверка баланса кошелька с историей корректировок без изменения доходов и расходов",
-        "Фильтры истории по нескольким категориям, вложениям и диапазону суммы с конвертацией",
-        "Сохранённые наборы фильтров запоминают выбранную валюту суммы",
-        "Общая лента уведомлений с компактными бейджами и ровными отступами",
-        "Мягкое свечение кошельков и тени карточек без обрезки на главной и в истории"
+        "Выбор видимых блоков в Настройки → Вид → Главный экран",
+        "Порядок блоков меняется перетаскиванием или стрелками и одинаков на телефоне и ПК",
+        "Опциональный блок накопительных целей с прогрессом и переходом ко всем целям",
+        "Настройки сохраняются автоматически, попадают в бэкапы и сбрасываются в любой момент"
       ]
     },
     categories: {
