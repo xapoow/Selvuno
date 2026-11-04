@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Settings, Transaction, Wallet, WalletTransfer, WalletView } from "@myfinances/types";
-import { animate, motion, useMotionValue, useTransform, type MotionValue, type PanInfo } from "framer-motion";
+import { AnimatePresence, animate, motion, useMotionValue, useTransform, type MotionValue, type PanInfo } from "framer-motion";
 import { ChevronLeft, ChevronRight, Layers3, ShieldCheck } from "lucide-react";
 import { calculateWalletTotals, formatMoney } from "@myfinances/utils";
 import { cn } from "../lib/cn";
@@ -142,8 +142,8 @@ function CarouselCardSlide({
             ? `linear-gradient(135deg, ${card.color ?? "#207a6f"}dd 0%, #13171b 100%)`
             : undefined,
           boxShadow: !card.isAll
-            ? `0 18px 40px -10px ${card.color ?? "#207a6f"}44, inset 0 1px 0 0 rgba(255,255,255,0.25)`
-            : "0 18px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 0 rgba(255,255,255,0.2)"
+            ? "inset 0 1px 0 0 rgba(255,255,255,0.25)"
+            : "inset 0 1px 0 0 rgba(255,255,255,0.2)"
         }}
         className={cn(
           "relative flex w-full flex-col justify-between overflow-hidden rounded-[24px] p-5 text-white select-none",
@@ -418,6 +418,8 @@ export function MonobankWalletCarousel({
   const canGoPrev = resolvedIndex > 0;
   const canGoNext = resolvedIndex < cardItems.length - 1;
   const fadeWidth = Math.max(10, peek - 6);
+  const activeCard = cardItems[resolvedIndex];
+  const glowColor = activeCard.isAll ? "#000000" : activeCard.color ?? "#207a6f";
 
   return (
     <div
@@ -428,6 +430,23 @@ export function MonobankWalletCarousel({
     >
       {/* Monobank Card Viewport */}
       <div className="relative flex w-full min-w-0 items-center justify-center">
+        {/* Ambient light stays outside the clipped track and fades before reaching its own bounds. */}
+        <div className="pointer-events-none absolute -inset-x-8 -bottom-10 -top-6" aria-hidden="true">
+          <AnimatePresence initial={false}>
+            <motion.div
+              key={`${activeCard.id}:${glowColor}`}
+              className="absolute inset-0"
+              style={{
+                background: `radial-gradient(ellipse 65% 60% at 50% 55%, ${glowColor}28 0%, ${glowColor}14 42%, ${glowColor}00 75%)`
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.28, ease: "easeOut" }}
+            />
+          </AnimatePresence>
+        </div>
+
         {/* Previous Card Peek (left preview button) */}
         {canGoPrev ? (
           <button
@@ -443,7 +462,7 @@ export function MonobankWalletCarousel({
         {/* Carousel Viewport Container with Soft Feather Mask */}
         <div
           ref={containerRef}
-          className="relative w-full min-w-0 max-w-full overflow-hidden rounded-[26px] py-2 [contain:inline-size]"
+          className="relative isolate w-full min-w-0 max-w-full overflow-hidden rounded-[26px] py-2 [contain:inline-size]"
           style={
             canSwitch
               ? {
