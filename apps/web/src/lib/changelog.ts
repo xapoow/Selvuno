@@ -9,6 +9,16 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.9.5",
+      date: "2026-11-05",
+      notes: [
+        "Выбор видимых блоков в Настройки → Вид → Главный экран",
+        "Порядок блоков меняется перетаскиванием или стрелками и одинаков на телефоне и ПК",
+        "Опциональный блок накопительных целей с прогрессом и переходом ко всем целям",
+        "Настройки сохраняются автоматически, попадают в бэкапы и сбрасываются в любой момент"
+      ]
+    },
+    {
       version: "0.9.4",
       date: "2026-11-04",
       notes: [
@@ -187,6 +197,16 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.9.5",
+      date: "2026-11-05",
+      notes: [
+        "Choose visible home blocks in Settings → Appearance → Home screen",
+        "Reorder blocks by dragging or using arrows, with one layout on mobile and desktop",
+        "Optionally show savings goals with progress and a shortcut to all goals",
+        "Your layout is saved automatically, included in backups, and can be reset at any time"
+      ]
+    },
     {
       version: "0.9.4",
       date: "2026-11-04",

@@ -1,11 +1,11 @@
-import type { ColorThemePreference } from "@myfinances/types";
+import type { ColorThemePreference, DashboardBlockId } from "@myfinances/types";
 import type { AppView } from "./state/appStore";
 
 export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.9.4";
+export const appVersion = "0.9.5";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -123,6 +123,20 @@ export interface Dictionary {
     operations: string;
     categoriesBreakdown: string;
     categoryComparison: string;
+  };
+  homeLayout: {
+    title: string;
+    intro: string;
+    walletHint: string;
+    drag: string;
+    up: string;
+    down: string;
+    reset: string;
+    saveError: string;
+    persistenceHint: string;
+    empty: string;
+    openGoals: string;
+    blocks: Record<DashboardBlockId, { title: string; hint: string }>;
   };
   insights: {
     title: string;
@@ -768,6 +782,24 @@ export const dictionaries: Record<Language, Dictionary> = {
       categoriesBreakdown: "Category breakdown",
       categoryComparison: "Your largest categories"
     },
+    homeLayout: {
+      title: "Home screen",
+      intro: "Choose your blocks and their order. Drag the handle or use the arrows. Changes are saved automatically.",
+      walletHint: "The wallet selector always stays at the top. The same layout is used on mobile and desktop.",
+      drag: "Reorder", up: "Move up", down: "Move down", reset: "Restore default layout",
+      saveError: "Could not save the layout. Your previous layout has been restored.",
+      persistenceHint: "Stored on this device and included in backups. Hiding a block does not delete its data.",
+      empty: "Your home blocks are hidden. You can enable them in Settings → Appearance → Home screen.",
+      openGoals: "All goals",
+      blocks: {
+        summary: { title: "Income and expenses", hint: "A quick overview for the selected wallet." },
+        budget: { title: "Monthly budget", hint: "Limits and remaining budget for this month." },
+        insights: { title: "Money observations", hint: "Local patterns from your transactions. Enabling this block also turns on observations." },
+        cashFlow: { title: "Cash flow", hint: "Category chart and a shortcut to analytics." },
+        recent: { title: "Recent transactions", hint: "Your latest transactions and their details." },
+        goals: { title: "Savings goals", hint: "Progress for up to three goals in the selected wallet." }
+      }
+    },
     insights: {
       title: "Money observations",
       hint: "Calculated locally from your transactions. No data leaves this device.",
@@ -1178,15 +1210,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "Safer deletion, wallet reconciliation, and more useful history search.",
+      intro: "Your home screen, arranged around what matters to you.",
       gotIt: "Explore the update",
       notes: [
-        "Undo transaction deletions and restore them later from Trash in History or Settings",
-        "Reconcile wallet balances with a correction history, without changing income or expenses",
-        "Filter history by multiple categories, attachments, and a converted amount range",
-        "Save and reuse filter sets with their original amount currency",
-        "One notification feed with compact type badges and balanced spacing",
-        "Softer wallet glow and unclipped card shadows on Home and History"
+        "Choose visible home blocks in Settings → Appearance → Home screen",
+        "Reorder blocks by dragging or using arrows, with one layout on mobile and desktop",
+        "Optionally show savings goals with progress and a shortcut to all goals",
+        "Your layout is saved automatically, included in backups, and can be reset at any time"
       ]
     },
     categories: {
@@ -1487,6 +1517,24 @@ export const dictionaries: Record<Language, Dictionary> = {
       operations: "операций",
       categoriesBreakdown: "По категориям",
       categoryComparison: "Самые крупные категории"
+    },
+    homeLayout: {
+      title: "Главный экран",
+      intro: "Выбери блоки и их порядок. Перетаскивай за ручку или используй стрелки. Изменения сохраняются автоматически.",
+      walletHint: "Выбор кошелька всегда остаётся сверху. Порядок одинаковый на телефоне и компьютере.",
+      drag: "Переместить", up: "Выше", down: "Ниже", reset: "Вернуть стандартный вид",
+      saveError: "Не удалось сохранить настройки. Восстановлен предыдущий вид.",
+      persistenceHint: "Сохраняется на этом устройстве и попадает в бэкапы. Скрытие блока не удаляет его данные.",
+      empty: "Все блоки скрыты. Включить их можно в Настройки → Вид → Главный экран.",
+      openGoals: "Все цели",
+      blocks: {
+        summary: { title: "Доходы и расходы", hint: "Краткая сводка выбранного кошелька." },
+        budget: { title: "Бюджет месяца", hint: "Лимиты и остаток бюджета на этот месяц." },
+        insights: { title: "Наблюдения о деньгах", hint: "Закономерности в операциях. Включение блока также включает наблюдения." },
+        cashFlow: { title: "Движение денег", hint: "График по категориям и переход к аналитике." },
+        recent: { title: "Последние операции", hint: "Недавние записи и их подробности." },
+        goals: { title: "Накопительные цели", hint: "Прогресс до трёх целей выбранного кошелька." }
+      }
     },
     insights: {
       title: "Наблюдения о деньгах",
@@ -1898,15 +1946,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Безопаснее удалять операции, проще сверять баланс и находить нужные записи.",
+      intro: "Главный экран можно настроить под себя и оставить только важное.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Отмена удаления операций и восстановление из корзины в истории или настройках",
-        "Сверка баланса кошелька с историей корректировок без изменения доходов и расходов",
-        "Фильтры истории по нескольким категориям, вложениям и диапазону суммы с конвертацией",
-        "Сохранённые наборы фильтров запоминают выбранную валюту суммы",
-        "Общая лента уведомлений с компактными бейджами и ровными отступами",
-        "Мягкое свечение кошельков и тени карточек без обрезки на главной и в истории"
+        "Выбор видимых блоков в Настройки → Вид → Главный экран",
+        "Порядок блоков меняется перетаскиванием или стрелками и одинаков на телефоне и ПК",
+        "Опциональный блок накопительных целей с прогрессом и переходом ко всем целям",
+        "Настройки сохраняются автоматически, попадают в бэкапы и сбрасываются в любой момент"
       ]
     },
     categories: {

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { HomeLayoutSettings } from "../components/HomeLayoutSettings";
 import { motion, Reorder, useDragControls } from "framer-motion";
 import type {
   BackupSnapshot,
@@ -579,27 +580,32 @@ export function SettingsView({
       ) : null}
 
       {activeTab === "appearance" ? (
-        <Section title={t.settings.appearance}>
-          <div className="app-surface grid gap-4 rounded-2xl p-4">
-            <SegmentedControl
-              value={visualTheme}
-              onChange={handleThemeChange}
-              options={[
-                { value: "system", label: t.settings.system },
-                { value: "light", label: t.settings.light },
-                { value: "dark", label: t.settings.dark }
-              ]}
-            />
-            <div className="grid gap-2">
-              <span className="text-sm font-medium text-foreground">{t.settings.colorTheme}</span>
-              <ColorThemePicker
-                value={visualColorTheme}
-                labels={t.settings.colorThemes}
-                onChange={handleColorThemeChange}
+        <>
+          <Section title={t.settings.appearance}>
+            <div className="app-surface grid gap-4 rounded-2xl p-4">
+              <SegmentedControl
+                value={visualTheme}
+                onChange={handleThemeChange}
+                options={[
+                  { value: "system", label: t.settings.system },
+                  { value: "light", label: t.settings.light },
+                  { value: "dark", label: t.settings.dark }
+                ]}
               />
+              <div className="grid gap-2">
+                <span className="text-sm font-medium text-foreground">{t.settings.colorTheme}</span>
+                <ColorThemePicker
+                  value={visualColorTheme}
+                  labels={t.settings.colorThemes}
+                  onChange={handleColorThemeChange}
+                />
+              </div>
             </div>
-          </div>
-        </Section>
+          </Section>
+          <Section title={t.homeLayout.title}>
+            <HomeLayoutSettings settings={settings} t={t} onUpdateSettings={updateSettings} />
+          </Section>
+        </>
       ) : null}
 
       {activeTab === "privacy" ? (

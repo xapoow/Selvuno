@@ -20,6 +20,7 @@ import { WalletsView } from "./WalletsView";
 import { WalletTransfersView } from "./WalletTransfersView";
 
 interface WalletsHubViewProps {
+  initialMode?: "wallets" | "transfers" | "goals";
   wallets: Wallet[];
   archivedWallets: Wallet[];
   transactions: Transaction[];
@@ -44,6 +45,7 @@ interface WalletsHubViewProps {
 }
 
 export function WalletsHubView({
+  initialMode = "wallets",
   wallets,
   archivedWallets,
   transactions,
@@ -66,7 +68,7 @@ export function WalletsHubView({
   onCreateTransfer,
   onDeleteTransfer
 }: WalletsHubViewProps) {
-  const [mode, setMode] = useState<"wallets" | "transfers" | "goals">("wallets");
+  const [mode, setMode] = useState<"wallets" | "transfers" | "goals">(initialMode);
 
   return (
     <div className="grid gap-5">
