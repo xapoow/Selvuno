@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.9.0";
+export const appVersion = "0.9.1";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -243,6 +243,9 @@ export interface Dictionary {
     removeAttachment: string;
     openAttachment: string;
     noAttachments: string;
+    attachmentsLoadError: string;
+    deleteHint: string;
+    deleteError: string;
   };
   recurring: {
     tabSingle: string;
@@ -802,7 +805,10 @@ export const dictionaries: Record<Language, Dictionary> = {
       attachmentLocalOnly: "Attachments stay on this device and are not included in backups yet.",
       removeAttachment: "Remove attachment",
       openAttachment: "Open attachment",
-      noAttachments: "No receipts or files attached."
+      noAttachments: "No receipts or files attached.",
+      attachmentsLoadError: "Unable to load attachments. Close and reopen the transaction to try again.",
+      deleteHint: "The transaction will be removed from your history. This action cannot be undone.",
+      deleteError: "Unable to delete the transaction. Please try again."
     },
     recurring: {
       tabSingle: "One-time",
@@ -1010,13 +1016,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "Receipts and documents now stay together with the transaction they belong to.",
+      intro: "More convenient transaction details and a more reliable desktop experience.",
       gotIt: "Explore the update",
       notes: [
-        "Attach receipt photos and PDF documents directly to a transaction",
-        "Capture receipts in a custom full-screen camera with an alignment frame",
-        "Preview photos and PDFs without leaving MyFinances",
-        "Redesigned responsive settings navigation for phone, tablet, and desktop"
+        "Edit or delete transactions directly from their details",
+        "Dialogs now dim the entire screen and keep the background from scrolling",
+        "Fixed a crash when opening Wallets with a single wallet",
+        "Desktop sidebar stays in place while the page scrolls"
       ]
     },
     categories: {
@@ -1436,7 +1442,10 @@ export const dictionaries: Record<Language, Dictionary> = {
       attachmentLocalOnly: "Вложения остаются на этом устройстве и пока не входят в резервные копии.",
       removeAttachment: "Удалить вложение",
       openAttachment: "Открыть вложение",
-      noAttachments: "К операции не прикреплены чеки или файлы."
+      noAttachments: "К операции не прикреплены чеки или файлы.",
+      attachmentsLoadError: "Не удалось загрузить вложения. Закрой и открой операцию, чтобы попробовать снова.",
+      deleteHint: "Операция будет удалена из истории. Это действие нельзя отменить.",
+      deleteError: "Не удалось удалить операцию. Попробуй ещё раз."
     },
     recurring: {
       tabSingle: "Разовая",
@@ -1644,13 +1653,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Теперь чеки и документы хранятся вместе с операцией, к которой относятся.",
+      intro: "Удобнее работать с деталями операций, а настольная версия стала стабильнее.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Фотографии чеков и PDF-документы можно прикреплять прямо к операции",
-        "Собственная полноэкранная камера с рамкой для удобной съёмки чеков",
-        "Встроенный просмотр фотографий и PDF без выхода из MyFinances",
-        "Переработанная навигация настроек для телефона, планшета и ПК"
+        "Редактирование и удаление операций прямо из окна подробностей",
+        "Модалки затемняют весь экран и блокируют прокрутку фона",
+        "Исправлено падение вкладки «Кошельки», когда кошелёк один",
+        "Боковая панель на ПК остаётся на месте при прокрутке страницы"
       ]
     },
     categories: {

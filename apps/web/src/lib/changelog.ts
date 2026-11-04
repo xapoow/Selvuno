@@ -9,6 +9,16 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.9.1",
+      date: "2026-11-04",
+      notes: [
+        "Редактирование и удаление операций прямо из окна подробностей",
+        "Модалки затемняют весь экран и блокируют прокрутку фона",
+        "Исправлено падение вкладки «Кошельки», когда кошелёк один или недоступно перетаскивание",
+        "Боковая панель на ПК остаётся на месте при прокрутке страницы"
+      ]
+    },
+    {
       version: "0.9.0",
       notes: [
         "Фотографии чеков и PDF-документы можно прикреплять прямо к операции",
@@ -134,6 +144,16 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.9.1",
+      date: "2026-11-04",
+      notes: [
+        "Edit or delete transactions directly from their details",
+        "Dialogs now dim the entire screen and lock background scrolling",
+        "Fixed a Wallets crash with a single wallet or when reordering is unavailable",
+        "Desktop sidebar stays in place while the page scrolls"
+      ]
+    },
     {
       version: "0.9.0",
       notes: [

@@ -316,8 +316,8 @@ export function App() {
   }
 
   return (
-    <div className="app-page-bg min-h-dvh text-foreground md:grid md:grid-cols-[236px_minmax(0,1fr)]">
-      <aside className="app-chrome sticky top-0 hidden h-dvh p-4 shadow-[1px_0_0_0_rgb(var(--color-foreground)/0.04)] md:flex md:flex-col">
+    <div className="app-page-bg min-h-dvh text-foreground md:pl-[236px]">
+      <aside className="app-chrome fixed inset-y-0 left-0 z-40 hidden h-dvh w-[236px] overflow-y-auto overscroll-contain p-4 shadow-[1px_0_0_0_rgb(var(--color-foreground)/0.04)] md:flex md:flex-col">
         <div className="mb-7 px-2 pt-2">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">MyFinances</p>
           <h1 className="mt-1 text-2xl font-semibold text-foreground">{t.appName}</h1>
@@ -429,6 +429,8 @@ export function App() {
                   onChange={handleWalletChange}
                   onAdd={() => setActiveView("add")}
                   onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
+                  onUpdateTransaction={async (id, submission) => { await mutations.updateTransactionWithAttachments.mutateAsync({ id, submission }); }}
+                  onDeleteTransaction={(id) => mutations.deleteTransaction.mutateAsync(id)}
                 />
               </div>
               <div className="hidden overflow-hidden md:block">
@@ -454,6 +456,8 @@ export function App() {
                     t={t}
                     onAdd={() => setActiveView("add")}
                     onSetBudget={(input) => mutations.setBudget.mutateAsync(input)}
+                    onUpdateTransaction={async (id, submission) => { await mutations.updateTransactionWithAttachments.mutateAsync({ id, submission }); }}
+                    onDeleteTransaction={(id) => mutations.deleteTransaction.mutateAsync(id)}
                   />
                 </motion.div>
               </div>

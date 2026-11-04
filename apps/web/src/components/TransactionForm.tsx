@@ -69,6 +69,8 @@ export function TransactionForm({
   const [detailsOpen, setDetailsOpen] = useState(Boolean(initial));
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   const [existingAttachments, setExistingAttachments] = useState<TransactionAttachment[]>([]);
   const [newAttachments, setNewAttachments] = useState<File[]>([]);
   const [removedAttachmentIds, setRemovedAttachmentIds] = useState<string[]>([]);
@@ -176,6 +178,9 @@ export function TransactionForm({
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitting(true);
     setError("");
     setSaved(false);
     try {
@@ -216,6 +221,9 @@ export function TransactionForm({
       setSaved(true);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : t.transaction.saveError);
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
     }
   }
 
@@ -243,7 +251,7 @@ export function TransactionForm({
   }
 
   return (
-    <form className="grid gap-5" onSubmit={handleSubmit}>
+    <form className="grid gap-5" onSubmit={handleSubmit} aria-busy={submitting}>
       {!initial && settings.quickTemplatesEnabled && (templates.length || quickTemplates.length) ? (
         <section className="grid gap-2">
           <div className="flex items-start justify-between gap-3">
@@ -517,7 +525,7 @@ export function TransactionForm({
       <Button
         type="submit"
         className="h-12 text-base"
-        disabled={!wallets.length || !typeCategories.length}
+        disabled={submitting || !wallets.length || !typeCategories.length}
       >
         {submitLabel}
       </Button>

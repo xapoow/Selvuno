@@ -36,6 +36,7 @@ import {
   shouldHideWalletAmounts
 } from "../lib/walletFeatures";
 import { compareTransactionsNewestFirst } from "../lib/transactions";
+import type { TransactionSubmission } from "../lib/transactionAttachments";
 
 interface DashboardViewProps {
   wallets: Wallet[];
@@ -54,6 +55,8 @@ interface DashboardViewProps {
   t: Dictionary;
   onAdd: () => void;
   onSetBudget: (input: MonthlyBudgetInput) => Promise<unknown>;
+  onUpdateTransaction: (id: string, submission: TransactionSubmission) => Promise<void>;
+  onDeleteTransaction: (id: string) => Promise<void>;
 }
 
 export function DashboardView({
@@ -72,7 +75,9 @@ export function DashboardView({
   direction = 1,
   t,
   onAdd,
-  onSetBudget
+  onSetBudget,
+  onUpdateTransaction,
+  onDeleteTransaction
 }: DashboardViewProps) {
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [budgetOpen, setBudgetOpen] = useState(false);
@@ -529,15 +534,19 @@ export function DashboardView({
         </Section>
         <TransactionDetailsSheet
           open={Boolean(details)}
-          transaction={details}
+          transaction={transactions.find((transaction) => transaction.id === details?.id) ?? details}
           category={categories.find((category) => category.id === details?.categoryId)}
           wallet={wallets.find((wallet) => wallet.id === details?.walletId)}
+          wallets={wallets}
+          categories={categories}
           settings={{ ...settings, hideAmounts }}
           t={t}
           displayAmountMinor={displayTransactions.find((item) => item.transaction.id === details?.id)?.amountMinor}
           displayCurrency={displayTransactions.find((item) => item.transaction.id === details?.id)?.currency}
           conversionMissing={displayTransactions.find((item) => item.transaction.id === details?.id)?.conversionMissing}
           onClose={() => setDetails(null)}
+          onUpdate={onUpdateTransaction}
+          onDelete={onDeleteTransaction}
         />
       </motion.div>
     </motion.div>

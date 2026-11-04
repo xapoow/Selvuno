@@ -64,15 +64,8 @@ function ReorderWalletItem({
     ? Math.min(100, Math.round((creditUsedMinor / wallet.creditLimitMinor) * 100))
     : 0;
 
-  return (
-    <Reorder.Item
-      key={wallet.id}
-      value={wallet.id}
-      dragListener={false}
-      dragControls={dragControls}
-      onDragEnd={onDragEnd}
-      className="app-surface grid gap-3 rounded-2xl p-4"
-    >
+  const content = (
+    <>
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           {canReorder ? (
@@ -163,7 +156,21 @@ function ReorderWalletItem({
       >
         {t.wallets.archive}
       </Button>
+    </>
+  );
+
+  return canReorder ? (
+    <Reorder.Item
+      value={wallet.id}
+      dragListener={false}
+      dragControls={dragControls}
+      onDragEnd={onDragEnd}
+      className="app-surface grid gap-3 rounded-2xl p-4"
+    >
+      {content}
     </Reorder.Item>
+  ) : (
+    <article className="app-surface grid gap-3 rounded-2xl p-4">{content}</article>
   );
 }
 

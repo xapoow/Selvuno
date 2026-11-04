@@ -530,15 +530,19 @@ export function HistoryView({
       </BottomSheet>
       <TransactionDetailsSheet
         open={Boolean(details)}
-        transaction={details}
+        transaction={transactions.find((transaction) => transaction.id === details?.id) ?? details}
         category={categories.find((category) => category.id === details?.categoryId)}
         wallet={wallets.find((wallet) => wallet.id === details?.walletId)}
+        wallets={wallets}
+        categories={categories}
         settings={settings}
         t={t}
         displayAmountMinor={displayTransactions.find((item) => item.transaction.id === details?.id)?.amountMinor}
         displayCurrency={displayTransactions.find((item) => item.transaction.id === details?.id)?.currency}
         conversionMissing={displayTransactions.find((item) => item.transaction.id === details?.id)?.conversionMissing}
         onClose={() => setDetails(null)}
+        onUpdate={onUpdateWithAttachments}
+        onDelete={onDelete}
       />
     </div>
   );

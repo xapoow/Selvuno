@@ -3,12 +3,14 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Category, Settings, Transaction, Wallet } from "@myfinances/types";
 import { formatDate, formatSignedMoney } from "@myfinances/utils";
-import { CalendarDays, FileText, Paperclip, Tag, WalletCards, X } from "lucide-react";
+import { CalendarDays, Edit3, FileText, LoaderCircle, Paperclip, Tag, Trash2, WalletCards, X } from "lucide-react";
 import type { TransactionAttachment } from "../db/models";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { CategoryIcon } from "../lib/icons";
 import { shouldHideWalletAmounts } from "../lib/walletFeatures";
 import { transactionAttachmentRepository } from "../repositories/transactionAttachmentRepository";
+import type { TransactionSubmission } from "../lib/transactionAttachments";
+import { TransactionForm } from "./TransactionForm";
 import { BottomSheet } from "./ui/BottomSheet";
 import { Button } from "./ui/Button";
 
@@ -17,12 +19,16 @@ interface TransactionDetailsSheetProps {
   transaction: Transaction | null;
   category?: Category;
   wallet?: Wallet;
+  wallets: Wallet[];
+  categories: Category[];
   settings: Settings;
   t: Dictionary;
   displayAmountMinor?: number;
   displayCurrency?: string;
   conversionMissing?: boolean;
   onClose: () => void;
+  onUpdate: (id: string, submission: TransactionSubmission) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
 }
 
 interface AttachmentPreview extends TransactionAttachment {
@@ -40,16 +46,30 @@ export function TransactionDetailsSheet({
   transaction,
   category,
   wallet,
+  wallets,
+  categories,
   settings,
   t,
   displayAmountMinor,
   displayCurrency,
   conversionMissing,
-  onClose
+  onClose,
+  onUpdate,
+  onDelete
 }: TransactionDetailsSheetProps) {
   const [attachments, setAttachments] = useState<TransactionAttachment[]>([]);
   const [loading, setLoading] = useState(false);
   const [viewer, setViewer] = useState<AttachmentPreview | null>(null);
+  const [mode, setMode] = useState<"details" | "edit" | "delete">("details");
+  const [busy, setBusy] = useState(false);
+  const [actionError, setActionError] = useState("");
+  const [attachmentError, setAttachmentError] = useState(false);
+
+  useEffect(() => {
+    setMode("details");
+    setActionError("");
+    setViewer(null);
+  }, [open, transaction?.id]);
 
   useEffect(() => {
     if (!open || !transaction) {
@@ -58,12 +78,15 @@ export function TransactionDetailsSheet({
       return;
     }
     let cancelled = false;
+    setAttachments([]);
+    setAttachmentError(false);
     setLoading(true);
     void transactionAttachmentRepository
       .listByTransaction(transaction.id)
       .then((items) => {
         if (!cancelled) setAttachments(items);
       })
+      .catch(() => { if (!cancelled) setAttachmentError(true); })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
@@ -139,7 +162,39 @@ export function TransactionDetailsSheet({
 
   return (
     <>
-      <BottomSheet open={open} title={t.transaction.detailsTitle} onClose={onClose}>
+      <BottomSheet
+        open={open}
+        title={mode === "edit" ? t.transaction.editTitle : t.transaction.detailsTitle}
+        onClose={onClose}
+        closeLabel={t.common.close}
+        dismissible={!busy && !viewer}
+      >
+        {mode === "edit" ? (
+          <div className="grid gap-4">
+            <Button type="button" variant="secondary" size="small" className="justify-self-start" disabled={busy} onClick={() => setMode("details")}>
+              {t.common.back}
+            </Button>
+            <TransactionForm
+              key={transaction.id}
+              wallets={wallets}
+              categories={categories}
+              settings={{ ...settings, hideAmounts: hideAmount }}
+              t={t}
+              initial={transaction}
+              activeWalletId={transaction.walletId}
+              submitLabel={t.transaction.update}
+              onSubmit={async (submission) => {
+                setBusy(true);
+                try {
+                  await onUpdate(transaction.id, submission);
+                  onClose();
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            />
+          </div>
+        ) : (
         <div className="grid gap-5">
           <section className="app-control relative overflow-hidden rounded-2xl p-4">
             <div
@@ -198,6 +253,8 @@ export function TransactionDetailsSheet({
             </div>
             {loading ? (
               <div className="app-control h-28 animate-pulse rounded-2xl" />
+            ) : attachmentError ? (
+              <p role="alert" className="text-sm text-expense">{t.transaction.attachmentsLoadError}</p>
             ) : previews.length ? (
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {previews.map((preview) => (
@@ -213,7 +270,48 @@ export function TransactionDetailsSheet({
               <div className="app-control grid min-h-24 place-items-center rounded-2xl px-4 text-center text-sm text-muted">{t.transaction.noAttachments}</div>
             )}
           </section>
+
+          {mode === "delete" ? (
+            <motion.section className="rounded-2xl bg-expense/10 p-4" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+              <h3 className="text-sm font-semibold text-foreground">{t.history.confirmDelete}</h3>
+              <p className="mt-1 text-xs leading-5 text-muted">{t.transaction.deleteHint}</p>
+              {actionError ? <p role="alert" className="mt-2 text-sm text-expense">{actionError}</p> : null}
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <Button type="button" variant="secondary" disabled={busy} onClick={() => { setMode("details"); setActionError(""); }}>
+                  {t.common.cancel}
+                </Button>
+                <Button type="button" variant="danger" disabled={busy} onClick={async () => {
+                  if (busy) return;
+                  setBusy(true);
+                  setActionError("");
+                  try {
+                    await onDelete(transaction.id);
+                    onClose();
+                  } catch {
+                    setActionError(t.transaction.deleteError);
+                  } finally {
+                    setBusy(false);
+                  }
+                }}>
+                  {busy ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                  {t.common.delete}
+                </Button>
+              </div>
+            </motion.section>
+          ) : (
+            <div className="grid grid-cols-2 gap-2 border-t border-line/60 pt-4">
+              <Button type="button" variant="secondary" className="min-w-0 px-2 text-xs sm:text-sm" onClick={() => setMode("edit")}>
+                <Edit3 className="h-4 w-4 shrink-0" />
+                {t.common.edit}
+              </Button>
+              <Button type="button" variant="ghost" className="min-w-0 px-2 text-xs text-expense sm:text-sm" onClick={() => setMode("delete")}>
+                <Trash2 className="h-4 w-4 shrink-0" />
+                {t.common.delete}
+              </Button>
+            </div>
+          )}
         </div>
+        )}
       </BottomSheet>
       {viewerOverlay}
     </>
