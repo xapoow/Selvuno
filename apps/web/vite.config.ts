@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      manifestFilename: "manifest-v0.9.5.webmanifest",
+      manifestFilename: "manifest-v0.9.6.webmanifest",
       includeAssets: ["pwa.svg"],
       manifest: {
         id: "/",
@@ -30,6 +30,7 @@ export default defineConfig({
         ]
       },
       workbox: {
+        navigateFallback: "/index.html",
         globPatterns: ["**/*.{js,css,html,svg,png,ico,json}"]
       },
       devOptions: {

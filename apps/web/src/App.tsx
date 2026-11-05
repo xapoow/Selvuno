@@ -20,6 +20,7 @@ import { getDictionary } from "./i18n";
 import { applyRootVisualTheme } from "./lib/colorThemes";
 import { useExchangeRates } from "./lib/exchangeRates";
 import { buildAppNotifications } from "./lib/notifications";
+import { historyPath, settingsPath, walletPath, viewPaths, type DashboardPage, type HistoryMode, type RoutableSettingsTab } from "./lib/routes";
 import { useAppStore, type AppView } from "./state/appStore";
 import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
 import { usePrivacyLock } from "./state/usePrivacyLock";
@@ -68,6 +69,13 @@ const pageVariants: Variants = {
 
 export function App() {
   const activeView = useAppStore((state) => state.activeView);
+  const route = useAppStore((state) => state.route);
+  const navigateRoute = useAppStore((state) => state.navigate);
+  const setRouteWallet = useAppStore((state) => state.setRouteWallet);
+  const backTo = useAppStore((state) => state.backTo);
+  const dashboardPage: DashboardPage = route.path === "/analytics" ? "analytics" : route.path === "/budget" ? "budget" : "overview";
+  const historyMode: HistoryMode = route.path === "/history/table" ? "table" : route.path === "/history/calendar" ? "calendar" : "list";
+  const setDashboardPage = (page: DashboardPage) => navigateRoute(page === "overview" ? "/" : page === "budget" ? "/budget" : "/analytics");
   const setActiveView = useAppStore((state) => state.setActiveView);
   const prevViewRef = useRef<AppView>(activeView);
   const viewTransitionDirection = (viewOrder[activeView] ?? 0) >= (viewOrder[prevViewRef.current] ?? 0) ? 1 : -1;
@@ -80,15 +88,8 @@ export function App() {
   const data = useFinanceData();
   const mutations = useFinanceMutations();
   const [trashOpen, setTrashOpen] = useState(false);
-  const [walletHubMode, setWalletHubMode] = useState<"wallets" | "goals">("wallets");
-  const openGoals = () => {
-    setWalletHubMode("goals");
-    setActiveView("wallets");
-  };
-  const navigate = (view: AppView) => {
-    if (view === "wallets") setWalletHubMode("wallets");
-    setActiveView(view);
-  };
+  const openGoals = () => navigateRoute("/wallets/goals");
+  const navigate = (view: AppView) => navigateRoute(viewPaths[view], { walletId: activeWalletId });
   const deletion = useTransactionDeletion({
     deleteTransactions: (ids) => mutations.deleteTransactions.mutateAsync(ids),
     restoreTransactions: (deleted) => mutations.restoreTransactions.mutateAsync(deleted)
@@ -187,14 +188,19 @@ export function App() {
     return () => window.clearTimeout(timer);
   }, [backupRevision, isLoading, settings?.onboardingCompleted]);
 
-  const [selectedWalletId, setSelectedWalletId] = useState<WalletView | null>(null);
+  const selectedWalletId = route.walletId;
 
   const activeWalletId: WalletView =
-    selectedWalletId !== null && (selectedWalletId === "all" || wallets.some((wallet) => wallet.id === selectedWalletId))
-      ? selectedWalletId
+    selectedWalletId !== null
+      ? selectedWalletId === "all" || wallets.some((wallet) => wallet.id === selectedWalletId) ? selectedWalletId : "all"
       : settings && (settings.activeWalletId === "all" || wallets.some((wallet) => wallet.id === settings.activeWalletId))
         ? settings.activeWalletId
         : "all";
+  useEffect(() => {
+    if (!isLoading && !isError && route.walletId && route.walletId !== "all" && !wallets.some((wallet) => wallet.id === route.walletId)) {
+      setRouteWallet("all");
+    }
+  }, [isLoading, isError, route.walletId, wallets, setRouteWallet]);
   const activeWallet = activeWalletId === "all" ? undefined : wallets.find((wallet) => wallet.id === activeWalletId);
   const displayCurrency = settings ? activeWallet?.currency ?? settings.currency : "USD";
   const includedWalletIds = getIncludedWalletIds(
@@ -229,9 +235,9 @@ export function App() {
   );
   const exchangeRates = useExchangeRates(displayCurrency, conversionNeeded);
   const handleWalletChange = (nextWalletId: WalletView, direction = 1) => {
-    setSelectedWalletId(nextWalletId);
+    setRouteWallet(nextWalletId);
     setWalletTransitionDirection(direction);
-    void mutations.updateSettings.mutateAsync({ activeWalletId: nextWalletId });
+    void mutations.updateSettings.mutateAsync({ activeWalletId: nextWalletId }).catch(() => undefined);
   };
   const addWalletId: WalletView = activeWalletId === "all" ? wallets[0]?.id ?? "all" : activeWalletId;
   const addWallet = wallets.find((wallet) => wallet.id === addWalletId);
@@ -315,7 +321,7 @@ export function App() {
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">MyFinances</p>
           <h1 className="mt-1 text-2xl font-semibold text-foreground">{t.appName}</h1>
         </div>
-        <HeaderNavigation activeView={activeView} labels={t.nav} onChange={navigate} />
+        <HeaderNavigation activeView={activeView} labels={t.nav} onChange={navigate} walletId={activeWalletId} />
         <div className="mt-auto grid gap-2">
           {showsWalletContext ? (
             <div className="app-surface rounded-app p-3.5">
@@ -397,6 +403,9 @@ export function App() {
             <>
               <div className="md:hidden">
                 <MobileWalletDashboardPager
+                  page={dashboardPage}
+                  onPageChange={setDashboardPage}
+                  onBack={() => backTo("/")}
                   wallets={wallets}
                   categories={categories}
                   transactions={transactions}
@@ -424,6 +433,9 @@ export function App() {
                   transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
                 >
                   <DashboardView
+                    page={dashboardPage}
+                    onPageChange={setDashboardPage}
+                    onBack={() => backTo("/")}
                     wallets={wallets}
                     categories={categories}
                     transactions={transactions}
@@ -451,6 +463,8 @@ export function App() {
           ) : null}
           {activeView === "add" ? (
             <AddTransactionView
+              mode={route.path === "/add/recurring" ? "recurring" : "single"}
+              onModeChange={(mode) => navigateRoute(mode === "single" ? "/add" : "/add/recurring")}
               wallets={wallets}
               categories={categories}
               recurringTransactions={recurringTransactions}
@@ -494,6 +508,8 @@ export function App() {
                 transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
               >
                 <HistoryView
+                  mode={historyMode}
+                  onModeChange={(mode) => navigateRoute(historyPath(mode))}
                   wallets={wallets}
                   categories={categories}
                   transactions={transactions}
@@ -519,7 +535,8 @@ export function App() {
           ) : null}
           {activeView === "wallets" ? (
             <WalletsHubView
-              initialMode={walletHubMode}
+              mode={route.path === "/wallets/goals" ? "goals" : route.path === "/wallets/transfers" ? "transfers" : "wallets"}
+              onModeChange={(mode) => navigateRoute(walletPath(mode))}
               wallets={wallets}
               archivedWallets={archivedWallets}
               transactions={transactions}
@@ -563,6 +580,11 @@ export function App() {
           ) : null}
           {activeView === "settings" ? (
             <SettingsView
+              activeTab={(route.path === "/settings" ? "general" : route.path?.slice("/settings/".length)) as RoutableSettingsTab}
+              onTabChange={(tab) => {
+                // An exiting settings sheet must not override a newer Back/Forward navigation.
+                if (tab !== "debug" && useAppStore.getState().route.path === route.path) navigateRoute(settingsPath(tab));
+              }}
               settings={settings}
               categories={categories}
               backupSnapshots={backupSnapshots}
@@ -602,7 +624,7 @@ export function App() {
       </AnimatePresence>
       </main>
 
-      <BottomNavigation activeView={activeView} labels={t.nav} onChange={navigate} />
+      <BottomNavigation activeView={activeView} labels={t.nav} onChange={navigate} walletId={activeWalletId} />
       <TransactionUndoNotice deletion={deletion} t={t} onOpenTrash={() => setTrashOpen(true)} />
       <TransactionTrash
         open={trashOpen}

@@ -22,6 +22,7 @@ import { SegmentedControl } from "../components/ui/SegmentedControl";
 import { SelectField } from "../components/ui/SelectField";
 import { TextField } from "../components/ui/TextField";
 import { getCategoryName, type Dictionary } from "../i18n";
+import type { HistoryMode } from "../lib/routes";
 import { convertMinorToBaseCurrency, useExchangeRates, type ExchangeRateTable } from "../lib/exchangeRates";
 import { advancedHistoryFilterCount, defaultHistoryFilters, equalHistoryFilters, filterHistoryTransactions, hasHistoryFilters, readHistoryAmountRange, type HistoryFilters, type HistorySort } from "../lib/historyFilters";
 import { useSavedHistoryFilters } from "../state/useSavedHistoryFilters";
@@ -31,6 +32,8 @@ import type { TransactionSubmission } from "../lib/transactionAttachments";
 import { compareTransactionsNewestFirst, compareTransactionsOldestFirst } from "../lib/transactions";
 
 interface HistoryViewProps {
+  mode?: HistoryMode;
+  onModeChange?: (mode: HistoryMode) => void;
   wallets: Wallet[];
   categories: Category[];
   transactions: Transaction[];
@@ -50,6 +53,8 @@ interface HistoryViewProps {
 }
 
 export function HistoryView({
+  mode: routedMode,
+  onModeChange,
   wallets,
   categories,
   transactions,
@@ -75,7 +80,9 @@ export function HistoryView({
   const [filtersOpen, setFiltersOpen] = useState(false);
   const presets = useSavedHistoryFilters();
   const advancedCount = advancedHistoryFilterCount(filters);
-  const [viewMode, setViewMode] = useState<"list" | "table" | "calendar">("list");
+  const [localMode, setLocalMode] = useState<HistoryMode>("list");
+  const viewMode = routedMode ?? localMode;
+  const setViewMode = (next: HistoryMode) => { if (onModeChange) onModeChange(next); else setLocalMode(next); };
   const [editing, setEditing] = useState<Transaction | null>(null);
   const [details, setDetails] = useState<Transaction | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());

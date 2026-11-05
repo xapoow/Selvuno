@@ -17,9 +17,13 @@ import { type Dictionary } from "../i18n";
 import { useExchangeRates } from "../lib/exchangeRates";
 import { MonobankWalletCarousel } from "./MonobankWalletCarousel";
 import { getIncludedWalletIds } from "../lib/walletFeatures";
+import type { DashboardPage } from "../lib/routes";
 import type { TransactionSubmission } from "../lib/transactionAttachments";
 
 interface MobileWalletDashboardPagerProps {
+  page?: DashboardPage;
+  onPageChange?: (page: DashboardPage) => void;
+  onBack?: () => void;
   wallets: Wallet[];
   categories: Category[];
   transactions: Transaction[];
@@ -42,6 +46,9 @@ interface MobileWalletDashboardPagerProps {
 function MobileWalletDashboardSlide({
   walletView,
   direction = 1,
+  page,
+  onPageChange,
+  onBack,
   wallets,
   categories,
   transactions,
@@ -91,6 +98,9 @@ function MobileWalletDashboardSlide({
 
   return (
     <DashboardView
+      page={page}
+      onPageChange={onPageChange}
+      onBack={onBack}
       wallets={wallets}
       categories={categories}
       transactions={transactions}
@@ -116,6 +126,9 @@ function MobileWalletDashboardSlide({
 }
 
 export function MobileWalletDashboardPager({
+  page,
+  onPageChange,
+  onBack,
   wallets,
   categories,
   transactions,
@@ -154,6 +167,9 @@ export function MobileWalletDashboardPager({
       />
 
       <MobileWalletDashboardSlide
+        page={page}
+        onPageChange={onPageChange}
+        onBack={onBack}
         walletView={activeWalletId}
         direction={slideDirection}
         wallets={wallets}

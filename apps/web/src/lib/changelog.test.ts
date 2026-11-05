@@ -18,8 +18,8 @@ describe("changelog", () => {
     const list = getChangelogHistory("ru-RU");
     expect(list.length).toBeGreaterThanOrEqual(10);
     expect(list[0].version).toBe(appVersion);
-    expect(list[1].version).toBe("0.9.4");
-    expect(list[2].version).toBe("0.9.2");
+    expect(list[1].version).toBe("0.9.5");
+    expect(list[2].version).toBe("0.9.4");
   });
 
   it("preserves stored changelog history from previous versions", () => {

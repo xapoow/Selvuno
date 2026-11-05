@@ -42,8 +42,12 @@ import {
 } from "../lib/walletFeatures";
 import { compareTransactionsNewestFirst } from "../lib/transactions";
 import type { TransactionSubmission } from "../lib/transactionAttachments";
+import type { DashboardPage } from "../lib/routes";
 
 interface DashboardViewProps {
+  page?: DashboardPage;
+  onPageChange?: (page: DashboardPage) => void;
+  onBack?: () => void;
   wallets: Wallet[];
   categories: Category[];
   transactions: Transaction[];
@@ -68,6 +72,9 @@ interface DashboardViewProps {
 }
 
 export function DashboardView({
+  page: routedPage,
+  onPageChange,
+  onBack,
   wallets,
   categories,
   transactions,
@@ -90,8 +97,12 @@ export function DashboardView({
   onUpdateTransaction,
   onDeleteTransaction
 }: DashboardViewProps) {
-  const [analyticsOpen, setAnalyticsOpen] = useState(false);
-  const [budgetOpen, setBudgetOpen] = useState(false);
+  const [localPage, setLocalPage] = useState<DashboardPage>("overview");
+  const page = routedPage ?? localPage;
+  const analyticsOpen = page === "analytics";
+  const budgetOpen = page === "budget";
+  const setPage = (next: DashboardPage) => { if (onPageChange) onPageChange(next); else setLocalPage(next); };
+  const back = () => { if (onBack) onBack(); else setPage("overview"); };
   const [chartType, setChartType] = useState<"expense" | "income">("expense");
   const [details, setDetails] = useState<Transaction | null>(null);
   const advancedWalletsEnabled = settings.advancedWalletsEnabled;
@@ -307,7 +318,7 @@ export function DashboardView({
         exchangeRates={budgetExchangeRates.data}
         t={t}
         onSetBudget={onSetBudget}
-        onBack={() => setBudgetOpen(false)}
+        onBack={back}
       />
     );
   }
@@ -321,7 +332,7 @@ export function DashboardView({
         settings={settings}
         initialWalletId={activeWalletId}
         t={t}
-        onBack={() => setAnalyticsOpen(false)}
+        onBack={back}
       />
     );
   }
@@ -397,7 +408,7 @@ export function DashboardView({
         monthLabel={formatBudgetMonth(currentBudgetMonth, settings.locale)}
         progress={budgetProgress}
         t={t}
-        onOpen={() => setBudgetOpen(true)}
+        onOpen={() => setPage("budget")}
       />
     ),
     insights: <SmartInsightsCard insights={smartInsights} categories={categories} t={t} />,
@@ -428,7 +439,7 @@ export function DashboardView({
             <div className="grid items-center gap-4 sm:grid-cols-[210px_1fr]">
               <button
                 type="button"
-                onClick={() => setAnalyticsOpen(true)}
+                onClick={() => setPage("analytics")}
                 className="app-focus relative h-48 rounded-full outline-none active:scale-[0.98]"
                 aria-label={t.dashboard.openAnalytics}
               >

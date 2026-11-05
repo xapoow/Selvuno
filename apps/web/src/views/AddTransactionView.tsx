@@ -18,9 +18,12 @@ import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
 import { SegmentedControl } from "../components/ui/SegmentedControl";
 import type { Dictionary } from "../i18n";
+import type { AddMode } from "../lib/routes";
 import type { TransactionSubmission } from "../lib/transactionAttachments";
 
 interface AddTransactionViewProps {
+  mode?: AddMode;
+  onModeChange?: (mode: AddMode) => void;
   wallets: Wallet[];
   categories: Category[];
   recurringTransactions: RecurringTransaction[];
@@ -38,6 +41,8 @@ interface AddTransactionViewProps {
 }
 
 export function AddTransactionView({
+  mode: routedMode,
+  onModeChange,
   wallets,
   categories,
   recurringTransactions,
@@ -53,7 +58,9 @@ export function AddTransactionView({
   onSetRecurringPaused,
   onDeleteRecurring
 }: AddTransactionViewProps) {
-  const [mode, setMode] = useState<"single" | "recurring">("single");
+  const [localMode, setLocalMode] = useState<AddMode>("single");
+  const mode = routedMode ?? localMode;
+  const setMode = (next: AddMode) => { if (onModeChange) onModeChange(next); else setLocalMode(next); };
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const activeWallet = settings.activeWalletId === "all" ? undefined : wallets.find((wallet) => wallet.id === settings.activeWalletId);
 
