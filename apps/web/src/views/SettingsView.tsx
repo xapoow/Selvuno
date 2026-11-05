@@ -54,6 +54,8 @@ import { appVersion, getCategoryName, languageOptions, type Dictionary, type Set
 import type { PrivacyLockController } from "../state/usePrivacyLock";
 
 interface SettingsViewProps {
+  activeTab?: SettingsTab;
+  onTabChange?: (tab: SettingsTab) => void;
   settings: Settings;
   categories: Category[];
   backupSnapshots: BackupSnapshot[];
@@ -157,6 +159,8 @@ function ReorderCategoryRow({
 }
 
 export function SettingsView({
+  activeTab: routedTab,
+  onTabChange,
   settings,
   categories,
   backupSnapshots,
@@ -188,7 +192,9 @@ export function SettingsView({
     expense: [],
     income: []
   });
-  const [activeTab, setActiveTab] = useState<SettingsTab>("general");
+  const [localTab, setLocalTab] = useState<SettingsTab>("general");
+  const activeTab = routedTab ?? localTab;
+  const setActiveTab = (tab: SettingsTab) => { if (onTabChange) onTabChange(tab); else setLocalTab(tab); };
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const [settingsSaveState, setSettingsSaveState] = useState<SettingsSaveState>("idle");
   const [visualTheme, setVisualTheme] = useState<ThemePreference>(settings.theme);
@@ -216,6 +222,12 @@ export function SettingsView({
   );
   const activeTabMeta = settingsTabs.find((tab) => tab.value === activeTab) ?? settingsTabs[0];
   const ActiveTabIcon = activeTabMeta.icon;
+
+  useEffect(() => {
+    // Browser navigation must not leave an old menu selection queued.
+    pendingSettingsTabRef.current = null;
+    setSettingsMenuOpen(false);
+  }, [routedTab]);
 
   useEffect(() => {
     setVisualTheme(settings.theme);

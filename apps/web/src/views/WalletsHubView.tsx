@@ -15,11 +15,14 @@ import type {
 import { MobileWalletsPager } from "../components/MobileWalletsPager";
 import { SegmentedControl } from "../components/ui/SegmentedControl";
 import type { Dictionary } from "../i18n";
+import type { WalletTab } from "../lib/routes";
 import { SavingsGoalsView } from "./SavingsGoalsView";
 import { WalletsView } from "./WalletsView";
 import { WalletTransfersView } from "./WalletTransfersView";
 
 interface WalletsHubViewProps {
+  mode?: WalletTab;
+  onModeChange?: (mode: WalletTab) => void;
   initialMode?: "wallets" | "transfers" | "goals";
   wallets: Wallet[];
   archivedWallets: Wallet[];
@@ -45,6 +48,8 @@ interface WalletsHubViewProps {
 }
 
 export function WalletsHubView({
+  mode: routedMode,
+  onModeChange,
   initialMode = "wallets",
   wallets,
   archivedWallets,
@@ -68,7 +73,9 @@ export function WalletsHubView({
   onCreateTransfer,
   onDeleteTransfer
 }: WalletsHubViewProps) {
-  const [mode, setMode] = useState<"wallets" | "transfers" | "goals">(initialMode);
+  const [localMode, setLocalMode] = useState<WalletTab>(initialMode);
+  const mode = routedMode ?? localMode;
+  const setMode = (next: WalletTab) => { if (onModeChange) onModeChange(next); else setLocalMode(next); };
 
   return (
     <div className="grid gap-5">

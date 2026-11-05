@@ -1,14 +1,17 @@
+import type { WalletView } from "@myfinances/types";
+import { isPlainNavigation, routeHref, viewPaths } from "../lib/routes";
 import { cn } from "../lib/cn";
 import type { AppView } from "../state/appStore";
 import { navigationItems } from "./navigationItems";
 
 interface BottomNavigationProps {
   activeView: AppView;
+  walletId?: WalletView | null;
   labels: Record<AppView, string>;
   onChange: (view: AppView) => void;
 }
 
-export function BottomNavigation({ activeView, labels, onChange }: BottomNavigationProps) {
+export function BottomNavigation({ activeView, labels, onChange, walletId = null }: BottomNavigationProps) {
   return (
     <nav className="app-chrome fixed inset-x-0 bottom-0 z-40 px-3 pb-[calc(env(safe-area-inset-bottom)+10px)] pt-2 md:hidden">
       <div className="mx-auto grid max-w-xl grid-cols-5 gap-1">
@@ -16,10 +19,10 @@ export function BottomNavigation({ activeView, labels, onChange }: BottomNavigat
           const Icon = item.icon;
           const isActive = activeView === item.view;
           return (
-            <button
+            <a
               key={item.view}
-              type="button"
-              onClick={() => onChange(item.view)}
+              href={routeHref(viewPaths[item.view], walletId)}
+              onClick={(event) => { if (isPlainNavigation(event)) { event.preventDefault(); onChange(item.view); } }}
               aria-current={isActive ? "page" : undefined}
               className={cn(
                 "app-focus grid h-12 place-items-center rounded-control text-[11px] font-medium text-muted outline-none transition-all active:scale-[0.96]",
@@ -28,7 +31,7 @@ export function BottomNavigation({ activeView, labels, onChange }: BottomNavigat
             >
               <Icon className={cn("h-5 w-5 transition-transform", isActive && "scale-105")} />
               <span className="tracking-tight">{labels[item.view]}</span>
-            </button>
+            </a>
           );
         })}
       </div>
