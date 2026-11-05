@@ -9,6 +9,16 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.9.6",
+      date: "2026-11-05",
+      notes: [
+        "Адресная строка синхронизирована с экранами и вкладками настроек, истории и кошельков",
+        "Прямые ссылки, перезагрузка и кнопки «Назад/Вперёд» восстанавливают выбранный раздел",
+        "Выбор кошелька отражается в URL без лишних шагов в истории браузера",
+        "Основные разделы открываются в новой вкладке; добавлена обработка вложенных ссылок в PWA"
+      ]
+    },
+    {
       version: "0.9.5",
       date: "2026-11-05",
       notes: [
@@ -197,6 +207,16 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.9.6",
+      date: "2026-11-05",
+      notes: [
+        "The address bar now follows screens and tabs in Settings, History and Wallets",
+        "Direct links, page reloads and Back/Forward restore the selected section",
+        "Wallet selection appears in the URL without flooding browser history",
+        "Main sections can open in a new tab; nested links have a PWA navigation fallback"
+      ]
+    },
     {
       version: "0.9.5",
       date: "2026-11-05",

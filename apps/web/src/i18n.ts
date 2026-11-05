@@ -5,7 +5,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.9.5";
+export const appVersion = "0.9.6";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -1210,13 +1210,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "Your home screen, arranged around what matters to you.",
+      intro: "Navigate between screens and return to the section you need.",
       gotIt: "Explore the update",
       notes: [
-        "Choose visible home blocks in Settings → Appearance → Home screen",
-        "Reorder blocks by dragging or using arrows, with one layout on mobile and desktop",
-        "Optionally show savings goals with progress and a shortcut to all goals",
-        "Your layout is saved automatically, included in backups, and can be reset at any time"
+        "The address bar now follows screens and tabs in Settings, History and Wallets",
+        "Direct links, page reloads and Back/Forward restore the selected section",
+        "Wallet selection appears in the URL without flooding browser history",
+        "Main sections can open in a new tab; nested links have a PWA navigation fallback"
       ]
     },
     categories: {
@@ -1946,13 +1946,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Главный экран можно настроить под себя и оставить только важное.",
+      intro: "Удобнее переходить между экранами и возвращаться к нужному разделу.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Выбор видимых блоков в Настройки → Вид → Главный экран",
-        "Порядок блоков меняется перетаскиванием или стрелками и одинаков на телефоне и ПК",
-        "Опциональный блок накопительных целей с прогрессом и переходом ко всем целям",
-        "Настройки сохраняются автоматически, попадают в бэкапы и сбрасываются в любой момент"
+        "Адресная строка синхронизирована с экранами и вкладками настроек, истории и кошельков",
+        "Прямые ссылки, перезагрузка и кнопки «Назад/Вперёд» восстанавливают выбранный раздел",
+        "Выбор кошелька отражается в URL без лишних шагов в истории браузера",
+        "Основные разделы открываются в новой вкладке; добавлена обработка вложенных ссылок в PWA"
       ]
     },
     categories: {
