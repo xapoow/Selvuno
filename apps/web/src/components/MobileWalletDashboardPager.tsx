@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { calculateWalletAdjustmentTotal } from "@myfinances/utils";
+import { calculateWalletAdjustmentTotal } from "@selvuno/utils";
 import type {
   Category,
   SavingsGoal,
@@ -11,7 +11,7 @@ import type {
   Wallet,
   WalletTransfer,
   WalletView
-} from "@myfinances/types";
+} from "@selvuno/types";
 import { DashboardView } from "../views/DashboardView";
 import { type Dictionary } from "../i18n";
 import { useExchangeRates } from "../lib/exchangeRates";

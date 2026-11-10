@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { convertMinorBetweenCurrencies } from "@myfinances/utils";
+import { convertMinorBetweenCurrencies } from "@selvuno/utils";
 
 export interface ExchangeRateTable {
   base: string;

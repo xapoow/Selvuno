@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Wallet } from "@myfinances/types";
+import type { Wallet } from "@selvuno/types";
 import { calculateCombinedWalletBalance, clampCarouselWidth, getCarouselGeometry } from "./MonobankWalletCarousel";
 
 function wallet(id: string, currency: string, initialBalanceMinor: number): Wallet {

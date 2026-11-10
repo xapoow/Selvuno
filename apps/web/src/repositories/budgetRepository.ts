@@ -1,5 +1,5 @@
-import type { BudgetMonth, MonthlyBudget, MonthlyBudgetInput } from "@myfinances/types";
-import { monthlyBudgetInputSchema } from "@myfinances/types";
+import type { BudgetMonth, MonthlyBudget, MonthlyBudgetInput } from "@selvuno/types";
+import { monthlyBudgetInputSchema } from "@selvuno/types";
 import { createEntityBase, financeDb, nowIso } from "../db/database";
 
 export interface BudgetRepository {

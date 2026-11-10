@@ -1,4 +1,4 @@
-import type { Wallet, WalletView } from "@myfinances/types";
+import type { Wallet, WalletView } from "@selvuno/types";
 import { useState } from "react";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import { ChevronLeft, ChevronRight, Layers3 } from "lucide-react";

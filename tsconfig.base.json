@@ -17,8 +17,8 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@myfinances/types": ["packages/types/src/index.ts"],
-      "@myfinances/utils": ["packages/utils/src/index.ts"]
+      "@selvuno/types": ["packages/types/src/index.ts"],
+      "@selvuno/utils": ["packages/utils/src/index.ts"]
     }
   }
 }

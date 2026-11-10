@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import type { Wallet, WalletView } from "@myfinances/types";
+import type { Wallet, WalletView } from "@selvuno/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeftRight, Layers3 } from "lucide-react";
 import { getCurrencyLabel } from "../lib/currencies";

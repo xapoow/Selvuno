@@ -1,4 +1,4 @@
-import type { WalletView } from "@myfinances/types";
+import type { WalletView } from "@selvuno/types";
 import type { SettingsTab } from "../i18n";
 
 export type AppView = "dashboard" | "add" | "history" | "wallets" | "settings";

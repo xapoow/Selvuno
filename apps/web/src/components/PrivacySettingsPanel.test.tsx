@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { settingsSchema } from "@myfinances/types";
+import { settingsSchema } from "@selvuno/types";
 import { getDictionary } from "../i18n";
 import type { PrivacyLockController } from "../state/usePrivacyLock";
 import { PrivacySettingsPanel } from "./PrivacySettingsPanel";

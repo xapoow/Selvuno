@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Category, Transaction, Wallet, WalletView } from "@myfinances/types";
+import type { Category, Transaction, Wallet, WalletView } from "@selvuno/types";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { convertMinorToBaseCurrency, type ExchangeRateTable } from "./exchangeRates";
 import { parseBalanceToMinor } from "./walletReconciliation";

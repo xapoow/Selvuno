@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Settings, Transaction, Wallet, WalletTransfer, WalletView } from "@myfinances/types";
+import type { Settings, Transaction, Wallet, WalletTransfer, WalletView } from "@selvuno/types";
 import { AnimatePresence, animate, motion, useMotionValue, useTransform, type MotionValue, type PanInfo } from "framer-motion";
 import { ChevronLeft, ChevronRight, Layers3, ShieldCheck } from "lucide-react";
-import { calculateWalletTotals, formatMoney } from "@myfinances/utils";
+import { calculateWalletTotals, formatMoney } from "@selvuno/utils";
 import { cn } from "../lib/cn";
 import { WalletIcon } from "../lib/icons";
 import { getCurrencyLabel } from "../lib/currencies";

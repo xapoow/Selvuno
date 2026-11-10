@@ -1,4 +1,4 @@
-import type { WalletView } from "@myfinances/types";
+import type { WalletView } from "@selvuno/types";
 import { isPlainNavigation, routeHref, viewPaths } from "../lib/routes";
 import { cn } from "../lib/cn";
 import type { AppView } from "../state/appStore";

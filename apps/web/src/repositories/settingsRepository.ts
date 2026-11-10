@@ -1,5 +1,5 @@
-import type { Settings, SettingsUpdate } from "@myfinances/types";
-import { settingsUpdateSchema } from "@myfinances/types";
+import type { Settings, SettingsUpdate } from "@selvuno/types";
+import { settingsUpdateSchema } from "@selvuno/types";
 import { financeDb, nowIso, seedLocalData } from "../db/database";
 
 export interface SettingsRepository {

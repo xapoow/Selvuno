@@ -1,5 +1,5 @@
 {
-  "name": "@myfinances/utils",
+  "name": "@selvuno/utils",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -13,7 +13,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@myfinances/types": "workspace:*"
+    "@selvuno/types": "workspace:*"
   },
   "devDependencies": {
     "vitest": "^3.2.1"

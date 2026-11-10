@@ -7,8 +7,8 @@ import type {
   Settings,
   TransactionType,
   Wallet
-} from "@myfinances/types";
-import { minorToDecimal, parseAmountToMinor } from "@myfinances/utils";
+} from "@selvuno/types";
+import { minorToDecimal, parseAmountToMinor } from "@selvuno/utils";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { toCalendarDate } from "../lib/dates";
 import { formatTagsInput, parseTagsInput } from "../lib/tags";

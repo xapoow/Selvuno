@@ -71,7 +71,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
       notes: [
         "Фотографии чеков и PDF-документы можно прикреплять прямо к операции",
         "Собственная полноэкранная камера с рамкой для удобной съёмки чеков",
-        "Встроенный просмотр фотографий и PDF без выхода из MyFinances",
+        "Встроенный просмотр фотографий и PDF без выхода из Selvuno",
         "Переработанная навигация настроек для телефона, планшета и ПК"
       ]
     },
@@ -270,7 +270,7 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
       notes: [
         "Attach receipt photos and PDF documents directly to a transaction",
         "Capture receipts in a custom full-screen camera with an alignment frame",
-        "Preview photos and PDFs without leaving MyFinances",
+        "Preview photos and PDFs without leaving Selvuno",
         "Redesigned responsive settings navigation for phone, tablet, and desktop"
       ]
     },

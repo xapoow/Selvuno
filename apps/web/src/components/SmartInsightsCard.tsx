@@ -1,4 +1,4 @@
-import type { Category } from "@myfinances/types";
+import type { Category } from "@selvuno/types";
 import {
   CalendarCheck2,
   CircleDollarSign,

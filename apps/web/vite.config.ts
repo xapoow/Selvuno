@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import { APP_NAME } from "./src/lib/brand";
 
 export default defineConfig({
   plugins: [
@@ -11,8 +12,8 @@ export default defineConfig({
       includeAssets: ["pwa.svg"],
       manifest: {
         id: "/",
-        name: "MyFinances Budget Tracker",
-        short_name: "MyFinances",
+        name: APP_NAME,
+        short_name: APP_NAME,
         description: "A local-first budget tracker for wallets, income, expenses, and backups.",
         theme_color: "#101412",
         background_color: "#101412",

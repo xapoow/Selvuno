@@ -1,4 +1,4 @@
-import type { BudgetMonth, Category, MonthlyBudget, Transaction } from "@myfinances/types";
+import type { BudgetMonth, Category, MonthlyBudget, Transaction } from "@selvuno/types";
 import { convertMinorToBaseCurrency, type ExchangeRateTable } from "./exchangeRates";
 
 export interface CategoryBudgetProgress {

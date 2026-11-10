@@ -1,4 +1,4 @@
-import type { Settings, Transaction, Wallet } from "@myfinances/types";
+import type { Settings, Transaction, Wallet } from "@selvuno/types";
 
 export function getIncludedWalletIds(
   wallets: Wallet[],

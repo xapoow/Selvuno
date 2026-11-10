@@ -1,4 +1,4 @@
-import type { TransactionInput } from "@myfinances/types";
+import type { TransactionInput } from "@selvuno/types";
 
 export const ATTACHMENT_MAX_FILES = 5;
 export const ATTACHMENT_MAX_SIZE = 10 * 1024 * 1024;

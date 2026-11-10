@@ -1,4 +1,4 @@
-import type { Transaction, TransactionType } from "@myfinances/types";
+import type { Transaction, TransactionType } from "@selvuno/types";
 
 function tokenize(value: string): string[] {
   return Array.from(

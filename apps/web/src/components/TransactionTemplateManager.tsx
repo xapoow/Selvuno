@@ -6,8 +6,8 @@ import type {
   TransactionTemplateInput,
   TransactionType,
   Wallet
-} from "@myfinances/types";
-import { decimalToMinor, formatMoney } from "@myfinances/utils";
+} from "@selvuno/types";
+import { decimalToMinor, formatMoney } from "@selvuno/utils";
 import { LayoutTemplate, Plus, Trash2 } from "lucide-react";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { evaluateAmountExpression } from "../lib/amountExpression";

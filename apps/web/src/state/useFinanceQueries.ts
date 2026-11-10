@@ -12,7 +12,7 @@ import type {
   WalletInput,
   WalletReconciliationInput,
   WalletTransferInput
-} from "@myfinances/types";
+} from "@selvuno/types";
 import { seedLocalData } from "../db/database";
 import { backupRepository } from "../repositories/backupRepository";
 import { budgetRepository } from "../repositories/budgetRepository";

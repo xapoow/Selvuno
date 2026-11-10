@@ -7,8 +7,8 @@ import type {
   TransactionType,
   Wallet,
   WalletView
-} from "@myfinances/types";
-import { formatMoney } from "@myfinances/utils";
+} from "@selvuno/types";
+import { formatMoney } from "@selvuno/utils";
 import {
   ArrowDownRight,
   ArrowLeft,

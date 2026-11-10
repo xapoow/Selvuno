@@ -1,5 +1,6 @@
-import type { ColorThemePreference, DashboardBlockId } from "@myfinances/types";
+import type { ColorThemePreference, DashboardBlockId } from "@selvuno/types";
 import type { AppView } from "./state/appStore";
+import { APP_NAME } from "./lib/brand";
 
 export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
@@ -687,7 +688,7 @@ export function getCategoryName(name: string | undefined, t: Dictionary): string
 export const dictionaries: Record<Language, Dictionary> = {
   en: {
     appName: "Budget Tracker",
-    brand: "MyFinances",
+    brand: APP_NAME,
     nav: {
       dashboard: "Home",
       history: "History",
@@ -945,7 +946,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       confirmDelete: "Delete this recurring transaction?",
       chooseCategory: "Choose a category.",
       saveError: "Unable to save recurring transaction.",
-      openAppHint: "Due operations are created automatically when MyFinances opens."
+      openAppHint: `Due operations are created automatically when ${APP_NAME} opens.`
     },
     history: {
       title: "History",
@@ -1120,7 +1121,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     },
     cookieNotice: {
       title: "Your privacy",
-      body: "MyFinances stores your settings and finance data only on this device. We do not use advertising cookies.",
+      body: `${APP_NAME} stores your settings and finance data only on this device. We do not use advertising cookies.`,
       accept: "Got it"
     },
     connectivity: {
@@ -1192,7 +1193,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       statusCompleted: "Completed",
       statusOverdue: "Overdue",
       statusUpcoming: "Upcoming",
-      updateTitle: "MyFinances {version}",
+      updateTitle: `${APP_NAME} {version}`,
       updateBody: "See the latest improvements in this update.",
       budgetNearTitle: "Budget is running low",
       budgetNearBody: "{category}: {percentage}% of the monthly limit has been used.",
@@ -1333,7 +1334,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       importError: "Unable to import backup.",
       replaceBackup: "Replace local data with this backup?",
       automaticBackup: "Automatic local backups",
-      automaticBackupHint: "MyFinances saves recent versions on this device as your data changes.",
+      automaticBackupHint: `${APP_NAME} saves recent versions on this device as your data changes.`,
       backupHistory: "Restore history",
       backupHistoryEmpty: "Automatic backups will appear here after your next change.",
       backupOperations: "transactions",
@@ -1366,7 +1367,7 @@ export const dictionaries: Record<Language, Dictionary> = {
         reload: "Reload",
         reloadApp: "Reload app"
       },
-      bootTitle: "Unable to load MyFinances",
+      bootTitle: `Unable to load ${APP_NAME}`,
       presets: {
         "bad-request": {
           eyebrow: "Bad request",
@@ -1423,7 +1424,7 @@ export const dictionaries: Record<Language, Dictionary> = {
   },
   ru: {
     appName: "Бюджет",
-    brand: "MyFinances",
+    brand: APP_NAME,
     nav: {
       dashboard: "Главная",
       history: "История",
@@ -1681,7 +1682,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       confirmDelete: "Удалить эту регулярную операцию?",
       chooseCategory: "Выбери категорию.",
       saveError: "Не удалось сохранить регулярную операцию.",
-      openAppHint: "Наступившие операции создаются автоматически при открытии MyFinances."
+      openAppHint: `Наступившие операции создаются автоматически при открытии ${APP_NAME}.`
     },
     history: {
       title: "История",
@@ -1856,7 +1857,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     },
     cookieNotice: {
       title: "О приватности",
-      body: "MyFinances хранит настройки и финансовые данные только на этом устройстве. Рекламные cookies не используются.",
+      body: `${APP_NAME} хранит настройки и финансовые данные только на этом устройстве. Рекламные cookies не используются.`,
       accept: "Понятно"
     },
     connectivity: {
@@ -1928,7 +1929,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       statusCompleted: "Выполнено",
       statusOverdue: "Просрочено",
       statusUpcoming: "Скоро",
-      updateTitle: "MyFinances {version}",
+      updateTitle: `${APP_NAME} {version}`,
       updateBody: "Посмотри, что изменилось в новой версии.",
       budgetNearTitle: "Бюджет подходит к лимиту",
       budgetNearBody: "{category}: использовано {percentage}% месячного лимита.",
@@ -2069,7 +2070,7 @@ export const dictionaries: Record<Language, Dictionary> = {
       importError: "Не удалось импортировать бэкап.",
       replaceBackup: "Заменить локальные данные этим бэкапом?",
       automaticBackup: "Автоматические локальные бэкапы",
-      automaticBackupHint: "MyFinances сохраняет недавние версии на этом устройстве при изменении данных.",
+      automaticBackupHint: `${APP_NAME} сохраняет недавние версии на этом устройстве при изменении данных.`,
       backupHistory: "История восстановления",
       backupHistoryEmpty: "Автоматические бэкапы появятся здесь после следующего изменения.",
       backupOperations: "операций",
@@ -2102,7 +2103,7 @@ export const dictionaries: Record<Language, Dictionary> = {
         reload: "Перезагрузить",
         reloadApp: "Перезагрузить приложение"
       },
-      bootTitle: "Не удалось загрузить MyFinances",
+      bootTitle: `Не удалось загрузить ${APP_NAME}`,
       presets: {
         "bad-request": {
           eyebrow: "Некорректный запрос",

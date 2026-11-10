@@ -6,8 +6,8 @@ import type {
   MonthlyBudgetInput,
   Settings,
   Transaction
-} from "@myfinances/types";
-import { formatMoney, minorToDecimal, parseAmountToMinor } from "@myfinances/utils";
+} from "@selvuno/types";
+import { formatMoney, minorToDecimal, parseAmountToMinor } from "@selvuno/utils";
 import { ArrowLeft, ChevronLeft, ChevronRight, CircleAlert, PiggyBank } from "lucide-react";
 import { getCategoryName, type Dictionary } from "../i18n";
 import {

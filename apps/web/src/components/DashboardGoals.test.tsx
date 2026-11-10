@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { savingsGoalSchema, savingsGoalContributionSchema } from "@myfinances/types";
+import { savingsGoalSchema, savingsGoalContributionSchema } from "@selvuno/types";
 import { getDictionary } from "../i18n";
 import { testSettings, testWallet } from "../test/fixtures";
 import { DashboardGoals } from "./DashboardGoals";

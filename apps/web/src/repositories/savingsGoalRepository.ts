@@ -3,11 +3,11 @@ import type {
   SavingsGoalContribution,
   SavingsGoalContributionInput,
   SavingsGoalInput
-} from "@myfinances/types";
+} from "@selvuno/types";
 import {
   savingsGoalContributionInputSchema,
   savingsGoalInputSchema
-} from "@myfinances/types";
+} from "@selvuno/types";
 import { createEntityBase, financeDb, nowIso } from "../db/database";
 
 export interface SavingsGoalRepository {

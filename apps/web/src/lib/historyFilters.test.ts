@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Transaction } from "@myfinances/types";
+import type { Transaction } from "@selvuno/types";
 import { getDictionary } from "../i18n";
 import { testCategory, testTransaction, testWallet } from "../test/fixtures";
 import { defaultHistoryFilters, equalHistoryFilters, filterHistoryTransactions, HISTORY_FILTER_STORAGE_KEY, persistSavedHistoryFilters, readHistoryAmountRange, readSavedHistoryFilters, type HistoryFilters } from "./historyFilters";

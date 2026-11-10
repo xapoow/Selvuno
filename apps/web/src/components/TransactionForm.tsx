@@ -7,8 +7,8 @@ import type {
   TransactionType,
   Wallet,
   WalletView
-} from "@myfinances/types";
-import { decimalToMinor, formatMoney, minorToDecimal } from "@myfinances/utils";
+} from "@selvuno/types";
+import { decimalToMinor, formatMoney, minorToDecimal } from "@selvuno/utils";
 import { CalendarDays, ChevronDown, Equal, Hash, RotateCcw, Sparkles, StickyNote } from "lucide-react";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { evaluateAmountExpression, setAmountOperator } from "../lib/amountExpression";

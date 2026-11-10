@@ -1,5 +1,5 @@
 {
-  "name": "@myfinances/web",
+  "name": "@selvuno/web",
   "private": true,
   "version": "0.9.6",
   "type": "module",
@@ -11,8 +11,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@myfinances/types": "workspace:*",
-    "@myfinances/utils": "workspace:*",
+    "@selvuno/types": "workspace:*",
+    "@selvuno/utils": "workspace:*",
     "@tanstack/react-query": "^5.80.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

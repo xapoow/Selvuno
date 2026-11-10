@@ -1,5 +1,5 @@
-import type { TransactionTemplate, TransactionTemplateInput } from "@myfinances/types";
-import { transactionTemplateInputSchema } from "@myfinances/types";
+import type { TransactionTemplate, TransactionTemplateInput } from "@selvuno/types";
+import { transactionTemplateInputSchema } from "@selvuno/types";
 import { createEntityBase, financeDb, nowIso } from "../db/database";
 import { normalizeTags } from "../lib/tags";
 

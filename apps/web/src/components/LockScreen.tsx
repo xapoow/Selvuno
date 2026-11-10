@@ -38,7 +38,7 @@ export function LockScreen({ t, onUnlock }: LockScreenProps) {
           <LockKeyhole className="h-6 w-6" />
         </span>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">MyFinances</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">{t.brand}</p>
           <h1 className="mt-1 text-2xl font-semibold">{t.settings.appLocked}</h1>
           <p className="mt-2 text-sm leading-6 text-muted">{t.settings.appLockedHint}</p>
         </div>

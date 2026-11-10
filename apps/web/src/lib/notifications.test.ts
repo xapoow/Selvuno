@@ -7,7 +7,7 @@ import type {
   SavingsGoalContribution,
   Settings,
   Transaction
-} from "@myfinances/types";
+} from "@selvuno/types";
 import { appVersion, getDictionary } from "../i18n";
 import { buildAppNotifications } from "./notifications";
 

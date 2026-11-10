@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Transaction } from "@myfinances/types";
+import type { Transaction } from "@selvuno/types";
 import { compareTransactionsNewestFirst, compareTransactionsOldestFirst } from "./transactions";
 
 function transaction(id: string, transactionDate: string, createdAt = transactionDate): Transaction {

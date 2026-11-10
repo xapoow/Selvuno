@@ -1,4 +1,4 @@
-import { categorySchema, settingsSchema, transactionSchema, walletSchema } from "@myfinances/types";
+import { categorySchema, settingsSchema, transactionSchema, walletSchema } from "@selvuno/types";
 
 const entity = {
   userId: null,

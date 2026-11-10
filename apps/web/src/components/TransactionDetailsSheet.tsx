@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import type { Category, Settings, Transaction, Wallet } from "@myfinances/types";
-import { formatDate, formatSignedMoney } from "@myfinances/utils";
+import type { Category, Settings, Transaction, Wallet } from "@selvuno/types";
+import { formatDate, formatSignedMoney } from "@selvuno/utils";
 import { CalendarDays, Edit3, FileText, LoaderCircle, Paperclip, Tag, Trash2, WalletCards, X } from "lucide-react";
 import type { TransactionAttachment } from "../db/models";
 import { getCategoryName, type Dictionary } from "../i18n";

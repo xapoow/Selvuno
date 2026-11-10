@@ -8,9 +8,9 @@ import type {
   WalletReconciliationInput,
   WalletTransfer,
   WalletView
-} from "@myfinances/types";
+} from "@selvuno/types";
 import { Archive, Edit3, GripVertical, Plus, RotateCcw, Scale, WalletCards } from "lucide-react";
-import { calculateWalletTotals, formatMoney } from "@myfinances/utils";
+import { calculateWalletTotals, formatMoney } from "@selvuno/utils";
 import { WalletForm } from "../components/WalletForm";
 import { WalletReconciliationForm } from "../components/WalletReconciliationForm";
 import { BottomSheet } from "../components/ui/BottomSheet";

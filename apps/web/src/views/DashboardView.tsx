@@ -12,9 +12,9 @@ import type {
   Wallet,
   WalletTransfer,
   WalletView
-} from "@myfinances/types";
+} from "@selvuno/types";
 import { BarChart3, PlusCircle } from "lucide-react";
-import { calculateWalletAdjustmentTotal, filterTransactionsByWallet, formatMoney } from "@myfinances/utils";
+import { calculateWalletAdjustmentTotal, filterTransactionsByWallet, formatMoney } from "@selvuno/utils";
 import {
   AnalyticsView,
   type AnalyticsCategoryItem

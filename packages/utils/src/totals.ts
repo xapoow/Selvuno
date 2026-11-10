@@ -1,4 +1,4 @@
-import type { Transaction, Wallet, WalletTransfer, WalletView } from "@myfinances/types";
+import type { Transaction, Wallet, WalletTransfer, WalletView } from "@selvuno/types";
 
 export interface TransactionTotals {
   incomeMinor: number;

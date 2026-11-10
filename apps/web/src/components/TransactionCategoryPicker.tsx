@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { Category } from "@myfinances/types";
+import type { Category } from "@selvuno/types";
 import { ChevronDown } from "lucide-react";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { cn } from "../lib/cn";

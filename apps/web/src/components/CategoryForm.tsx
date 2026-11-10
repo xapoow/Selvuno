@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { Category, CategoryInput, TransactionType } from "@myfinances/types";
+import type { Category, CategoryInput, TransactionType } from "@selvuno/types";
 import { Search } from "lucide-react";
 import { CategoryIcon, categoryIconNames } from "../lib/icons";
 import { Button } from "./ui/Button";

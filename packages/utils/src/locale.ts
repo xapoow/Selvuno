@@ -1,4 +1,4 @@
-import type { DateFormatPreference } from "@myfinances/types";
+import type { DateFormatPreference } from "@selvuno/types";
 
 const REGION_CURRENCY: Record<string, string> = {
   AU: "AUD",

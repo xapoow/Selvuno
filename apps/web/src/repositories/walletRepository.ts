@@ -1,6 +1,6 @@
-import type { Wallet, WalletInput, WalletReconciliationInput } from "@myfinances/types";
-import { balanceReconciliationSchema, walletInputSchema, walletReconciliationInputSchema } from "@myfinances/types";
-import { calculateWalletTotals } from "@myfinances/utils";
+import type { Wallet, WalletInput, WalletReconciliationInput } from "@selvuno/types";
+import { balanceReconciliationSchema, walletInputSchema, walletReconciliationInputSchema } from "@selvuno/types";
+import { calculateWalletTotals } from "@selvuno/utils";
 import { createEntityBase, createId, financeDb, nowIso } from "../db/database";
 import { WalletBalanceChangedError } from "../lib/walletReconciliation";
 

@@ -1,4 +1,4 @@
-import { getCurrencyMinorUnits } from "@myfinances/utils";
+import { getCurrencyMinorUnits } from "@selvuno/utils";
 
 export class WalletBalanceChangedError extends Error {
   constructor() { super("Wallet balance changed. Review the updated balance before reconciling."); }

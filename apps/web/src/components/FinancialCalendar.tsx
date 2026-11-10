@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import type { CalendarDate, Category, Settings, Transaction, Wallet } from "@myfinances/types";
-import { formatMoney, minorToDecimal } from "@myfinances/utils";
+import type { CalendarDate, Category, Settings, Transaction, Wallet } from "@selvuno/types";
+import { formatMoney, minorToDecimal } from "@selvuno/utils";
 import { AlertTriangle, CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { calendarDateInTimeZone } from "../lib/analytics";

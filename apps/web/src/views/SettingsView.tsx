@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { HomeLayoutSettings } from "../components/HomeLayoutSettings";
+import { EXPORT_PREFIX } from "../lib/brand";
 import { motion, Reorder, useDragControls } from "framer-motion";
 import type {
   BackupSnapshot,
@@ -11,7 +12,7 @@ import type {
   SettingsUpdate,
   ThemePreference,
   TransactionType
-} from "@myfinances/types";
+} from "@selvuno/types";
 import {
   AlertCircle,
   Check,
@@ -326,7 +327,7 @@ export function SettingsView({
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `myfinances-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      anchor.download = `${EXPORT_PREFIX}-backup-${new Date().toISOString().slice(0, 10)}.json`;
       anchor.hidden = true;
       document.body.append(anchor);
       anchor.click();

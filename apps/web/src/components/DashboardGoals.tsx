@@ -1,5 +1,5 @@
-import type { SavingsGoal, SavingsGoalContribution, Settings, Wallet, WalletView } from "@myfinances/types";
-import { formatMoney } from "@myfinances/utils";
+import type { SavingsGoal, SavingsGoalContribution, Settings, Wallet, WalletView } from "@selvuno/types";
+import { formatMoney } from "@selvuno/utils";
 import { ArrowUpRight, Target } from "lucide-react";
 import type { Dictionary } from "../i18n";
 import { shouldHideWalletAmounts } from "../lib/walletFeatures";
