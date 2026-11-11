@@ -8,9 +8,20 @@ import {
 export interface TransactionAttachmentRepository {
   listByTransaction(transactionId: string): Promise<TransactionAttachment[]>;
   applyChanges(transactionId: string, newFiles: File[], removedIds: string[]): Promise<void>;
+  removeFile(id: string): Promise<void>;
 }
 
 export const transactionAttachmentRepository: TransactionAttachmentRepository = {
+  async removeFile(id) {
+    // Storage management also needs to remove bytes retained by trashed operations.
+    await financeDb.transaction("rw", financeDb.transactionAttachments, financeDb.transactions, async () => {
+      const file = await financeDb.transactionAttachments.get(id);
+      if (!file) return;
+      await financeDb.transactionAttachments.delete(id);
+      const attachmentCount = await financeDb.transactionAttachments.where("transactionId").equals(file.transactionId).count();
+      await financeDb.transactions.update(file.transactionId, { attachmentCount, updatedAt: nowIso(), syncStatus: "pending" });
+    });
+  },
   async listByTransaction(transactionId) {
     return financeDb.transactionAttachments.where("transactionId").equals(transactionId).sortBy("createdAt");
   },

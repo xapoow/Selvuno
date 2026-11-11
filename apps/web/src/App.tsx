@@ -587,6 +587,7 @@ export function App() {
           ) : null}
           {activeView === "settings" ? (
             <SettingsView
+              onStorageChange={() => { void data.transactions.refetch(); void data.deletedTransactions.refetch(); void data.backupSnapshots.refetch(); }}
               activeTab={(route.path === "/settings" ? "general" : route.path?.slice("/settings/".length)) as RoutableSettingsTab}
               onTabChange={(tab) => {
                 // An exiting settings sheet must not override a newer Back/Forward navigation.

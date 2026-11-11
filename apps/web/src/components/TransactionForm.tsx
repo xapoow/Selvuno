@@ -27,6 +27,7 @@ import { TextField } from "./ui/TextField";
 import type { TransactionAttachment } from "../db/models";
 import { transactionAttachmentRepository } from "../repositories/transactionAttachmentRepository";
 import type { TransactionSubmission } from "../lib/transactionAttachments";
+import { useTransactionDraft } from "../state/useTransactionDraft";
 
 interface TransactionFormProps {
   wallets: Wallet[];
@@ -77,6 +78,17 @@ export function TransactionForm({
   const amountInputRef = useRef<HTMLInputElement | null>(null);
   const selectedWallet = wallets.find((wallet) => wallet.id === walletId);
   const currency = selectedWallet?.currency ?? initial?.currency ?? settings.currency;
+  const draft = useTransactionDraft(initial ? null : `new-entry:${defaultWalletId}`, settings.draftsEnabled && !initial, {
+    fields: { type, walletId, currency, categoryId, amount, date, note, tagsInput },
+    files: newAttachments.map((file) => ({ name: file.name, type: file.type, lastModified: file.lastModified, blob: file }))
+  }, (record) => {
+    const wallet = wallets.find((item) => item.id === record.fields.walletId && item.currency === record.fields.currency && !item.deletedAt && !item.archivedAt);
+    if (!wallet) { setError(t.safety.draftInvalid); return false; }
+    setType(record.fields.type); setWalletId(wallet.id); setCategoryId(record.fields.categoryId);
+    setAmount(record.fields.amount); setDate(record.fields.date); setNote(record.fields.note); setTagsInput(record.fields.tagsInput); setDetailsOpen(true);
+    setNewAttachments(record.files.map((file) => new File([file.blob], file.name, { type: file.type, lastModified: file.lastModified })));
+    return true;
+  });
 
   const typeCategories = useMemo(
     () => categories.filter((category) => category.type === type),
@@ -178,6 +190,7 @@ export function TransactionForm({
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (draft.pending) return;
     if (submittingRef.current) return;
     submittingRef.current = true;
     setSubmitting(true);
@@ -212,6 +225,7 @@ export function TransactionForm({
         removedAttachmentIds
       });
       if (!initial) {
+        await draft.saved();
         setAmount("");
         setNote("");
         setTagsInput("");
@@ -252,6 +266,8 @@ export function TransactionForm({
 
   return (
     <form className="grid gap-5" onSubmit={handleSubmit} aria-busy={submitting}>
+      {draft.pending ? <div className="app-control grid gap-3 rounded-2xl p-4" role="status"><p className="text-sm font-semibold">{t.safety.foundDraft}</p><p className="text-xs text-muted">{new Intl.DateTimeFormat(settings.locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(draft.pending.updatedAt))}</p><div className="flex flex-wrap gap-2"><Button type="button" variant="secondary" size="small" onClick={() => draft.resume()}>{t.safety.resume}</Button><Button type="button" variant="ghost" size="small" onClick={() => void draft.discard()}>{t.safety.discard}</Button></div></div> : null}
+      {!draft.pending && draft.status !== "idle" ? <p role="status" className={cn("text-xs", draft.status === "error" ? "text-expense" : "text-muted")}>{draft.status === "saved" ? t.safety.draftSaved : draft.status === "saving" ? t.safety.draftSaving : t.safety.draftError}</p> : null}
       {!initial && settings.quickTemplatesEnabled && (templates.length || quickTemplates.length) ? (
         <section className="grid gap-2">
           <div className="flex items-start justify-between gap-3">
@@ -530,7 +546,7 @@ export function TransactionForm({
       <Button
         type="submit"
         className="h-12 text-base"
-        disabled={submitting || !wallets.length || !typeCategories.length}
+        disabled={submitting || Boolean(draft.pending) || !wallets.length || !typeCategories.length}
       >
         {submitLabel}
       </Button>

@@ -1,12 +1,13 @@
 import type { ColorThemePreference, DashboardBlockId } from "@selvuno/types";
 import type { AppView } from "./state/appStore";
 import { APP_NAME } from "./lib/brand";
+import { safetyEn, safetyRu } from "./lib/dataSafetyCopy";
 
 export type Language = "en" | "ru";
-export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
+export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "storage" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.9.8";
+export const appVersion = "0.9.9";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -44,6 +45,7 @@ interface ErrorCopy {
 }
 
 export interface Dictionary {
+  safety: typeof safetyEn;
   appName: string;
   brand: string;
   nav: Record<AppView, string>;
@@ -693,6 +695,7 @@ export function getCategoryName(name: string | undefined, t: Dictionary): string
 
 export const dictionaries: Record<Language, Dictionary> = {
   en: {
+    safety: safetyEn,
     appName: "Budget Tracker",
     brand: APP_NAME,
     nav: {
@@ -1217,13 +1220,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "Optional haptic feedback for important actions.",
+      intro: "Full backups, recoverable drafts and clearer local storage controls.",
       gotIt: "Explore the update",
       notes: [
-        "Haptic feedback in Settings → Features, with a test button; off by default",
-        "Brief feedback when switching wallets, successfully saving a transaction or entering an incorrect PIN",
-        "Repeated requests are rate-limited and feedback stops when the tab is hidden",
-        "Unsupported devices continue to work normally without vibration"
+        "Full ZIP backups include receipt photos and PDFs, with integrity checks and a restore preview",
+        "Local restore points retain receipt files; legacy JSON backups remain supported",
+        "Unfinished transactions and attachments are saved as drafts; autosave can be disabled in Settings → Features",
+        "Settings → Storage shows usage and lets you manage receipt files, drafts and restore history"
       ]
     },
     categories: {
@@ -1264,6 +1267,7 @@ export const dictionaries: Record<Language, Dictionary> = {
         privacy: "Privacy",
         categories: "Categories",
         backup: "Backup",
+        storage: "Storage",
         sync: "Sync",
         debug: "Debug"
       },
@@ -1435,6 +1439,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     }
   },
   ru: {
+    safety: safetyRu,
     appName: "Бюджет",
     brand: APP_NAME,
     nav: {
@@ -1959,13 +1964,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Опциональный виброотклик для важных действий.",
+      intro: "Полные бэкапы, восстановление черновиков и управление локальным хранилищем.",
       gotIt: "Посмотреть обновление",
       notes: [
-        "Виброотклик в Настройки → Функции с кнопкой проверки; по умолчанию выключен",
-        "Короткий отклик при смене кошелька, успешном сохранении операции и неверном PIN",
-        "Защита от частых повторов и отключение вибрации в скрытой вкладке",
-        "На неподдерживаемых устройствах приложение работает без вибрации"
+        "Полный ZIP-бэкап включает фото чеков и PDF, проверку целостности и предпросмотр восстановления",
+        "Локальные точки восстановления сохраняют вложения; старые JSON-бэкапы по-прежнему поддерживаются",
+        "Незавершённые операции и файлы сохраняются в черновик; автосохранение можно отключить в Настройки → Функции",
+        "В Настройки → Хранилище виден объём данных и доступны управление вложениями, очистка черновиков и истории восстановления"
       ]
     },
     categories: {
@@ -2006,6 +2011,7 @@ export const dictionaries: Record<Language, Dictionary> = {
         privacy: "Приватность",
         categories: "Категории",
         backup: "Бэкап",
+        storage: "Хранилище",
         sync: "Синхронизация",
         debug: "Дебаг"
       },
