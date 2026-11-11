@@ -6,7 +6,7 @@ import type {
   SavingsGoalContribution,
   Settings,
   Transaction
-} from "@myfinances/types";
+} from "@selvuno/types";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { calculateMonthlyBudgetProgress, getBudgetMonth } from "./budgets";
 import { toCalendarDate } from "./dates";

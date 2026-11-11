@@ -1,4 +1,4 @@
-import type { DashboardBlockId, DashboardLayout, Settings } from "@myfinances/types";
+import type { DashboardBlockId, DashboardLayout, Settings } from "@selvuno/types";
 
 export const DASHBOARD_BLOCKS: DashboardBlockId[] = ["summary", "budget", "insights", "cashFlow", "recent", "goals"];
 const DEFAULT_HIDDEN: DashboardBlockId[] = ["goals"];

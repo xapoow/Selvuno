@@ -5,8 +5,8 @@ import type {
   RecurringTransactionInput,
   Settings,
   Wallet
-} from "@myfinances/types";
-import { formatSignedMoney } from "@myfinances/utils";
+} from "@selvuno/types";
+import { formatSignedMoney } from "@selvuno/utils";
 import { CalendarClock, Edit3, Pause, Play, Plus, Repeat2, Trash2 } from "lucide-react";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { CategoryIcon } from "../lib/icons";

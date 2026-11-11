@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff, LockKeyhole, ShieldCheck } from "lucide-react";
-import type { Settings, SettingsUpdate } from "@myfinances/types";
+import type { Settings, SettingsUpdate } from "@selvuno/types";
 import type { Dictionary } from "../i18n";
 import { autoLockOptions, isValidPin, PIN_LENGTH, type AutoLockMinutes } from "../lib/privacy";
 import type { PrivacyLockController } from "../state/usePrivacyLock";

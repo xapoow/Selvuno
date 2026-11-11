@@ -3,8 +3,8 @@ import type {
   RecurringTransaction,
   RecurringTransactionInput,
   Transaction
-} from "@myfinances/types";
-import { recurringTransactionInputSchema } from "@myfinances/types";
+} from "@selvuno/types";
+import { recurringTransactionInputSchema } from "@selvuno/types";
 import { createEntityBase, financeDb, nowIso } from "../db/database";
 import { fromDateInputValue, nextRecurringDate, toCalendarDate } from "../lib/dates";
 import { normalizeTags } from "../lib/tags";

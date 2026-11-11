@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
-import type { Settings } from "@myfinances/types";
+import type { Settings } from "@selvuno/types";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../i18n";
 import { testSettings, testWallet } from "../test/fixtures";

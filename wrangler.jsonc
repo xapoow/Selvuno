@@ -1,5 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
+  // Existing Cloudflare Pages project; branding changes must not create a new origin.
   "name": "myfinances",
   "pages_build_output_dir": "./apps/web/dist"
 }

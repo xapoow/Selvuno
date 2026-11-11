@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dashboardLayoutSchema, settingsSchema } from "@myfinances/types";
+import { dashboardLayoutSchema, settingsSchema } from "@selvuno/types";
 import { testSettings } from "../test/fixtures";
 import { DASHBOARD_BLOCKS, dashboardRows, moveDashboardBlock, normalizeDashboardLayout } from "./dashboardLayout";
 

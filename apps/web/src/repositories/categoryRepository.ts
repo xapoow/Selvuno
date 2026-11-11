@@ -1,5 +1,5 @@
-import type { Category, CategoryInput, TransactionType } from "@myfinances/types";
-import { categoryInputSchema } from "@myfinances/types";
+import type { Category, CategoryInput, TransactionType } from "@selvuno/types";
+import { categoryInputSchema } from "@selvuno/types";
 import { createEntityBase, financeDb, nowIso } from "../db/database";
 
 export interface CategoryRepository {

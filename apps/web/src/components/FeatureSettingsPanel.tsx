@@ -1,4 +1,4 @@
-import type { Settings, SettingsUpdate } from "@myfinances/types";
+import type { Settings, SettingsUpdate } from "@selvuno/types";
 import { BrainCircuit, WalletCards } from "lucide-react";
 import type { Dictionary } from "../i18n";
 import { SettingsToggleCard } from "./ui/SettingsToggleCard";

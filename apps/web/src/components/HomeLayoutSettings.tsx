@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Reorder, useDragControls } from "framer-motion";
 import { ArrowDown, ArrowUp, GripVertical, LoaderCircle, RotateCcw } from "lucide-react";
-import type { DashboardBlockId, DashboardLayout, Settings, SettingsUpdate } from "@myfinances/types";
+import type { DashboardBlockId, DashboardLayout, Settings, SettingsUpdate } from "@selvuno/types";
 import type { Dictionary } from "../i18n";
 import { moveDashboardBlock, normalizeDashboardLayout } from "../lib/dashboardLayout";
 import { Button } from "./ui/Button";

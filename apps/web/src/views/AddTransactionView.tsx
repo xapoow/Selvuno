@@ -8,7 +8,7 @@ import type {
   TransactionTemplate,
   TransactionTemplateInput,
   Wallet
-} from "@myfinances/types";
+} from "@selvuno/types";
 import { LayoutTemplate, WalletCards } from "lucide-react";
 import { RecurringTransactionsPanel } from "../components/RecurringTransactionsPanel";
 import { TransactionForm } from "../components/TransactionForm";

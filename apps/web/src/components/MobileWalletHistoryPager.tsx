@@ -1,4 +1,4 @@
-import type { Category, Settings, Transaction, TransactionInput, Wallet, WalletView } from "@myfinances/types";
+import type { Category, Settings, Transaction, TransactionInput, Wallet, WalletView } from "@selvuno/types";
 import { HistoryView } from "../views/HistoryView";
 import { type Dictionary } from "../i18n";
 import { useExchangeRates } from "../lib/exchangeRates";

@@ -1,4 +1,4 @@
-import type { ColorThemePreference } from "@myfinances/types";
+import type { ColorThemePreference } from "@selvuno/types";
 import { Check } from "lucide-react";
 import { colorThemeOptions } from "../lib/colorThemes";
 import { cn } from "../lib/cn";

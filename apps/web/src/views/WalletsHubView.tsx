@@ -11,7 +11,7 @@ import type {
   WalletReconciliationInput,
   WalletTransfer,
   WalletTransferInput
-} from "@myfinances/types";
+} from "@selvuno/types";
 import { MobileWalletsPager } from "../components/MobileWalletsPager";
 import { SegmentedControl } from "../components/ui/SegmentedControl";
 import type { Dictionary } from "../i18n";

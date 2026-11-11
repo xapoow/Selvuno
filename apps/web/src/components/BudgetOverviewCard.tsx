@@ -1,4 +1,4 @@
-import { formatMoney } from "@myfinances/utils";
+import { formatMoney } from "@selvuno/utils";
 import { ArrowUpRight, PiggyBank } from "lucide-react";
 import type { Dictionary } from "../i18n";
 import type { MonthlyBudgetProgress } from "../lib/budgets";

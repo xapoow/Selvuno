@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
-import type { WalletView } from "@myfinances/types";
+import type { WalletView } from "@selvuno/types";
 import { Eye, EyeOff, LockKeyhole } from "lucide-react";
-import { calculateWalletAdjustmentTotal } from "@myfinances/utils";
+import { calculateWalletAdjustmentTotal } from "@selvuno/utils";
 import { BottomNavigation } from "./components/BottomNavigation";
 import { CookieNotice } from "./components/CookieNotice";
 import { HeaderNavigation } from "./components/HeaderNavigation";
@@ -318,7 +318,7 @@ export function App() {
     <div className="app-page-bg min-h-dvh text-foreground md:pl-[236px]">
       <aside className="app-chrome fixed inset-y-0 left-0 z-40 hidden h-dvh w-[236px] overflow-y-auto overscroll-contain p-4 shadow-[1px_0_0_0_rgb(var(--color-foreground)/0.04)] md:flex md:flex-col">
         <div className="mb-7 px-2 pt-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">MyFinances</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">{t.brand}</p>
           <h1 className="mt-1 text-2xl font-semibold text-foreground">{t.appName}</h1>
         </div>
         <HeaderNavigation activeView={activeView} labels={t.nav} onChange={navigate} walletId={activeWalletId} />

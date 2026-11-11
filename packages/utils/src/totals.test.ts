@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Transaction, Wallet, WalletTransfer } from "@myfinances/types";
+import type { Transaction, Wallet, WalletTransfer } from "@selvuno/types";
 import { calculateTransactionTotals, calculateWalletTotals } from "./totals";
 
 const base = {

@@ -5,7 +5,7 @@ import type {
   WalletInput,
   WalletReconciliationInput,
   WalletTransfer
-} from "@myfinances/types";
+} from "@selvuno/types";
 import { WalletsView } from "../views/WalletsView";
 import { type Dictionary } from "../i18n";
 

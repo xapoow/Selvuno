@@ -1,11 +1,11 @@
 {
-  "name": "myfinances",
+  "name": "selvuno",
   "private": true,
-  "version": "0.9.6",
+  "version": "0.9.7",
   "packageManager": "pnpm@10.12.4",
   "scripts": {
-    "dev": "corepack pnpm --filter @myfinances/web dev",
-    "dev:web": "corepack pnpm --filter @myfinances/web dev",
+    "dev": "corepack pnpm --filter @selvuno/web dev",
+    "dev:web": "corepack pnpm --filter @selvuno/web dev",
     "build": "corepack pnpm -r build",
     "test": "corepack pnpm -r test",
     "typecheck": "corepack pnpm -r typecheck"

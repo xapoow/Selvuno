@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { settingsSchema, walletSchema, type Transaction } from "@myfinances/types";
+import { settingsSchema, walletSchema, type Transaction } from "@selvuno/types";
 import {
   filterTransactionsForTotals,
   getIncludedWalletIds,

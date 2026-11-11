@@ -20,10 +20,10 @@ importers:
 
   apps/web:
     dependencies:
-      '@myfinances/types':
+      '@selvuno/types':
         specifier: workspace:*
         version: link:../../packages/types
-      '@myfinances/utils':
+      '@selvuno/utils':
         specifier: workspace:*
         version: link:../../packages/utils
       '@tanstack/react-query':
@@ -117,7 +117,7 @@ importers:
 
   packages/utils:
     dependencies:
-      '@myfinances/types':
+      '@selvuno/types':
         specifier: workspace:*
         version: link:../types
     devDependencies:

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Category, MonthlyBudget, Transaction } from "@myfinances/types";
+import type { Category, MonthlyBudget, Transaction } from "@selvuno/types";
 import {
   calculateMonthlyBudgetProgress,
   getBudgetMonth,

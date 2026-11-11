@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Transaction } from "@myfinances/types";
+import type { Transaction } from "@selvuno/types";
 import { suggestCategoryId } from "./categorySuggestions";
 
 const base: Transaction = {

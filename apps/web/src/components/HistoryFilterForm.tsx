@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import type { Category } from "@myfinances/types";
+import type { Category } from "@selvuno/types";
 import { Bookmark, Check, Search, Trash2 } from "lucide-react";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { CategoryIcon } from "../lib/icons";

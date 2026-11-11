@@ -4,8 +4,8 @@ import type {
   Wallet,
   WalletTransfer,
   WalletTransferInput
-} from "@myfinances/types";
-import { formatDate, formatMoney } from "@myfinances/utils";
+} from "@selvuno/types";
+import { formatDate, formatMoney } from "@selvuno/utils";
 import { ArrowRight, Plus, Repeat2, Trash2 } from "lucide-react";
 import { WalletTransferForm } from "../components/WalletTransferForm";
 import { shouldHideWalletAmounts } from "../lib/walletFeatures";

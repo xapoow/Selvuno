@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-quer
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { calculateWalletTotals } from "@myfinances/utils";
+import { calculateWalletTotals } from "@selvuno/utils";
 import { financeDb, resetDatabaseForTests } from "../db/database";
 import { getDictionary } from "../i18n";
 import { queryKeys } from "../lib/queryKeys";

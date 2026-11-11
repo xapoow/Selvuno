@@ -3,8 +3,8 @@ import type {
   BackupSnapshotReason,
   FinanceBackup,
   FinanceBackupV8
-} from "@myfinances/types";
-import { backupSchema, backupSnapshotSchema } from "@myfinances/types";
+} from "@selvuno/types";
+import { backupSchema, backupSnapshotSchema } from "@selvuno/types";
 import { createId, financeDb, nowIso, seedLocalData } from "../db/database";
 
 const MAX_AUTOMATIC_BACKUPS = 12;

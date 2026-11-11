@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { WalletView } from "@myfinances/types";
+import type { WalletView } from "@selvuno/types";
 import { parseAppRoute, routeHref, supportsWallet, viewPaths, type AppPath, type AppRoute, type AppView } from "../lib/routes";
 
 export type { AppView } from "../lib/routes";

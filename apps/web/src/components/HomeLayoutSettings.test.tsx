@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Settings, SettingsUpdate } from "@myfinances/types";
+import type { Settings, SettingsUpdate } from "@selvuno/types";
 import { describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../i18n";
 import { normalizeDashboardLayout } from "../lib/dashboardLayout";

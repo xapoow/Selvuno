@@ -1,4 +1,4 @@
-import type { CalendarDate, RecurrenceFrequency } from "@myfinances/types";
+import type { CalendarDate, RecurrenceFrequency } from "@selvuno/types";
 
 export function toDateInputValue(iso: string): string {
   return iso.slice(0, 10);

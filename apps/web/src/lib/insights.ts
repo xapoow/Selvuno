@@ -1,4 +1,4 @@
-import type { TransactionType } from "@myfinances/types";
+import type { TransactionType } from "@selvuno/types";
 import {
   addCalendarDays,
   calendarDateInTimeZone,

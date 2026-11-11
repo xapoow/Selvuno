@@ -1,5 +1,5 @@
-import type { WalletTransfer, WalletTransferInput } from "@myfinances/types";
-import { walletTransferInputSchema } from "@myfinances/types";
+import type { WalletTransfer, WalletTransferInput } from "@selvuno/types";
+import { walletTransferInputSchema } from "@selvuno/types";
 import { createEntityBase, financeDb, nowIso } from "../db/database";
 
 export interface WalletTransferRepository {

@@ -1,6 +1,6 @@
-import type { Category, Settings, Transaction, Wallet } from "@myfinances/types";
+import type { Category, Settings, Transaction, Wallet } from "@selvuno/types";
 import { Edit3, Paperclip, Trash2 } from "lucide-react";
-import { formatDate, formatSignedMoney } from "@myfinances/utils";
+import { formatDate, formatSignedMoney } from "@selvuno/utils";
 import { CategoryIcon } from "../lib/icons";
 import { Button } from "./ui/Button";
 import { getCategoryName, type Dictionary } from "../i18n";

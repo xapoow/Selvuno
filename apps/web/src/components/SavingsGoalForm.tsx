@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { SavingsGoal, SavingsGoalInput, Settings, Wallet } from "@myfinances/types";
-import { minorToDecimal, parseAmountToMinor } from "@myfinances/utils";
+import type { SavingsGoal, SavingsGoalInput, Settings, Wallet } from "@selvuno/types";
+import { minorToDecimal, parseAmountToMinor } from "@selvuno/utils";
 import type { Dictionary } from "../i18n";
 import { toCalendarDate } from "../lib/dates";
 import { Button } from "./ui/Button";

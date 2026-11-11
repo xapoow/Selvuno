@@ -1,10 +1,10 @@
 import { useState } from "react";
-import type { Wallet, WalletInput, WalletKind } from "@myfinances/types";
+import type { Wallet, WalletInput, WalletKind } from "@selvuno/types";
 import {
   decimalToMinor,
   getCurrencyMinorUnits,
   minorToDecimal
-} from "@myfinances/utils";
+} from "@selvuno/utils";
 import { currencyOptions, getCurrencyLabel } from "../lib/currencies";
 import { WalletIcon, walletIconNames } from "../lib/icons";
 import { Button } from "./ui/Button";

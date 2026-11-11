@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import type { Settings, Wallet, WalletTransferInput } from "@myfinances/types";
-import { parseAmountToMinor } from "@myfinances/utils";
+import type { Settings, Wallet, WalletTransferInput } from "@selvuno/types";
+import { parseAmountToMinor } from "@selvuno/utils";
 import type { Dictionary } from "../i18n";
 import { fromDateInputValue, toDateInputValue } from "../lib/dates";
 import { Button } from "./ui/Button";

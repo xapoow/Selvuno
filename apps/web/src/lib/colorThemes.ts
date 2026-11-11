@@ -1,4 +1,4 @@
-import type { ColorThemePreference, ThemePreference } from "@myfinances/types";
+import type { ColorThemePreference, ThemePreference } from "@selvuno/types";
 
 export const defaultColorTheme: ColorThemePreference = "sage";
 

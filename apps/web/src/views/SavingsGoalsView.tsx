@@ -6,8 +6,8 @@ import type {
   SavingsGoalInput,
   Settings,
   Wallet
-} from "@myfinances/types";
-import { formatMoney } from "@myfinances/utils";
+} from "@selvuno/types";
+import { formatMoney } from "@selvuno/utils";
 import { CheckCircle2, Edit3, History, Plus, Target, Trash2 } from "lucide-react";
 import { SavingsGoalContributionForm } from "../components/SavingsGoalContributionForm";
 import { SavingsGoalForm } from "../components/SavingsGoalForm";

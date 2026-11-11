@@ -11,8 +11,8 @@ import type {
   TransactionTemplate,
   Wallet,
   WalletTransfer
-} from "@myfinances/types";
-import { DEFAULT_CURRENCY, detectDefaultLocaleSettings, inferCurrencyFromLocale } from "@myfinances/utils";
+} from "@selvuno/types";
+import { DEFAULT_CURRENCY, detectDefaultLocaleSettings, inferCurrencyFromLocale } from "@selvuno/utils";
 import type { TransactionAttachment } from "./models";
 
 const DEFAULT_LOCALE = "ru-RU";
@@ -31,6 +31,7 @@ export class FinanceDatabase extends Dexie {
   backupSnapshots!: Table<BackupSnapshot, string>;
   transactionAttachments!: Table<TransactionAttachment, string>;
 
+  // Keep the existing DB identity so the Selvuno rename preserves all local data.
   constructor(name = "myfinances") {
     super(name);
     this.version(1).stores({

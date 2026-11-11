@@ -1,4 +1,4 @@
-import type { CalendarDate } from "@myfinances/types";
+import type { CalendarDate } from "@selvuno/types";
 
 export type AnalyticsPeriodPreset = "week" | "month" | "year" | "custom";
 

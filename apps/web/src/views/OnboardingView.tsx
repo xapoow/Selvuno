@@ -7,7 +7,7 @@ import type {
   ThemePreference,
   Wallet,
   WalletInput
-} from "@myfinances/types";
+} from "@selvuno/types";
 import { Check, ChevronLeft, Languages, WalletCards } from "lucide-react";
 import { ColorThemePicker } from "../components/ColorThemePicker";
 import { currencyOptions, getCurrencyLabel } from "../lib/currencies";
@@ -90,7 +90,7 @@ export function OnboardingView({
     <main className="app-page-bg min-h-dvh px-4 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-[calc(env(safe-area-inset-top)+20px)] text-foreground">
       <section className="mx-auto flex min-h-[calc(100dvh-40px)] max-w-xl flex-col justify-center gap-6">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted">MyFinances</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted">{t.brand}</p>
           <div className="flex items-center gap-2">
             {[1, 2].map((item) => (
               <motion.span

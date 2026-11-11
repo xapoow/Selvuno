@@ -1,4 +1,4 @@
-import type { Transaction } from "@myfinances/types";
+import type { Transaction } from "@selvuno/types";
 
 function timestamp(value?: string): number {
   if (!value) return 0;

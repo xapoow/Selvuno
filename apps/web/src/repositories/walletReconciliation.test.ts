@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { calculateWalletTotals } from "@myfinances/utils";
+import { calculateWalletTotals } from "@selvuno/utils";
 import { financeDb, resetDatabaseForTests } from "../db/database";
 import { WalletBalanceChangedError } from "../lib/walletReconciliation";
 import { testCategory, testSettings, testTransaction, testWallet } from "../test/fixtures";

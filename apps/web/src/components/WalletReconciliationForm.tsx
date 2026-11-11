@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
-import type { Settings, Transaction, Wallet, WalletReconciliationInput, WalletTransfer } from "@myfinances/types";
-import { calculateWalletTotals, formatDate, formatMoney } from "@myfinances/utils";
+import type { Settings, Transaction, Wallet, WalletReconciliationInput, WalletTransfer } from "@selvuno/types";
+import { calculateWalletTotals, formatDate, formatMoney } from "@selvuno/utils";
 import { Check, Eye, EyeOff, History, LoaderCircle, Scale } from "lucide-react";
 import type { Dictionary } from "../i18n";
 import { parseBalanceToMinor, WalletBalanceChangedError } from "../lib/walletReconciliation";

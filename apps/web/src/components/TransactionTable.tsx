@@ -1,5 +1,5 @@
-import type { Category, Settings, Transaction, Wallet } from "@myfinances/types";
-import { formatDate, formatSignedMoney } from "@myfinances/utils";
+import type { Category, Settings, Transaction, Wallet } from "@selvuno/types";
+import { formatDate, formatSignedMoney } from "@selvuno/utils";
 import { Edit3 } from "lucide-react";
 import { getCategoryName, type Dictionary } from "../i18n";
 import { shouldHideWalletAmounts } from "../lib/walletFeatures";

@@ -6,8 +6,8 @@ import type {
   TransactionInput,
   Wallet,
   WalletView
-} from "@myfinances/types";
-import { formatMoney, minorToDecimal } from "@myfinances/utils";
+} from "@selvuno/types";
+import { formatMoney, minorToDecimal } from "@selvuno/utils";
 import { Bookmark, Download, Filter, ReceiptText, Tags, Trash2, X } from "lucide-react";
 import { FinancialCalendar } from "../components/FinancialCalendar";
 import { HistoryFilterForm } from "../components/HistoryFilterForm";
@@ -23,6 +23,7 @@ import { SelectField } from "../components/ui/SelectField";
 import { TextField } from "../components/ui/TextField";
 import { getCategoryName, type Dictionary } from "../i18n";
 import type { HistoryMode } from "../lib/routes";
+import { EXPORT_PREFIX } from "../lib/brand";
 import { convertMinorToBaseCurrency, useExchangeRates, type ExchangeRateTable } from "../lib/exchangeRates";
 import { advancedHistoryFilterCount, defaultHistoryFilters, equalHistoryFilters, filterHistoryTransactions, hasHistoryFilters, readHistoryAmountRange, type HistoryFilters, type HistorySort } from "../lib/historyFilters";
 import { useSavedHistoryFilters } from "../state/useSavedHistoryFilters";
@@ -250,7 +251,7 @@ export function HistoryView({
         transaction.tags.join(", ")
       ])
     ];
-    downloadCsv(`myfinances-${new Date().toISOString().slice(0, 10)}.csv`, createCsv(rows));
+    downloadCsv(`${EXPORT_PREFIX}-${new Date().toISOString().slice(0, 10)}.csv`, createCsv(rows));
   }
 
   async function applyBulkCategory() {
