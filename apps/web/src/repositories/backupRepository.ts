@@ -1,27 +1,16 @@
-import type {
-  BackupSnapshot,
-  BackupSnapshotReason,
-  FinanceBackup,
-  FinanceBackupV8
-} from "@selvuno/types";
+import type { BackupSnapshot, BackupSnapshotReason, FinanceBackup, FinanceBackupV8 } from "@selvuno/types";
 import { backupSchema, backupSnapshotSchema } from "@selvuno/types";
 import { createId, financeDb, nowIso, seedLocalData } from "../db/database";
+import type { TransactionAttachment } from "../db/models";
 
 const MAX_AUTOMATIC_BACKUPS = 12;
 const BACKUP_SESSION_WINDOW_MS = 10 * 60 * 1000;
-
-export interface BackupRepository {
-  exportBackup(): Promise<FinanceBackupV8>;
-  importBackup(backup: unknown): Promise<FinanceBackup>;
-  createSnapshot(reason?: BackupSnapshotReason): Promise<BackupSnapshot>;
-  listSnapshots(): Promise<BackupSnapshot[]>;
-  restoreSnapshot(id: string): Promise<FinanceBackup>;
-  deleteSnapshot(id: string): Promise<void>;
+function dataTables() {
+  return [financeDb.wallets, financeDb.categories, financeDb.transactions, financeDb.transactionTemplates,
+    financeDb.settings, financeDb.budgets, financeDb.recurringTransactions, financeDb.savingsGoals,
+    financeDb.savingsGoalContributions, financeDb.walletTransfers, financeDb.transactionAttachments];
 }
-
-export const backupRepository: BackupRepository = {
-  async exportBackup() {
-    await seedLocalData();
+async function readJsonBackup(): Promise<FinanceBackupV8> {
     const settings = await financeDb.settings.get("default");
     if (!settings) {
       throw new Error("Settings not found.");
@@ -40,132 +29,106 @@ export const backupRepository: BackupRepository = {
       walletTransfers: await financeDb.walletTransfers.toArray(),
       settings
     }) as FinanceBackupV8;
+}
+export async function captureFullBackup() {
+  await seedLocalData();
+  return financeDb.transaction("r", dataTables(), async () => ({
+    data: await readJsonBackup(),
+    attachments: await financeDb.transactionAttachments.toArray()
+  }));
+}
+async function collectSnapshotFiles() {
+  const snapshots = await financeDb.backupSnapshots.toArray();
+  const retained = new Set(snapshots.flatMap((snapshot) => snapshot.attachmentIds ?? []));
+  const ids = await financeDb.snapshotAttachments.toCollection().primaryKeys();
+  await financeDb.snapshotAttachments.bulkDelete(ids.filter((id) => !retained.has(id)));
+}
+export interface BackupRepository {
+  exportBackup(): Promise<FinanceBackupV8>;
+  exportArchive(): Promise<Blob>;
+  importBackup(backup: unknown): Promise<FinanceBackup>;
+  createSnapshot(reason?: BackupSnapshotReason): Promise<BackupSnapshot>;
+  listSnapshots(): Promise<BackupSnapshot[]>;
+  restoreSnapshot(id: string): Promise<FinanceBackup>;
+  deleteSnapshot(id: string): Promise<void>;
+}
+export const backupRepository: BackupRepository = {
+  async exportBackup() {
+    await seedLocalData();
+    return financeDb.transaction("r", dataTables(), readJsonBackup);
   },
-
-  async importBackup(backup) {
-    const parsed = backupSchema.parse(backup);
-    await financeDb.transaction(
-      "rw",
-      [
-        financeDb.wallets,
-        financeDb.categories,
-        financeDb.transactions,
-        financeDb.transactionTemplates,
-        financeDb.settings,
-        financeDb.budgets,
-        financeDb.recurringTransactions,
-        financeDb.savingsGoals,
-        financeDb.savingsGoalContributions,
-        financeDb.walletTransfers,
-        financeDb.transactionAttachments
-      ],
-      async () => {
-        await financeDb.wallets.clear();
-        await financeDb.categories.clear();
-        await financeDb.transactions.clear();
-        await financeDb.transactionTemplates.clear();
-        await financeDb.settings.clear();
-        await financeDb.budgets.clear();
-        await financeDb.recurringTransactions.clear();
-        await financeDb.savingsGoals.clear();
-        await financeDb.savingsGoalContributions.clear();
-        await financeDb.walletTransfers.clear();
-        await financeDb.transactionAttachments.clear();
-        await financeDb.wallets.bulkPut(
-          parsed.wallets.map((wallet) => ({
-            ...wallet,
-            initialBalanceMinor: wallet.initialBalanceMinor ?? 0,
-            kind: wallet.kind ?? "cash",
-            creditLimitMinor: wallet.creditLimitMinor ?? 0,
-            excludeFromTotals: wallet.excludeFromTotals ?? false,
-            hideBalance: wallet.hideBalance ?? false
-          }))
-        );
-        await financeDb.categories.bulkPut(parsed.categories);
-        await financeDb.transactions.bulkPut(parsed.transactions);
-        if (
-          parsed.version === 2 ||
-          parsed.version === 3 ||
-          parsed.version === 4 ||
-          parsed.version === 5 ||
-          parsed.version === 6 ||
-          parsed.version === 7 ||
-          parsed.version === 8
-        ) {
-          await financeDb.budgets.bulkPut(parsed.budgets);
-        }
-        if (
-          parsed.version === 3 ||
-          parsed.version === 4 ||
-          parsed.version === 5 ||
-          parsed.version === 6 ||
-          parsed.version === 7 ||
-          parsed.version === 8
-        ) {
-          await financeDb.recurringTransactions.bulkPut(parsed.recurringTransactions);
-        }
-        if (
-          parsed.version === 4 ||
-          parsed.version === 5 ||
-          parsed.version === 6 ||
-          parsed.version === 7 ||
-          parsed.version === 8
-        ) {
-          await financeDb.savingsGoals.bulkPut(parsed.savingsGoals);
-          await financeDb.savingsGoalContributions.bulkPut(parsed.savingsGoalContributions);
-        }
-        if (parsed.version === 5 || parsed.version === 6 || parsed.version === 7 || parsed.version === 8) {
-          await financeDb.walletTransfers.bulkPut(parsed.walletTransfers);
-        }
-        if (parsed.version === 7 || parsed.version === 8) {
-          await financeDb.transactionTemplates.bulkPut(parsed.transactionTemplates);
-        }
-        await financeDb.settings.put(parsed.settings);
+  async exportArchive() {
+    const { createBackupArchive } = await import("../lib/backupArchive");
+    return createBackupArchive(await captureFullBackup());
+  },
+  async importBackup(input) {
+    const { normalizeBackupInput } = await import("../lib/backupArchive");
+    // Validate every incoming record and file before taking a safety copy or modifying data.
+    const incoming = normalizeBackupInput(input);
+    const parsed = incoming.data;
+    await this.createSnapshot("before-restore");
+    await financeDb.transaction("rw", dataTables(), async () => {
+      const ids = new Set(parsed.transactions.map((item) => item.id));
+      // Legacy JSON has no file bytes. Preserve matching local receipts instead of losing them.
+      const attachments: TransactionAttachment[] = incoming.attachments ??
+        (await financeDb.transactionAttachments.toArray()).filter((item) => ids.has(item.transactionId));
+      const counts = new Map<string, number>();
+      attachments.forEach((item) => counts.set(item.transactionId, (counts.get(item.transactionId) ?? 0) + 1));
+      for (const table of dataTables()) await table.clear();
+      await financeDb.wallets.bulkPut(parsed.wallets);
+      await financeDb.categories.bulkPut(parsed.categories);
+      await financeDb.transactions.bulkPut(parsed.transactions.map((item) => {
+        const count = counts.get(item.id) ?? 0;
+        return count || item.attachmentCount !== undefined ? { ...item, attachmentCount: count } : item;
+      }));
+      if ("budgets" in parsed) await financeDb.budgets.bulkPut(parsed.budgets);
+      if ("recurringTransactions" in parsed) await financeDb.recurringTransactions.bulkPut(parsed.recurringTransactions);
+      if ("savingsGoals" in parsed) {
+        await financeDb.savingsGoals.bulkPut(parsed.savingsGoals);
+        await financeDb.savingsGoalContributions.bulkPut(parsed.savingsGoalContributions);
       }
-    );
+      if ("walletTransfers" in parsed) await financeDb.walletTransfers.bulkPut(parsed.walletTransfers);
+      if ("transactionTemplates" in parsed) await financeDb.transactionTemplates.bulkPut(parsed.transactionTemplates);
+      await financeDb.transactionAttachments.bulkPut(attachments);
+      await financeDb.settings.put(parsed.settings);
+    });
     return parsed;
   },
-
   async createSnapshot(reason = "automatic") {
-    const backup = await this.exportBackup();
-    const latest = await financeDb.backupSnapshots.orderBy("createdAt").last();
-    const canReuseLatest =
-      reason === "automatic" &&
-      latest?.reason === "automatic" &&
-      Date.now() - Date.parse(latest.createdAt) < BACKUP_SESSION_WINDOW_MS;
-    const snapshot = backupSnapshotSchema.parse({
-      id: canReuseLatest && latest ? latest.id : createId(),
-      createdAt: nowIso(),
-      reason,
-      backup
+    await seedLocalData();
+    return financeDb.transaction("rw", [...dataTables(), financeDb.backupSnapshots, financeDb.snapshotAttachments], async () => {
+      const backup = await readJsonBackup();
+      const files = await financeDb.transactionAttachments.toArray();
+      const latest = await financeDb.backupSnapshots.orderBy("createdAt").last();
+      const reuse = reason === "automatic" && latest?.reason === "automatic" &&
+        Date.now() - Date.parse(latest.createdAt) < BACKUP_SESSION_WINDOW_MS;
+      const snapshot = backupSnapshotSchema.parse({
+        id: reuse && latest ? latest.id : createId(), createdAt: nowIso(), reason, backup,
+        attachmentIds: files.map((file) => file.id)
+      });
+      await financeDb.snapshotAttachments.bulkPut(files);
+      await financeDb.backupSnapshots.put(snapshot);
+      const snapshots = await financeDb.backupSnapshots.orderBy("createdAt").toArray();
+      await financeDb.backupSnapshots.bulkDelete(snapshots.slice(0, Math.max(0, snapshots.length - MAX_AUTOMATIC_BACKUPS)).map((item) => item.id));
+      await collectSnapshotFiles();
+      return snapshot;
     });
-    await financeDb.backupSnapshots.put(snapshot);
-
-    const snapshots = await financeDb.backupSnapshots.orderBy("createdAt").toArray();
-    if (snapshots.length > MAX_AUTOMATIC_BACKUPS) {
-      await financeDb.backupSnapshots.bulkDelete(
-        snapshots.slice(0, snapshots.length - MAX_AUTOMATIC_BACKUPS).map((item) => item.id)
-      );
-    }
-    return snapshot;
   },
-
   async listSnapshots() {
-    return (await financeDb.backupSnapshots.orderBy("createdAt").reverse().toArray()).map(
-      (snapshot) => backupSnapshotSchema.parse(snapshot)
-    );
+    return (await financeDb.backupSnapshots.orderBy("createdAt").reverse().toArray()).map((snapshot) => backupSnapshotSchema.parse(snapshot));
   },
-
   async restoreSnapshot(id) {
     const snapshot = await financeDb.backupSnapshots.get(id);
-    if (!snapshot) {
-      throw new Error("Backup snapshot not found.");
-    }
-    await this.createSnapshot("before-restore");
-    return this.importBackup(snapshot.backup);
+    if (!snapshot) throw new Error("snapshot-missing");
+    if (!snapshot.attachmentIds) return this.importBackup(snapshot.backup);
+    const files = await financeDb.snapshotAttachments.bulkGet(snapshot.attachmentIds);
+    if (files.some((file) => !file)) throw new Error("archive-incomplete");
+    return this.importBackup({ kind: "full-backup", data: snapshot.backup, attachments: files });
   },
-
   async deleteSnapshot(id) {
-    await financeDb.backupSnapshots.delete(id);
+    await financeDb.transaction("rw", financeDb.backupSnapshots, financeDb.snapshotAttachments, async () => {
+      await financeDb.backupSnapshots.delete(id);
+      await collectSnapshotFiles();
+    });
   }
 };

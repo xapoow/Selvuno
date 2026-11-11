@@ -13,7 +13,7 @@ import type {
   WalletTransfer
 } from "@selvuno/types";
 import { DEFAULT_CURRENCY, detectDefaultLocaleSettings, inferCurrencyFromLocale } from "@selvuno/utils";
-import type { TransactionAttachment } from "./models";
+import type { TransactionAttachment, TransactionDraft } from "./models";
 
 const DEFAULT_LOCALE = "ru-RU";
 
@@ -30,6 +30,8 @@ export class FinanceDatabase extends Dexie {
   walletTransfers!: Table<WalletTransfer, string>;
   backupSnapshots!: Table<BackupSnapshot, string>;
   transactionAttachments!: Table<TransactionAttachment, string>;
+  snapshotAttachments!: Table<TransactionAttachment, string>;
+  transactionDrafts!: Table<TransactionDraft, string>;
 
   // Keep the existing DB identity so the Selvuno rename preserves all local data.
   constructor(name = "myfinances") {
@@ -257,6 +259,10 @@ export class FinanceDatabase extends Dexie {
       backupSnapshots: "id, createdAt, reason",
       transactionAttachments: "id, transactionId, createdAt"
     });
+    this.version(13).stores({
+      snapshotAttachments: "id, transactionId",
+      transactionDrafts: "id, updatedAt"
+    });
   }
 }
 
@@ -328,6 +334,7 @@ export async function seedLocalData(db = financeDb): Promise<void> {
       advancedWalletsEnabled: false,
       smartInsightsEnabled: false,
       hapticsEnabled: false,
+      draftsEnabled: true,
       onboardingCompleted: false,
       defaultsVersion: 2,
       createdAt: now,
@@ -380,6 +387,9 @@ export async function seedLocalData(db = financeDb): Promise<void> {
     }
     if (typeof settings.hapticsEnabled !== "boolean") {
       repairedSettings.hapticsEnabled = false;
+    }
+    if (typeof settings.draftsEnabled !== "boolean") {
+      repairedSettings.draftsEnabled = true;
     }
     if (typeof settings.onboardingCompleted !== "boolean") {
       repairedSettings.onboardingCompleted = true;
@@ -498,6 +508,8 @@ export async function seedLocalData(db = financeDb): Promise<void> {
       )
     ]);
   }
+  // Expired drafts are removed on the next application access, not by a background timer.
+  await db.transactionDrafts.where("updatedAt").below(new Date(Date.now() - 30 * 86400000).toISOString()).delete();
 }
 
 export async function resetDatabaseForTests(db = financeDb): Promise<void> {

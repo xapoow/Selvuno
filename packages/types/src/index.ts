@@ -312,6 +312,7 @@ export const settingsSchema = z.object({
   advancedWalletsEnabled: z.boolean().default(false),
   smartInsightsEnabled: z.boolean().default(false),
   hapticsEnabled: z.boolean().default(false),
+  draftsEnabled: z.boolean().default(true),
   dashboardLayout: dashboardLayoutSchema.optional(),
   onboardingCompleted: z.boolean().default(false),
   defaultsVersion: z.number().int().default(2),
@@ -394,6 +395,7 @@ export const backupSnapshotSchema = z.object({
   id: z.string().uuid(),
   createdAt: z.string().datetime(),
   reason: backupSnapshotReasonSchema,
-  backup: backupSchema
+  backup: backupSchema,
+  attachmentIds: z.array(z.string()).optional()
 });
 export type BackupSnapshot = z.infer<typeof backupSnapshotSchema>;
