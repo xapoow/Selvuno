@@ -9,6 +9,16 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.9.9",
+      date: "2026-11-11",
+      notes: [
+        "Полный ZIP-бэкап включает фото чеков и PDF, проверку целостности и предпросмотр восстановления",
+        "Локальные точки восстановления сохраняют вложения; старые JSON-бэкапы по-прежнему поддерживаются",
+        "Незавершённые операции и файлы сохраняются в черновик; автосохранение можно отключить в Настройки → Функции",
+        "В Настройки → Хранилище виден объём данных и доступны управление вложениями, очистка черновиков и истории восстановления"
+      ]
+    },
+    {
       version: "0.9.8",
       date: "2026-11-11",
       notes: [
@@ -226,6 +236,16 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.9.9",
+      date: "2026-11-11",
+      notes: [
+        "Full ZIP backups include receipt photos and PDFs, with integrity checks and a restore preview",
+        "Local restore points retain receipt files; legacy JSON backups remain supported",
+        "Unfinished transactions and attachments are saved as drafts; autosave can be disabled in Settings → Features",
+        "Settings → Storage shows usage and lets you manage receipt files, drafts and restore history"
+      ]
+    },
     {
       version: "0.9.8",
       date: "2026-11-11",
