@@ -70,7 +70,9 @@ export const backupRepository: BackupRepository = {
     await financeDb.transaction("rw", dataTables(), async () => {
       const ids = new Set(parsed.transactions.map((item) => item.id));
       // Legacy JSON has no file bytes. Preserve matching local receipts instead of losing them.
-      const attachments: TransactionAttachment[] = incoming.attachments ??
+      // Imported IDs must not overwrite file copies used by older restore points.
+      // Live attachments are immutable, but an external archive may reuse an ID.
+      const attachments: TransactionAttachment[] = incoming.attachments?.map((file) => ({ ...file, id: createId() })) ??
         (await financeDb.transactionAttachments.toArray()).filter((item) => ids.has(item.transactionId));
       const counts = new Map<string, number>();
       attachments.forEach((item) => counts.set(item.transactionId, (counts.get(item.transactionId) ?? 0) + 1));

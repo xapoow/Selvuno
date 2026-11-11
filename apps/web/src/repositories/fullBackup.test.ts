@@ -18,6 +18,29 @@ beforeEach(async () => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("full backup safety", () => {
+  it("rolls all financial tables back if replacement fails after clearing them", async () => {
+    const incoming = await backupRepository.exportBackup();
+    incoming.wallets[0].name = "Replacement wallet";
+    incoming.transactions[0].amountMinor = 99999;
+    const failure = vi.spyOn(financeDb.transactions, "bulkPut").mockRejectedValueOnce(new Error("storage-full"));
+    try {
+      await expect(backupRepository.importBackup(incoming)).rejects.toThrow("storage-full");
+    } finally { failure.mockRestore(); }
+    expect((await financeDb.wallets.get(testWallet.id))?.name).toBe(testWallet.name);
+    expect((await financeDb.transactions.get(testTransaction.id))?.amountMinor).toBe(testTransaction.amountMinor);
+    expect(await financeDb.transactionAttachments.count()).toBe(1);
+    expect(await financeDb.backupSnapshots.count()).toBeGreaterThan(0);
+  });
+  it("does not overwrite older restore copies when an external archive reuses a file ID", async () => {
+    const original = await backupRepository.createSnapshot("before-restore");
+    const data = await backupRepository.exportBackup();
+    const file = (await financeDb.transactionAttachments.toArray())[0];
+    const blob = new Blob(["replacement bytes"], { type: file.mimeType });
+    await backupRepository.importBackup({ kind: "full-backup", data, attachments: [{ ...file, size: blob.size, blob }] });
+    await backupRepository.createSnapshot();
+    await backupRepository.restoreSnapshot(original.id);
+    expect(await (await financeDb.transactionAttachments.toArray())[0].blob.text()).toBe("receipt bytes");
+  });
   it("accepts a standard deflated ZIP without relying on stored-only encoding", async () => {
     const archive = await blobBytes(await backupRepository.exportArchive());
     const zipped = zipSync(unzipSync(archive));
