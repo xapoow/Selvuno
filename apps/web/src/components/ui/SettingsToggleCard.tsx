@@ -7,6 +7,8 @@ interface SettingsToggleCardProps {
   icon: React.ReactNode;
   label: string;
   hint: string;
+  disabled?: boolean;
+  children?: React.ReactNode;
   onChange: (checked: boolean) => Promise<void>;
 }
 
@@ -15,12 +17,14 @@ export function SettingsToggleCard({
   icon,
   label,
   hint,
+  disabled = false,
+  children,
   onChange
 }: SettingsToggleCardProps) {
   const [pending, setPending] = useState(false);
 
   async function handleChange() {
-    if (pending) {
+    if (pending || disabled) {
       return;
     }
     setPending(true);
@@ -47,13 +51,14 @@ export function SettingsToggleCard({
       <div className="min-w-0 flex-1">
         <h3 className="text-sm font-semibold text-foreground">{label}</h3>
         <p className="mt-1 text-xs leading-5 text-muted">{hint}</p>
+        {children}
       </div>
       <Switch
         checked={checked}
         label={label}
-        disabled={pending}
+        disabled={pending || disabled}
         onClick={() => void handleChange()}
-        className="disabled:cursor-wait"
+        className={pending ? "disabled:cursor-wait" : "disabled:cursor-not-allowed"}
       />
     </article>
   );

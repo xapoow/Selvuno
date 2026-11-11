@@ -327,6 +327,7 @@ export async function seedLocalData(db = financeDb): Promise<void> {
       addAnotherEnabled: true,
       advancedWalletsEnabled: false,
       smartInsightsEnabled: false,
+      hapticsEnabled: false,
       onboardingCompleted: false,
       defaultsVersion: 2,
       createdAt: now,
@@ -376,6 +377,9 @@ export async function seedLocalData(db = financeDb): Promise<void> {
     }
     if (typeof settings.smartInsightsEnabled !== "boolean") {
       repairedSettings.smartInsightsEnabled = false;
+    }
+    if (typeof settings.hapticsEnabled !== "boolean") {
+      repairedSettings.hapticsEnabled = false;
     }
     if (typeof settings.onboardingCompleted !== "boolean") {
       repairedSettings.onboardingCompleted = true;

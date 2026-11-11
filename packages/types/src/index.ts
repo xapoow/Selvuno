@@ -311,6 +311,7 @@ export const settingsSchema = z.object({
   addAnotherEnabled: z.boolean().default(true),
   advancedWalletsEnabled: z.boolean().default(false),
   smartInsightsEnabled: z.boolean().default(false),
+  hapticsEnabled: z.boolean().default(false),
   dashboardLayout: dashboardLayoutSchema.optional(),
   onboardingCompleted: z.boolean().default(false),
   defaultsVersion: z.number().int().default(2),

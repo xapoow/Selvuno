@@ -2,15 +2,18 @@ import { useState } from "react";
 import { LockKeyhole } from "lucide-react";
 import type { Dictionary } from "../i18n";
 import { PIN_LENGTH } from "../lib/privacy";
+import { useHapticFeedback } from "../state/useHapticFeedback";
 import { Button } from "./ui/Button";
 import { PinCodeField, PinKeypad } from "./ui/PinKeypad";
 
 interface LockScreenProps {
+  hapticsEnabled?: boolean;
   t: Dictionary;
   onUnlock: (pin: string) => Promise<boolean>;
 }
 
-export function LockScreen({ t, onUnlock }: LockScreenProps) {
+export function LockScreen({ t, onUnlock, hapticsEnabled = false }: LockScreenProps) {
+  const feedback = useHapticFeedback(hapticsEnabled);
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -26,6 +29,7 @@ export function LockScreen({ t, onUnlock }: LockScreenProps) {
           void onUnlock(pin)
             .then((valid) => {
               if (!valid) {
+                feedback("error");
                 setError(t.settings.pinIncorrect);
                 setPin("");
               }

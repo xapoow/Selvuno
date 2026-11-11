@@ -598,6 +598,12 @@ export interface Dictionary {
     advancedWalletsSettingHint: string;
     smartInsightsSetting: string;
     smartInsightsSettingHint: string;
+    haptics: string;
+    hapticsHint: string;
+    hapticsUnsupported: string;
+    hapticsTest: string;
+    hapticsRequested: string;
+    hapticsBlocked: string;
     privacy: string;
     pinProtection: string;
     pinProtectionHint: string;
@@ -1273,6 +1279,12 @@ export const dictionaries: Record<Language, Dictionary> = {
       advancedWalletsSetting: "Advanced wallet options",
       advancedWalletsSettingHint: "Enable credit limits, per-wallet privacy, and exclusion from combined statistics.",
       smartInsightsSetting: "Money observations",
+      haptics: "Haptic feedback",
+      hapticsHint: "Optional, brief feedback when switching wallets, saving a transaction or entering an incorrect PIN. System settings may block vibration.",
+      hapticsUnsupported: "Vibration is unavailable in this browser. Safari on iPhone does not support this feature. The app works normally without it.",
+      hapticsTest: "Test vibration",
+      hapticsRequested: "Request sent. If you felt nothing, check vibration settings on your phone; the browser cannot confirm physical feedback.",
+      hapticsBlocked: "The browser did not accept the request. Check your device settings or try again in a supported browser.",
       smartInsightsSettingHint: "Show optional local summaries and patterns on the home screen. No notifications or cloud analysis.",
       privacy: "Privacy",
       pinProtection: "PIN protection",
@@ -2008,6 +2020,12 @@ export const dictionaries: Record<Language, Dictionary> = {
       advancedWalletsSetting: "Расширенные настройки кошельков",
       advancedWalletsSettingHint: "Включает кредитные лимиты, приватность отдельного кошелька и исключение из общей статистики.",
       smartInsightsSetting: "Наблюдения о деньгах",
+      haptics: "Виброотклик",
+      hapticsHint: "Необязательный короткий отклик при смене кошелька, сохранении операции и неверном PIN. Система может блокировать вибрацию.",
+      hapticsUnsupported: "Вибрация недоступна в этом браузере. Safari на iPhone не поддерживает эту функцию. Приложение работает без неё как обычно.",
+      hapticsTest: "Проверить вибрацию",
+      hapticsRequested: "Запрос отправлен. Если отклика нет, проверь настройки вибрации телефона: браузер не может подтвердить физическую вибрацию.",
+      hapticsBlocked: "Браузер не принял запрос. Проверь системные настройки или попробуй ещё раз в поддерживаемом браузере.",
       smartInsightsSettingHint: "Показывать на главной необязательные локальные выводы. Без уведомлений и облачного анализа.",
       privacy: "Приватность",
       pinProtection: "Защита PIN-кодом",

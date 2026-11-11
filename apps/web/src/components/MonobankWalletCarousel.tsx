@@ -9,6 +9,7 @@ import { getCurrencyLabel } from "../lib/currencies";
 import { getIncludedWalletIds } from "../lib/walletFeatures";
 import { convertMinorToBaseCurrency, type ExchangeRateTable, useExchangeRates } from "../lib/exchangeRates";
 import type { Dictionary } from "../i18n";
+import { useHapticFeedback } from "../state/useHapticFeedback";
 
 interface MonobankWalletCarouselProps {
   wallets: Wallet[];
@@ -269,6 +270,7 @@ export function MonobankWalletCarousel({
   onChange,
   className
 }: MonobankWalletCarouselProps) {
+  const feedback = useHapticFeedback(settings.hapticsEnabled);
   const containerRef = useRef<HTMLDivElement>(null);
   const [internalActiveId, setInternalActiveId] = useState<WalletView>(activeWalletId);
 
@@ -379,6 +381,7 @@ export function MonobankWalletCarousel({
     if (fireChange && index !== resolvedIndex) {
       const direction = index > resolvedIndex ? 1 : -1;
       setInternalActiveId(cardItems[index].id);
+      feedback("selection");
       onChange(cardItems[index].id, direction);
     }
     void animate(trackX, peek - index * step, {
