@@ -6,7 +6,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.9.7";
+export const appVersion = "0.9.8";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -1217,12 +1217,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: `A new name — ${APP_NAME}. Your data and familiar features stay with you.`,
+      intro: "Optional haptic feedback for important actions.",
       gotIt: "Explore the update",
       notes: [
-        `${APP_NAME} is the new name across the interface, notifications and installed PWA`,
-        "CSV exports and backup filenames now use selvuno",
-        "Existing local data, attachments, PIN protection and settings remain compatible"
+        "Haptic feedback in Settings → Features, with a test button; off by default",
+        "Brief feedback when switching wallets, successfully saving a transaction or entering an incorrect PIN",
+        "Repeated requests are rate-limited and feedback stops when the tab is hidden",
+        "Unsupported devices continue to work normally without vibration"
       ]
     },
     categories: {
@@ -1958,12 +1959,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: `Новое имя — ${APP_NAME}. Ваши данные и привычные возможности остаются с вами.`,
+      intro: "Опциональный виброотклик для важных действий.",
       gotIt: "Посмотреть обновление",
       notes: [
-        `${APP_NAME} — новое название в интерфейсе, уведомлениях и установленной PWA`,
-        "Имена CSV-экспортов и файлов бэкапов обновлены на selvuno",
-        "Сохранена совместимость с локальными данными, вложениями, PIN-кодом и настройками"
+        "Виброотклик в Настройки → Функции с кнопкой проверки; по умолчанию выключен",
+        "Короткий отклик при смене кошелька, успешном сохранении операции и неверном PIN",
+        "Защита от частых повторов и отключение вибрации в скрытой вкладке",
+        "На неподдерживаемых устройствах приложение работает без вибрации"
       ]
     },
     categories: {
