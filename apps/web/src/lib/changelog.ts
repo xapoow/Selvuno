@@ -9,6 +9,15 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.9.7",
+      date: "2026-11-11",
+      notes: [
+        "Selvuno — новое название в интерфейсе, уведомлениях и установленной PWA",
+        "Имена CSV-экспортов и файлов бэкапов обновлены на selvuno",
+        "Сохранена совместимость с локальными данными, вложениями, PIN-кодом и настройками"
+      ]
+    },
+    {
       version: "0.9.6",
       date: "2026-11-05",
       notes: [
@@ -207,6 +216,15 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.9.7",
+      date: "2026-11-11",
+      notes: [
+        "Selvuno is the new name across the interface, notifications and installed PWA",
+        "CSV exports and backup filenames now use selvuno",
+        "Existing local data, attachments, PIN protection and settings remain compatible"
+      ]
+    },
     {
       version: "0.9.6",
       date: "2026-11-05",

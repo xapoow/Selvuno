@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      manifestFilename: "manifest-v0.9.6.webmanifest",
+      manifestFilename: "manifest-v0.9.7.webmanifest",
       includeAssets: ["pwa.svg"],
       manifest: {
         id: "/",

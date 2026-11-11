@@ -6,7 +6,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.9.6";
+export const appVersion = "0.9.7";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -1211,13 +1211,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: "Navigate between screens and return to the section you need.",
+      intro: `A new name — ${APP_NAME}. Your data and familiar features stay with you.`,
       gotIt: "Explore the update",
       notes: [
-        "The address bar now follows screens and tabs in Settings, History and Wallets",
-        "Direct links, page reloads and Back/Forward restore the selected section",
-        "Wallet selection appears in the URL without flooding browser history",
-        "Main sections can open in a new tab; nested links have a PWA navigation fallback"
+        `${APP_NAME} is the new name across the interface, notifications and installed PWA`,
+        "CSV exports and backup filenames now use selvuno",
+        "Existing local data, attachments, PIN protection and settings remain compatible"
       ]
     },
     categories: {
@@ -1947,13 +1946,12 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: "Удобнее переходить между экранами и возвращаться к нужному разделу.",
+      intro: `Новое имя — ${APP_NAME}. Ваши данные и привычные возможности остаются с вами.`,
       gotIt: "Посмотреть обновление",
       notes: [
-        "Адресная строка синхронизирована с экранами и вкладками настроек, истории и кошельков",
-        "Прямые ссылки, перезагрузка и кнопки «Назад/Вперёд» восстанавливают выбранный раздел",
-        "Выбор кошелька отражается в URL без лишних шагов в истории браузера",
-        "Основные разделы открываются в новой вкладке; добавлена обработка вложенных ссылок в PWA"
+        `${APP_NAME} — новое название в интерфейсе, уведомлениях и установленной PWA`,
+        "Имена CSV-экспортов и файлов бэкапов обновлены на selvuno",
+        "Сохранена совместимость с локальными данными, вложениями, PIN-кодом и настройками"
       ]
     },
     categories: {
