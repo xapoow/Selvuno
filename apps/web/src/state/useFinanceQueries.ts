@@ -27,6 +27,7 @@ import { walletRepository } from "../repositories/walletRepository";
 import { walletTransferRepository } from "../repositories/walletTransferRepository";
 import { queryKeys } from "../lib/queryKeys";
 import type { TransactionSubmission } from "../lib/transactionAttachments";
+import { haptics } from "../lib/haptics";
 
 export function useFinanceData() {
   const bootstrap = useQuery({
@@ -148,11 +149,16 @@ export function useFinanceMutations() {
   const invalidate = () => {
     void invalidateFinance(queryClient);
   };
+  const transactionSaved = () => {
+    // Read the latest preference, including changes made while a save was pending.
+    haptics.play("success", queryClient.getQueryData<Settings>(queryKeys.settings)?.hapticsEnabled ?? false);
+    invalidate();
+  };
 
   return {
     addTransaction: useMutation({
       mutationFn: (input: TransactionInput) => transactionRepository.addTransaction(input),
-      onSuccess: invalidate
+      onSuccess: transactionSaved
     }),
     addTransactionWithAttachments: useMutation({
       mutationFn: async ({ input, newFiles }: TransactionSubmission) => {
@@ -162,12 +168,12 @@ export function useFinanceMutations() {
         }
         return transaction;
       },
-      onSuccess: invalidate
+      onSuccess: transactionSaved
     }),
     updateTransaction: useMutation({
       mutationFn: ({ id, input }: { id: string; input: Partial<TransactionInput> }) =>
         transactionRepository.updateTransaction(id, input),
-      onSuccess: invalidate
+      onSuccess: transactionSaved
     }),
     updateTransactionWithAttachments: useMutation({
       mutationFn: async ({
@@ -187,7 +193,7 @@ export function useFinanceMutations() {
         }
         return transaction;
       },
-      onSuccess: invalidate
+      onSuccess: transactionSaved
     }),
     deleteTransaction: useMutation({
       mutationFn: (id: string) => transactionRepository.deleteTransaction(id),

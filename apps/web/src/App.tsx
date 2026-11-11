@@ -20,6 +20,7 @@ import { getDictionary } from "./i18n";
 import { applyRootVisualTheme } from "./lib/colorThemes";
 import { useExchangeRates } from "./lib/exchangeRates";
 import { buildAppNotifications } from "./lib/notifications";
+import { haptics } from "./lib/haptics";
 import { historyPath, settingsPath, walletPath, viewPaths, type DashboardPage, type HistoryMode, type RoutableSettingsTab } from "./lib/routes";
 import { useAppStore, type AppView } from "./state/appStore";
 import { useFinanceData, useFinanceMutations } from "./state/useFinanceQueries";
@@ -96,6 +97,12 @@ export function App() {
   });
 
   const settings = data.settings.data;
+  useEffect(() => { if (!settings?.hapticsEnabled) haptics.cancel(); }, [settings?.hapticsEnabled]);
+  useEffect(() => {
+    const onVisibilityChange = () => { if (document.visibilityState !== "visible") haptics.cancel(); };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => { document.removeEventListener("visibilitychange", onVisibilityChange); haptics.cancel(); };
+  }, []);
   const wallets = data.wallets.data ?? [];
   const archivedWallets = data.archivedWallets.data ?? [];
   const categories = data.categories.data ?? [];
@@ -284,7 +291,7 @@ export function App() {
   const t = getDictionary(settings.locale);
 
   if (privacy.locked) {
-    return <LockScreen t={t} onUnlock={privacy.unlock} />;
+    return <LockScreen t={t} onUnlock={privacy.unlock} hapticsEnabled={settings.hapticsEnabled} />;
   }
 
   const notifications = buildAppNotifications({

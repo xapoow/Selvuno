@@ -6,7 +6,7 @@ export type Language = "en" | "ru";
 export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
-export const appVersion = "0.9.7";
+export const appVersion = "0.9.8";
 
 export const languageOptions = [
   { value: "ru-RU", label: "🇷🇺 Русский", language: "ru" },
@@ -598,6 +598,12 @@ export interface Dictionary {
     advancedWalletsSettingHint: string;
     smartInsightsSetting: string;
     smartInsightsSettingHint: string;
+    haptics: string;
+    hapticsHint: string;
+    hapticsUnsupported: string;
+    hapticsTest: string;
+    hapticsRequested: string;
+    hapticsBlocked: string;
     privacy: string;
     pinProtection: string;
     pinProtectionHint: string;
@@ -1211,12 +1217,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "What’s new",
       eyebrow: "Version {version}",
-      intro: `A new name — ${APP_NAME}. Your data and familiar features stay with you.`,
+      intro: "Optional haptic feedback for important actions.",
       gotIt: "Explore the update",
       notes: [
-        `${APP_NAME} is the new name across the interface, notifications and installed PWA`,
-        "CSV exports and backup filenames now use selvuno",
-        "Existing local data, attachments, PIN protection and settings remain compatible"
+        "Haptic feedback in Settings → Features, with a test button; off by default",
+        "Brief feedback when switching wallets, successfully saving a transaction or entering an incorrect PIN",
+        "Repeated requests are rate-limited and feedback stops when the tab is hidden",
+        "Unsupported devices continue to work normally without vibration"
       ]
     },
     categories: {
@@ -1273,6 +1280,12 @@ export const dictionaries: Record<Language, Dictionary> = {
       advancedWalletsSetting: "Advanced wallet options",
       advancedWalletsSettingHint: "Enable credit limits, per-wallet privacy, and exclusion from combined statistics.",
       smartInsightsSetting: "Money observations",
+      haptics: "Haptic feedback",
+      hapticsHint: "Optional, brief feedback when switching wallets, saving a transaction or entering an incorrect PIN. System settings may block vibration.",
+      hapticsUnsupported: "Vibration is unavailable in this browser. Safari on iPhone does not support this feature. The app works normally without it.",
+      hapticsTest: "Test vibration",
+      hapticsRequested: "Request sent. If you felt nothing, check vibration settings on your phone; the browser cannot confirm physical feedback.",
+      hapticsBlocked: "The browser did not accept the request. Check your device settings or try again in a supported browser.",
       smartInsightsSettingHint: "Show optional local summaries and patterns on the home screen. No notifications or cloud analysis.",
       privacy: "Privacy",
       pinProtection: "PIN protection",
@@ -1946,12 +1959,13 @@ export const dictionaries: Record<Language, Dictionary> = {
     updates: {
       title: "Что нового",
       eyebrow: "Версия {version}",
-      intro: `Новое имя — ${APP_NAME}. Ваши данные и привычные возможности остаются с вами.`,
+      intro: "Опциональный виброотклик для важных действий.",
       gotIt: "Посмотреть обновление",
       notes: [
-        `${APP_NAME} — новое название в интерфейсе, уведомлениях и установленной PWA`,
-        "Имена CSV-экспортов и файлов бэкапов обновлены на selvuno",
-        "Сохранена совместимость с локальными данными, вложениями, PIN-кодом и настройками"
+        "Виброотклик в Настройки → Функции с кнопкой проверки; по умолчанию выключен",
+        "Короткий отклик при смене кошелька, успешном сохранении операции и неверном PIN",
+        "Защита от частых повторов и отключение вибрации в скрытой вкладке",
+        "На неподдерживаемых устройствах приложение работает без вибрации"
       ]
     },
     categories: {
@@ -2008,6 +2022,12 @@ export const dictionaries: Record<Language, Dictionary> = {
       advancedWalletsSetting: "Расширенные настройки кошельков",
       advancedWalletsSettingHint: "Включает кредитные лимиты, приватность отдельного кошелька и исключение из общей статистики.",
       smartInsightsSetting: "Наблюдения о деньгах",
+      haptics: "Виброотклик",
+      hapticsHint: "Необязательный короткий отклик при смене кошелька, сохранении операции и неверном PIN. Система может блокировать вибрацию.",
+      hapticsUnsupported: "Вибрация недоступна в этом браузере. Safari на iPhone не поддерживает эту функцию. Приложение работает без неё как обычно.",
+      hapticsTest: "Проверить вибрацию",
+      hapticsRequested: "Запрос отправлен. Если отклика нет, проверь настройки вибрации телефона: браузер не может подтвердить физическую вибрацию.",
+      hapticsBlocked: "Браузер не принял запрос. Проверь системные настройки или попробуй ещё раз в поддерживаемом браузере.",
       smartInsightsSettingHint: "Показывать на главной необязательные локальные выводы. Без уведомлений и облачного анализа.",
       privacy: "Приватность",
       pinProtection: "Защита PIN-кодом",

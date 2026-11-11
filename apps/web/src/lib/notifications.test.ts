@@ -34,6 +34,7 @@ const settings: Settings = {
   addAnotherEnabled: true,
   advancedWalletsEnabled: false,
   smartInsightsEnabled: false,
+  hapticsEnabled: false,
   onboardingCompleted: true,
   defaultsVersion: 2,
   createdAt: entityBase.createdAt,

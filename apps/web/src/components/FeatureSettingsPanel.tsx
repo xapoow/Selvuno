@@ -2,6 +2,7 @@ import type { Settings, SettingsUpdate } from "@selvuno/types";
 import { BrainCircuit, WalletCards } from "lucide-react";
 import type { Dictionary } from "../i18n";
 import { SettingsToggleCard } from "./ui/SettingsToggleCard";
+import { HapticsSettings } from "./HapticsSettings";
 
 interface FeatureSettingsPanelProps {
   settings: Settings;
@@ -12,6 +13,7 @@ interface FeatureSettingsPanelProps {
 export function FeatureSettingsPanel({ settings, t, onUpdateSettings }: FeatureSettingsPanelProps) {
   return (
     <div className="grid gap-3">
+      <HapticsSettings settings={settings} t={t} onUpdateSettings={onUpdateSettings} />
       <SettingsToggleCard
         checked={settings.advancedWalletsEnabled}
         icon={<WalletCards className="h-5 w-5" />}

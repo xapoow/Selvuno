@@ -9,6 +9,16 @@ export interface ChangelogItem {
 export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
   ru: [
     {
+      version: "0.9.8",
+      date: "2026-11-11",
+      notes: [
+        "Виброотклик в Настройки → Функции с кнопкой проверки; по умолчанию выключен",
+        "Короткий отклик при смене кошелька, успешном сохранении операции и неверном PIN",
+        "Защита от частых повторов и отключение вибрации в скрытой вкладке",
+        "На неподдерживаемых устройствах приложение работает без вибрации"
+      ]
+    },
+    {
       version: "0.9.7",
       date: "2026-11-11",
       notes: [
@@ -216,6 +226,16 @@ export const BUILTIN_CHANGELOG: Record<"ru" | "en", ChangelogItem[]> = {
     }
   ],
   en: [
+    {
+      version: "0.9.8",
+      date: "2026-11-11",
+      notes: [
+        "Haptic feedback in Settings → Features, with a test button; off by default",
+        "Brief feedback when switching wallets, successfully saving a transaction or entering an incorrect PIN",
+        "Repeated requests are rate-limited and feedback stops when the tab is hidden",
+        "Unsupported devices continue to work normally without vibration"
+      ]
+    },
     {
       version: "0.9.7",
       date: "2026-11-11",
