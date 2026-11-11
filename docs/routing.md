@@ -15,6 +15,7 @@ Do not update `activeView` directly with `setState`; use `navigate` or `setActiv
 | `/settings` | General settings |
 | `/settings/appearance`, `/settings/automation`, `/settings/features` | Appearance, quick entry and optional features |
 | `/settings/privacy`, `/settings/categories`, `/settings/backup`, `/settings/sync` | Other settings sections |
+| `/settings/storage` | Local usage, receipt files and restore-history management |
 
 `/index.html`, `/dashboard`, `/settings/general` and trailing slashes are normalized
 with `replaceState`. Unknown paths show the existing 404 screen. Debug is not a route.
@@ -27,8 +28,8 @@ context does not write preferences; an explicit wallet selection retains the exi
 preference-saving behavior. Invalid and unsupported query parameters are discarded.
 
 Amounts, notes, attachment data, PINs, search text and financial filters are not put
-in URLs. Transient dialogs and unsaved form drafts remain local component state;
-they are not currently deep-link targets.
+in URLs. Transient dialogs remain local component state; optional transaction
+drafts are saved in IndexedDB. Neither is a deep-link target.
 
 ## Hosting and PWA
 

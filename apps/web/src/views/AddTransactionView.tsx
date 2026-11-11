@@ -98,6 +98,7 @@ export function AddTransactionView({
             </div>
             <div className="app-surface rounded-2xl p-3 sm:p-5">
               <TransactionForm
+                key={`new-entry-${settings.activeWalletId}`}
                 wallets={wallets}
                 categories={categories}
                 settings={settings}

@@ -364,7 +364,7 @@ export function useFinanceMutations() {
       }
     }),
     exportBackup: useMutation({
-      mutationFn: () => backupRepository.exportBackup()
+      mutationFn: () => backupRepository.exportArchive()
     }),
     importBackup: useMutation({
       mutationFn: (backup: unknown) => backupRepository.importBackup(backup),

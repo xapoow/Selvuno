@@ -1,3 +1,6 @@
+import type { FinanceBackup } from "@selvuno/types";
+import { StoragePanel } from "../components/StoragePanel";
+import { markArchivePrepared } from "../lib/storageInfo";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { HomeLayoutSettings } from "../components/HomeLayoutSettings";
 import { EXPORT_PREFIX } from "../lib/brand";
@@ -25,6 +28,7 @@ import {
   FileUp,
   GripVertical,
   History,
+  HardDrive,
   LoaderCircle,
   Menu,
   Palette,
@@ -55,6 +59,7 @@ import { appVersion, getCategoryName, languageOptions, type Dictionary, type Set
 import type { PrivacyLockController } from "../state/usePrivacyLock";
 
 interface SettingsViewProps {
+  onStorageChange?: () => void;
   activeTab?: SettingsTab;
   onTabChange?: (tab: SettingsTab) => void;
   settings: Settings;
@@ -85,6 +90,7 @@ const settingsTabs: Array<{ value: SettingsTab; icon: LucideIcon }> = [
   { value: "privacy", icon: ShieldCheck },
   { value: "categories", icon: Tags },
   { value: "backup", icon: DatabaseBackup },
+  { value: "storage", icon: HardDrive },
   { value: "sync", icon: Cloud }
 ];
 
@@ -160,6 +166,7 @@ function ReorderCategoryRow({
 }
 
 export function SettingsView({
+  onStorageChange,
   activeTab: routedTab,
   onTabChange,
   settings,
@@ -201,6 +208,9 @@ export function SettingsView({
   const [visualTheme, setVisualTheme] = useState<ThemePreference>(settings.theme);
   const [visualColorTheme, setVisualColorTheme] = useState<ColorThemePreference>(settings.colorTheme);
   const [importError, setImportError] = useState("");
+  const [backupBusy, setBackupBusy] = useState(false);
+  const [pendingRestore, setPendingRestore] = useState<{ data: FinanceBackup; input?: unknown; snapshotId?: string; full: boolean; fileCount?: number } | null>(null);
+  const backupError = (cause: unknown) => cause instanceof Error && cause.message in t.safety ? t.safety[cause.message as keyof typeof t.safety] : t.settings.importError;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const settingsTopRef = useRef<HTMLDivElement | null>(null);
   const pendingSettingsTabRef = useRef<SettingsTab | null>(null);
@@ -320,41 +330,34 @@ export function SettingsView({
   }
 
   async function handleExport() {
-    setImportError("");
+    setImportError(""); setBackupBusy(true);
     try {
       const backup = await onExportBackup();
-      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
+      if (!(backup instanceof Blob)) throw new Error("archive-invalid");
+      const url = URL.createObjectURL(backup);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `${EXPORT_PREFIX}-backup-${new Date().toISOString().slice(0, 10)}.json`;
-      anchor.hidden = true;
-      document.body.append(anchor);
-      anchor.click();
-      anchor.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 0);
-    } catch (cause) {
-      setImportError(cause instanceof Error ? cause.message : t.settings.exportError);
-    }
+      anchor.download = `${EXPORT_PREFIX}-backup-${new Date().toISOString().slice(0, 10)}.zip`;
+      anchor.hidden = true; document.body.append(anchor);
+      try { anchor.click(); markArchivePrepared(); }
+      finally { anchor.remove(); window.setTimeout(() => URL.revokeObjectURL(url), 1000); }
+    } catch (cause) { setImportError(cause instanceof Error && cause.message === "archive-too-large" ? t.safety["archive-too-large"] : t.safety.exportError); }
+    finally { setBackupBusy(false); }
   }
 
   async function handleImport(file: File | undefined) {
     setImportError("");
-    if (!file) {
-      return;
-    }
+    if (!file) return;
+    setBackupBusy(true);
     try {
-      const text = await file.text();
-      const parsed = JSON.parse(text) as unknown;
-      if (window.confirm(t.settings.replaceBackup)) {
-        await onImportBackup(parsed);
-      }
-    } catch (cause) {
-      setImportError(cause instanceof Error ? cause.message : t.settings.importError);
-    } finally {
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      const { readBackupFile } = await import("../lib/backupArchive");
+      const preview = await readBackupFile(file);
+      const full = "kind" in preview;
+      setPendingRestore({ data: preview.data, input: full ? preview : preview.data, full, fileCount: preview.attachments?.length });
+    } catch (cause) { setImportError(backupError(cause)); }
+    finally {
+      setBackupBusy(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }
 
@@ -725,22 +728,23 @@ export function SettingsView({
         <Section title={t.settings.backup}>
           <div className="grid gap-4">
             <div className="app-surface grid gap-3 rounded-2xl p-4 sm:grid-cols-2">
-              <Button variant="secondary" onClick={() => void handleExport()}>
+              <Button variant="secondary" disabled={backupBusy} onClick={() => void handleExport()}>
                 <FileDown className="h-4 w-4" />
-                {t.settings.exportJson}
+                {backupBusy ? t.safety.preparing : t.safety.archive}
               </Button>
-              <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
+              <Button variant="secondary" disabled={backupBusy} onClick={() => fileInputRef.current?.click()}>
                 <FileUp className="h-4 w-4" />
-                {t.settings.importJson}
+                {t.safety.import}
               </Button>
               <input
                 ref={fileInputRef}
                 className="hidden"
                 type="file"
-                accept="application/json"
+                accept=".zip,.json,application/zip,application/json"
                 onChange={(event) => void handleImport(event.target.files?.[0])}
               />
-              {importError ? <p className="text-sm font-medium text-expense sm:col-span-2">{importError}</p> : null}
+              <p className="text-xs leading-5 text-muted sm:col-span-2">{t.safety.limit}</p>
+              {importError ? <p role="alert" className="text-sm font-medium text-expense sm:col-span-2">{importError}</p> : null}
             </div>
 
             <div className="app-surface grid gap-3 rounded-2xl p-4">
@@ -785,15 +789,10 @@ export function SettingsView({
                           size="icon"
                           className="h-8 w-8"
                           aria-label={t.settings.restoreBackup}
+                          disabled={backupBusy}
                           onClick={() => {
-                            if (window.confirm(t.settings.restoreBackupConfirm)) {
-                              setImportError("");
-                              void onRestoreBackupSnapshot(snapshot.id).catch((cause: unknown) =>
-                                setImportError(
-                                  cause instanceof Error ? cause.message : t.settings.importError
-                                )
-                              );
-                            }
+                            setImportError("");
+                            setPendingRestore({ data: snapshot.backup, snapshotId: snapshot.id, full: Boolean(snapshot.attachmentIds), fileCount: snapshot.attachmentIds?.length });
                           }}
                         >
                           <RotateCcw className="h-4 w-4" />
@@ -804,6 +803,7 @@ export function SettingsView({
                           size="icon"
                           className="h-8 w-8 text-expense"
                           aria-label={t.settings.deleteBackup}
+                          disabled={backupBusy}
                           onClick={() => {
                             if (window.confirm(t.settings.deleteBackupConfirm)) {
                               setImportError("");
@@ -830,6 +830,30 @@ export function SettingsView({
           </div>
         </Section>
       ) : null}
+
+      {activeTab === "storage" ? <Section title={t.safety.storage}><StoragePanel t={t} locale={settings.locale} onChange={onStorageChange} /></Section> : null}
+
+      <BottomSheet open={Boolean(pendingRestore)} title={t.safety.preview} closeLabel={t.common.close} dismissible={!backupBusy} onClose={() => { setPendingRestore(null); setImportError(""); }}>
+        {pendingRestore ? <div className="grid gap-4">
+          <p className="text-sm leading-6 text-muted">{pendingRestore.full ? t.safety.overview : pendingRestore.snapshotId ? t.safety.legacySnapshot : t.safety.legacy}</p>
+          <dl className="app-control grid grid-cols-2 gap-3 rounded-xl p-3 text-sm">
+            <dt>{t.safety.created}</dt><dd>{new Intl.DateTimeFormat(settings.locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(pendingRestore.data.exportedAt))}</dd>
+            <dt>{t.safety.wallets}</dt><dd>{pendingRestore.data.wallets.length}</dd>
+            <dt>{t.safety.operations}</dt><dd>{pendingRestore.data.transactions.length}</dd>
+            <dt>{t.safety.files}</dt><dd>{pendingRestore.fileCount ?? "—"}</dd>
+          </dl>
+          {importError ? <p role="alert" className="text-sm text-expense">{importError}</p> : null}
+          <Button variant="danger" disabled={backupBusy} onClick={async () => {
+            setBackupBusy(true); setImportError("");
+            try {
+              if (pendingRestore.snapshotId) await onRestoreBackupSnapshot(pendingRestore.snapshotId);
+              else await onImportBackup(pendingRestore.input);
+              setPendingRestore(null);
+            } catch (cause) { setImportError(backupError(cause)); }
+            finally { setBackupBusy(false); }
+          }}>{backupBusy ? t.safety.restoring : t.safety.confirm}</Button>
+        </div> : null}
+      </BottomSheet>
 
       {activeTab === "sync" ? (
         <Section title={t.settings.sync}>

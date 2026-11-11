@@ -13,6 +13,7 @@ interface FeatureSettingsPanelProps {
 export function FeatureSettingsPanel({ settings, t, onUpdateSettings }: FeatureSettingsPanelProps) {
   return (
     <div className="grid gap-3">
+      <SettingsToggleCard checked={settings.draftsEnabled} icon={<WalletCards className="h-5 w-5" />} label={t.safety.drafts} hint={t.safety.draftsHint} onChange={(checked) => onUpdateSettings({ draftsEnabled: checked })} />
       <HapticsSettings settings={settings} t={t} onUpdateSettings={onUpdateSettings} />
       <SettingsToggleCard
         checked={settings.advancedWalletsEnabled}

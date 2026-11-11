@@ -3,7 +3,7 @@
 The product is now **Selvuno**. Runtime UI strings and PWA names use
 `apps/web/src/lib/brand.ts`; the static HTML startup/failure screens also use
 Selvuno. Workspace packages use the `@selvuno/*` scope. Downloads use
-`selvuno-YYYY-MM-DD.csv` and `selvuno-backup-YYYY-MM-DD.json`.
+`selvuno-YYYY-MM-DD.csv` and `selvuno-backup-YYYY-MM-DD.zip`.
 
 ## Compatibility identifiers — do not rename blindly
 
@@ -22,11 +22,12 @@ product branding:
 - `wrangler.jsonc` still targets the existing Cloudflare Pages project
   `myfinances`. Do not change it until the deployment project is deliberately moved.
 
-The GitHub repository, Git remote, local workspace folder and production domain
-have not been renamed. Those are separate administrative changes. A different
-website origin has separate browser storage; export a backup before changing the
-domain and import it on the new origin. Attachments are not embedded in the JSON
-backup and need a separate migration plan before moving to another origin.
+The GitHub repository name, Git remote, local workspace folder and production
+domain are configured separately from product branding. A different website
+origin has separate browser storage; export a full ZIP backup before changing
+the domain and import it on the new origin. ZIP archives include receipt photos
+and PDFs; legacy JSON files do not. See [data safety](data-safety.md) for scope
+and limitations.
 
 Existing JSON backups do not depend on their filename or on the product name and
 remain importable. Rebranding tests verify access to the original database and

@@ -1,15 +1,17 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { backupSchema } from "@selvuno/types";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getDictionary, type SettingsTab } from "../i18n";
 import { settingsPath, type RoutableSettingsTab } from "../lib/routes";
 import { startRouteSync, useAppStore } from "../state/appStore";
-import { testSettings } from "../test/fixtures";
+import { testCategory, testSettings, testTransaction, testWallet } from "../test/fixtures";
+import { createBackupArchive } from "../lib/backupArchive";
 import { SettingsView } from "./SettingsView";
 
 const t = getDictionary("en-US");
 
-function Fixture({ onOpenTrash, deletedCount = 0, activeTab, onTabChange }: { onOpenTrash?: () => void; deletedCount?: number; activeTab?: SettingsTab; onTabChange?: (tab: SettingsTab) => void } = {}) {
+function Fixture({ onOpenTrash, deletedCount = 0, activeTab, onTabChange, overrides }: { onOpenTrash?: () => void; deletedCount?: number; activeTab?: SettingsTab; onTabChange?: (tab: SettingsTab) => void; overrides?: Partial<Parameters<typeof SettingsView>[0]> } = {}) {
   const save = vi.fn().mockResolvedValue(undefined);
   return (
     <div style={{ transform: "translateZ(0)", overflow: "hidden", height: 100 }}>
@@ -26,6 +28,7 @@ function Fixture({ onOpenTrash, deletedCount = 0, activeTab, onTabChange }: { on
         onExportBackup={save} onImportBackup={save} onRestoreBackupSnapshot={save}
         onDeleteBackupSnapshot={save}
         onOpenTrash={onOpenTrash} deletedCount={deletedCount}
+        {...overrides}
       />
     </div>
   );
@@ -111,5 +114,67 @@ describe("mobile settings navigation", () => {
     expect(trigger).toHaveFocus();
     expect(trigger).toHaveAttribute("aria-expanded", "false");
     expect(document.body.style.overflow).not.toBe("hidden");
+  });
+});
+
+describe("backup review UX", () => {
+  const backup = backupSchema.parse({ version: 8, exportedAt: "2026-11-11T10:00:00.000Z", settings: testSettings,
+    wallets: [testWallet], categories: [testCategory], transactions: [testTransaction], budgets: [], recurringTransactions: [],
+    savingsGoals: [], savingsGoalContributions: [], walletTransfers: [], transactionTemplates: [] });
+
+  it("previews a validated archive without restoring it until explicit confirmation", async () => {
+    const blob = new Blob(["receipt"], { type: "image/jpeg" });
+    const archive = await createBackupArchive({ data: backup, attachments: [{ id: "file-1", transactionId: testTransaction.id,
+      name: "receipt.jpg", size: blob.size, mimeType: blob.type, blob, createdAt: testTransaction.createdAt }] });
+    const restore = vi.fn().mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    const { container } = render(<Fixture activeTab="backup" overrides={{ onImportBackup: restore }} />);
+    await user.upload(container.querySelector<HTMLInputElement>('input[type="file"]')!, new File([archive], "backup.zip", { type: "application/zip" }));
+    const dialog = await screen.findByRole("dialog", { name: t.safety.preview });
+    expect(within(dialog).getByText(t.safety.overview)).toBeInTheDocument();
+    expect(restore).not.toHaveBeenCalled();
+    await user.click(within(dialog).getByRole("button", { name: t.safety.confirm }));
+    await waitFor(() => expect(restore).toHaveBeenCalledOnce());
+    expect(restore.mock.calls[0][0]).toMatchObject({ kind: "full-backup", attachments: [{ name: "receipt.jpg" }] });
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+  });
+
+  it("warns about legacy JSON and preserves the preview after a failed restore for retry", async () => {
+    const restore = vi.fn().mockRejectedValueOnce(new Error("archive-incomplete")).mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    const { container } = render(<Fixture activeTab="backup" overrides={{ onImportBackup: restore }} />);
+    await user.upload(container.querySelector<HTMLInputElement>('input[type="file"]')!, new File([JSON.stringify(backup)], "old.json", { type: "application/json" }));
+    const dialog = await screen.findByRole("dialog", { name: t.safety.preview });
+    expect(within(dialog).getByText(t.safety.legacy)).toBeInTheDocument();
+    expect(restore).not.toHaveBeenCalled();
+    await user.click(within(dialog).getByRole("button", { name: t.safety.confirm }));
+    expect(await within(dialog).findByRole("alert")).toHaveTextContent(t.safety["archive-incomplete"]);
+    await user.click(within(dialog).getByRole("button", { name: t.safety.confirm }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(restore).toHaveBeenCalledTimes(2);
+    expect(restore.mock.calls[1][0]).toEqual(backup);
+  });
+
+  it("rejects invalid files without opening a restore confirmation", async () => {
+    const restore = vi.fn();
+    const user = userEvent.setup();
+    const { container } = render(<Fixture activeTab="backup" overrides={{ onImportBackup: restore }} />);
+    await user.upload(container.querySelector<HTMLInputElement>('input[type="file"]')!, new File(["broken"], "broken.json", { type: "application/json" }));
+    await screen.findByRole("alert");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(restore).not.toHaveBeenCalled();
+  });
+
+  it("also requires a preview confirmation for local restore points", async () => {
+    const restore = vi.fn().mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    render(<Fixture activeTab="backup" overrides={{ onRestoreBackupSnapshot: restore, backupSnapshots: [{
+      id: "40000000-0000-4000-8000-000000000001", reason: "automatic", createdAt: backup.exportedAt, backup, attachmentIds: []
+    }] }} />);
+    await user.click(screen.getByRole("button", { name: t.settings.restoreBackup }));
+    expect(restore).not.toHaveBeenCalled();
+    await user.click(within(screen.getByRole("dialog", { name: t.safety.preview })).getByRole("button", { name: t.safety.confirm }));
+    expect(restore).toHaveBeenCalledWith("40000000-0000-4000-8000-000000000001");
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
   });
 });

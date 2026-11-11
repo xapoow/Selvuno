@@ -15,7 +15,7 @@ export const routeViews = {
   "/wallets": "wallets", "/wallets/transfers": "wallets", "/wallets/goals": "wallets",
   "/settings": "settings", "/settings/appearance": "settings", "/settings/automation": "settings",
   "/settings/features": "settings", "/settings/privacy": "settings", "/settings/categories": "settings",
-  "/settings/backup": "settings", "/settings/sync": "settings"
+  "/settings/backup": "settings", "/settings/storage": "settings", "/settings/sync": "settings"
 } as const satisfies Record<string, AppView>;
 export type AppPath = keyof typeof routeViews;
 export const viewPaths: Record<AppView, AppPath> = {

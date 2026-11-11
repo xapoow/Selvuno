@@ -1,9 +1,10 @@
 import type { ColorThemePreference, DashboardBlockId } from "@selvuno/types";
 import type { AppView } from "./state/appStore";
 import { APP_NAME } from "./lib/brand";
+import { safetyEn, safetyRu } from "./lib/dataSafetyCopy";
 
 export type Language = "en" | "ru";
-export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "sync" | "debug";
+export type SettingsTab = "general" | "appearance" | "automation" | "features" | "privacy" | "categories" | "backup" | "storage" | "sync" | "debug";
 export type DateFormatLabel = "short" | "medium" | "long";
 
 export const appVersion = "0.9.8";
@@ -44,6 +45,7 @@ interface ErrorCopy {
 }
 
 export interface Dictionary {
+  safety: typeof safetyEn;
   appName: string;
   brand: string;
   nav: Record<AppView, string>;
@@ -693,6 +695,7 @@ export function getCategoryName(name: string | undefined, t: Dictionary): string
 
 export const dictionaries: Record<Language, Dictionary> = {
   en: {
+    safety: safetyEn,
     appName: "Budget Tracker",
     brand: APP_NAME,
     nav: {
@@ -1264,6 +1267,7 @@ export const dictionaries: Record<Language, Dictionary> = {
         privacy: "Privacy",
         categories: "Categories",
         backup: "Backup",
+        storage: "Storage",
         sync: "Sync",
         debug: "Debug"
       },
@@ -1435,6 +1439,7 @@ export const dictionaries: Record<Language, Dictionary> = {
     }
   },
   ru: {
+    safety: safetyRu,
     appName: "Бюджет",
     brand: APP_NAME,
     nav: {
@@ -2006,6 +2011,7 @@ export const dictionaries: Record<Language, Dictionary> = {
         privacy: "Приватность",
         categories: "Категории",
         backup: "Бэкап",
+        storage: "Хранилище",
         sync: "Синхронизация",
         debug: "Дебаг"
       },
